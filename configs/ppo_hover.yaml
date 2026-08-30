@@ -1,0 +1,20 @@
+env:
+  target_altitude_ft: 30.0
+  episode_seconds: 20.0
+  control_hz: 20
+  physics_hz: 240
+  hover_throttle: 0.410
+  throttle_range: 0.25
+ppo:
+  policy: MlpPolicy
+  n_steps: 1024
+  batch_size: 256
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  learning_rate: 0.0003
+  ent_coef: 0.0
+train:
+  timesteps: 300000
+  n_envs: 4
