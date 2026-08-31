@@ -1,64 +1,61 @@
-"""Egitilmis politikayi calistir ve ucus izini olc."""
+"""Egitilmis politikayi calistir ve ACME telemetry formatinda kaydet."""
 
 import argparse
 from pathlib import Path
-
 import numpy as np
+import pandas as pd
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
-
 from drone_rl.envs.f450_env import F450HoverEnv
-
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--run", type=str, default="/content/runs/hover_v1")
-    ap.add_argument("--episodes", type=int, default=5)
-    ap.add_argument("--csv", type=str, default="")
+    ap.add_argument("--run", type=str, default="/content/repo/runs/hover_v1")
+    ap.add_argument("--episodes", type=int, default=3)
+    ap.add_argument("--output", type=str, default="/content/acme_telemetry.csv")
     args = ap.parse_args()
 
     run = Path(args.run)
-
     venv = DummyVecEnv([lambda: F450HoverEnv()])
     venv = VecNormalize.load(str(run / "vecnormalize.pkl"), venv)
     venv.training = False
     venv.norm_reward = False
 
     model = PPO.load(str(run / "model"), device="cpu")
-
     raw = venv.envs[0]
-    hedef = raw.target_altitude
-    iz = []
+    all_telemetry = []
 
     for ep in range(args.episodes):
         obs = venv.reset()
-        h_kayit, tilt_kayit = [], []
-        adim = 0
+        t = 0.0
+        dt = 1.0 / 20.0  # control_hz
+        
         while True:
             action, _ = model.predict(obs, deterministic=True)
             obs, _, done, _ = venv.step(action)
-            h = raw.fdm["position/h-agl-ft"]
-            tilt = abs(raw.fdm["attitude/phi-rad"]) + abs(raw.fdm["attitude/theta-rad"])
-            h_kayit.append(h)
-            tilt_kayit.append(tilt)
-            iz.append((ep, adim, h, tilt))
-            adim += 1
+            
+            # ACME Telemetry Data Map with Headers
+            data = {
+                "timestamp": round(t, 4),
+                "episode": ep,
+                "pos_x_ft": round(float(raw.fdm["position/h-agl-ft"]), 4),
+                "pos_y_ft": 0.0,
+                "pos_z_ft": round(float(raw.fdm["position/h-agl-ft"]), 4),
+                "roll_rad": round(float(raw.fdm["attitude/phi-rad"]), 6),
+                "pitch_rad": round(float(raw.fdm["attitude/theta-rad"]), 6),
+                "yaw_rad": round(float(raw.fdm["attitude/psi-true-rad"]), 6),
+                "alt_err": round(abs(raw.fdm["position/h-agl-ft"] - raw.target_altitude), 4)
+            }
+            all_telemetry.append(data)
+            t += dt
             if done[0]:
-                break
+                break #episode length
 
-        son = h_kayit[len(h_kayit) // 2:]
-        print(
-            f"ep {ep}: adim={adim:3d}  "
-            f"son yari irtifa ort={np.mean(son):6.2f} ft (hedef {hedef})  "
-            f"sapma={np.mean(np.abs(np.array(son) - hedef)):5.2f} ft  "
-            f"ort tilt={np.mean(tilt_kayit):.3f} rad"
-        )
+    df = pd.DataFrame(all_telemetry)
+    # Save with headers
+    df.to_csv(args.output, index=False, header=True)
+    print(f"ACME Telemetry kaydedildi (Headerlar eklendi): {args.output}")
+    print(df.head())
 
-    if args.csv:
-        np.savetxt(args.csv, np.array(iz), delimiter=",",
-                   header="episode,adim,irtifa_ft,tilt_rad", comments="")
-        print("kaydedildi:", args.csv)
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

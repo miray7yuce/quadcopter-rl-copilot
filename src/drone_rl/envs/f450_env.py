@@ -79,7 +79,7 @@ class F450HoverEnv(gym.Env):
         )
 
     def step(self, action):
-        action = np.clip(np.asarray(action, dtype=np.float32), -1.0, 1.0)
+        #action = np.clip(np.asarray(action, dtype=np.float32), -1.0, 1.0)
         throttles = np.clip(HOVER_THROTTLE + action * THROTTLE_RANGE, 0.0, 1.0)
 
         for _ in range(self.substeps):
