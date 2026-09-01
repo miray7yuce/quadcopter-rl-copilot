@@ -28,32 +28,24 @@ Egitim:
 
     cd src && python -m drone_rl.train --timesteps 300000 --n-envs 4 --out ../runs/hover_v2
 
-Degerlendirme (egitim sonundaki modelle, model_final.zip + vecnormalize.pkl):
+Degerlendirme:
 
-    cd src && python -m drone_rl.evaluate --run ../runs/hover_v2 --output /content/telemetry.csv
-
-Degerlendirme (en iyi modelle, best_model.zip + vecnormalize_best.pkl):
-
-    cd src && python -m drone_rl.evaluate --run ../runs/hover_v2 --output /content/telemetry.csv --use-best
+    cd src && python -m drone_rl.evaluate --run ../runs/hover_v1 --csv /content/iz.csv
 
 ## Yapi
 
 - src/drone_rl/envs/f450_env.py - Gymnasium ortami
-- src/drone_rl/train.py - PPO egitimi (EvalCallback ile en iyi model + VecNormalize kaydi)
-- src/drone_rl/evaluate.py - egitilmis politikanin olculmesi ve CSV telemetri ciktisi
-- configs/ppo_hover.yaml - kullanilan ayarlar (NOT: su an kod tarafindan okunmuyor, sadece referans)
+- src/drone_rl/train.py - PPO egitimi
+- src/drone_rl/evaluate.py - egitilmis politikanin olculmesi
+- configs/ppo_hover.yaml - kullanilan ayarlar
 - runs/hover_v1/ - egitilmis model ve normalizasyon istatistikleri
 - notebooks/quadcopter_rl.ipynb - Colab calisma defteri
 
 ## Notlar
 
 - JSBSim emperyal birim kullanir (ft, lbs, fps).
-- Hover gazi f450_env.py icinde HOVER_THROTTLE olarak sabitlenmistir.
-  configs/ppo_hover.yaml'daki hover_throttle degeri su an sadece
-  dokumantasyon amaclidir, kod tarafindan okunmaz.
-- vecnormalize.pkl (veya vecnormalize_best.pkl) model ile birlikte
-  yuklenmelidir, aksi halde politika yanlis olcekli gozlem alir ve
-  calismaz.
+- Hover gazi 0.410 olarak olculdu. Aksiyon bu deger etrafinda +-0.25
+  araliginda olceklenir, boylece sifir aksiyon "asili kal" anlamina gelir.
+- vecnormalize.pkl model ile birlikte yuklenmelidir, aksi halde politika
+  yanlis olcekli gozlem alir ve calismaz.
 - F450 XML'i yuklenirken "version 3.0" uyarisi verir; zararsizdir.
-- evaluate.py su an gercek bir ACMI (.acmi / Tacview) dosyasi degil,
-  duz bir CSV telemetri dosyasi uretir.
