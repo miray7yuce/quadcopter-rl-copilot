@@ -7,6 +7,9 @@ algoritma icin de ayni; sadece model olusturma satiri degisir.
 
 import argparse
 from pathlib import Path
+import numpy as np
+from drone_rl.acmi_writer import ACMIWriter
+from drone_rl.utils.units import ft_to_m 
 
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, EvalCallback
@@ -32,6 +35,64 @@ class SaveVecNormalizeCallback(BaseCallback):
             self.save_path.mkdir(parents=True, exist_ok=True)
             vec_normalize.save(str(self.save_path / "vecnormalize_best.pkl"))
         return True
+
+class ACMISnapshotCallback(BaseCallback):
+    """EvalCallback ile ayni periyotta (eval_freq), o anki politikayla
+    TEK bir episode calistirip ayri bir .acmi dosyasi olarak kaydeder.
+    Boylece egitim ilerledikce ucus davranisinin nasil degistigi
+    Tacview'de snapshot'lar halinde karsilastirilabilir.
+
+    Her snapshot AYRI dosyaya yazilir (snapshot_<timestep>.acmi):
+    tek dosyada birlestirseydik, eval ortami her cagrida resetlendigi
+    icin obje snapshot sinirlarinda aniden 'isinlanir' - bu goruntuyu
+    yanlis yorumlamaya yol acar.
+    """
+
+    def __init__(self, eval_env, out_dir: Path, eval_freq: int, control_dt: float):
+        super().__init__()
+        self.eval_env = eval_env
+        self.out_dir = Path(out_dir)
+        self.out_dir.mkdir(parents=True, exist_ok=True)
+        self.eval_freq = eval_freq
+        self.control_dt = control_dt
+
+    def _on_step(self) -> bool:
+        if self.eval_freq > 0 and self.n_calls % self.eval_freq == 0:
+            self._record_snapshot()
+        return True
+
+    def _record_snapshot(self):
+        acmi = ACMIWriter(name="F450", obj_type="Air+Rotorcraft+UAV", color="Blue")
+        obs = self.eval_env.reset()
+        t = 0.0
+
+        while True:
+            action, _ = self.model.predict(obs, deterministic=True)
+            obs, _, done, infos = self.eval_env.step(action)
+            # infos[0]: f450_env.step()'in VecEnv auto-reset'inden ONCE
+            # topladigi ham telemetri (evaluate.py ile ayni mantik).
+            telem = infos[0]
+
+            acmi.add_frame(
+                t=t,
+                lon_deg=telem["lon_deg"],
+                lat_deg=telem["lat_deg"],
+                alt_m=ft_to_m(telem["alt_sl_ft"]),
+                roll_deg=np.degrees(telem["roll_rad"]),
+                pitch_deg=np.degrees(telem["pitch_rad"]),
+                yaw_deg=np.degrees(telem["yaw_rad"]),
+            )
+            t += self.control_dt
+
+            if done[0]:
+                break
+
+        path = self.out_dir / f"snapshot_{self.num_timesteps}.acmi"
+        acmi.save(path)
+        print(f"  [ACMI] snapshot kaydedildi: {path}", flush=True)
+
+
+
 
 
 def build_model(algo: str, cfg, venv, tensorboard_log: str):
@@ -123,8 +184,18 @@ def main():
         render=False,
     )
 
-    model.learn(total_timesteps=timesteps, callback=[ckpt_cb, eval_cb])
 
+    # 3. ACMI Snapshot Callback: eval_cb ile AYNI periyotta calisir
+    raw_eval_env = eval_env.venv.envs[0].unwrapped  # VecNormalize(DummyVecEnv(Monitor(F450HoverEnv)))
+    acmi_snapshot_cb = ACMISnapshotCallback(
+        eval_env=eval_env,
+        out_dir=out / "acmi_snapshots",
+        eval_freq=max(args.eval_freq // n_envs, 1),  # eval_cb ile ayni hesap
+        control_dt=raw_eval_env.control_dt,
+    )
+
+    model.learn(total_timesteps=timesteps, callback=[ckpt_cb, eval_cb, acmi_snapshot_cb])
+    
     model.save(out / "model_final")
     venv.save(str(out / "vecnormalize.pkl"))
     print(f"Egitim tamamlandi ve kaydedildi ({args.algo}):", out)

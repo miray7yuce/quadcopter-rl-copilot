@@ -9,12 +9,12 @@ ppo:
   policy: MlpPolicy
   n_steps: 1024
   batch_size: 256
-  n_epochs: 10
-  gamma: 0.99
-  gae_lambda: 0.95
-  clip_range: 0.2
-  learning_rate: 0.0003
-  ent_coef: 0.0
+  n_epochs: 8
+  gamma: 0.98
+  gae_lambda: 0.821733218323567
+  clip_range: 0.30028032106674823
+  learning_rate: 0.0009682086811397772
+  ent_coef: 0.008527398284507002
 sac:
   policy: MlpPolicy
   learning_rate: 0.0003
