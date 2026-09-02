@@ -8,7 +8,7 @@ davranis degismez.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional, Union
+from typing import Optional, Union, List
 import yaml
 
 
@@ -41,6 +41,12 @@ class PPOConfig:
     clip_range: float = 0.2
     learning_rate: float = 3e-4
     ent_coef: float = 0.0
+    # YENI: custom actor-critic mimarisi (opsiyonel).
+    # None birakilirsa SB3'un kendi varsayilani kullanilir (pi=[64,64], vf=[64,64], Tanh)
+    # -- yani eski config'ler / eski calistirmalar HICBIR SEKILDE etkilenmez.
+    net_arch_pi: Optional[List[int]] = None   # actor (policy) agi katman boyutlari
+    net_arch_vf: Optional[List[int]] = None   # critic (value) agi katman boyutlari
+    activation_fn: Optional[str] = None       # "tanh" veya "relu" (None -> SB3 varsayilani: Tanh)
 
 
 @dataclass
@@ -59,6 +65,10 @@ class SACConfig:
     train_freq: int = 1
     gradient_steps: int = 1
     ent_coef: Union[str, float] = "auto"
+    # YENI: SAC icin de ayni mantik, opsiyonel ve varsayilani None
+    net_arch_pi: Optional[List[int]] = None
+    net_arch_vf: Optional[List[int]] = None
+    activation_fn: Optional[str] = None
 
 
 @dataclass

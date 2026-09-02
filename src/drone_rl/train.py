@@ -95,20 +95,67 @@ class ACMISnapshotCallback(BaseCallback):
 
 
 
+import torch.nn as nn
+
+ACTIVATION_MAP = {
+    "tanh": nn.Tanh,
+    "relu": nn.ReLU,
+}
+
+
+def build_policy_kwargs(cfg_algo):
+    """cfg.ppo veya cfg.sac icindeki net_arch_pi/net_arch_vf/activation_fn
+    alanlarindan policy_kwargs sozlugu uretir. Hicbiri set edilmemisse
+    None doner -> SB3'e policy_kwargs hic verilmez, tam varsayilan davranis
+    korunur (eski config'ler / eski calistirmalar etkilenmez)."""
+    has_custom = (
+        cfg_algo.net_arch_pi is not None
+        or cfg_algo.net_arch_vf is not None
+        or cfg_algo.activation_fn is not None
+    )
+    if not has_custom:
+        return None
+
+    kwargs = {}
+
+    # net_arch: ikisinden biri verilmisse, digeri icin SB3 varsayilani (64,64) kullan
+    pi_arch = cfg_algo.net_arch_pi if cfg_algo.net_arch_pi is not None else [64, 64]
+    vf_arch = cfg_algo.net_arch_vf if cfg_algo.net_arch_vf is not None else [64, 64]
+    kwargs["net_arch"] = dict(pi=pi_arch, vf=vf_arch)
+
+    if cfg_algo.activation_fn is not None:
+        act_key = cfg_algo.activation_fn.lower()
+        if act_key not in ACTIVATION_MAP:
+            raise ValueError(
+                f"Bilinmeyen activation_fn: {cfg_algo.activation_fn!r} "
+                f"(secenekler: {list(ACTIVATION_MAP.keys())})"
+            )
+        kwargs["activation_fn"] = ACTIVATION_MAP[act_key]
+
+    return kwargs
+
+
 def build_model(algo: str, cfg, venv, tensorboard_log: str):
     """Secilen algoritmaya gore PPO veya SAC modeli olusturur.
     Ortam (venv) ve kayit/callback mantigi her iki durumda da aynidir;
-    sadece burasi algoritmaya ozel hiperparametreleri kullanir."""
+    sadece burasi algoritmaya ozel hiperparametreleri kullanir.
+
+    policy_kwargs (custom actor-critic mimarisi) sadece config'te
+    net_arch_pi/net_arch_vf/activation_fn alanlari doldurulmussa
+    aktif olur; aksi halde SB3'un kendi varsayilan mimarisi kullanilir."""
     if algo == "ppo":
+        policy_kwargs = build_policy_kwargs(cfg.ppo)
         return PPO(
             cfg.ppo.policy, venv,
             n_steps=cfg.ppo.n_steps, batch_size=cfg.ppo.batch_size, n_epochs=cfg.ppo.n_epochs,
             gamma=cfg.ppo.gamma, gae_lambda=cfg.ppo.gae_lambda, clip_range=cfg.ppo.clip_range,
             learning_rate=cfg.ppo.learning_rate, ent_coef=cfg.ppo.ent_coef,
+            policy_kwargs=policy_kwargs,
             verbose=1, device="cpu",
             tensorboard_log=tensorboard_log,
         )
     elif algo == "sac":
+        policy_kwargs = build_policy_kwargs(cfg.sac)
         return SAC(
             cfg.sac.policy, venv,
             learning_rate=cfg.sac.learning_rate,
@@ -120,6 +167,7 @@ def build_model(algo: str, cfg, venv, tensorboard_log: str):
             train_freq=cfg.sac.train_freq,
             gradient_steps=cfg.sac.gradient_steps,
             ent_coef=cfg.sac.ent_coef,
+            policy_kwargs=policy_kwargs,
             verbose=1, device="cpu",
             tensorboard_log=tensorboard_log,
         )

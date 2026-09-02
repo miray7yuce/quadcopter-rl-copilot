@@ -1,0 +1,34 @@
+env:
+  target_altitude_ft: 30.0
+  episode_seconds: 60.0
+  control_hz: 20
+  physics_hz: 240
+  hover_throttle: 0.420
+  throttle_range: 0.25
+ppo:
+  policy: MlpPolicy
+  n_steps: 1024
+  batch_size: 256
+  n_epochs: 8
+  gamma: 0.98
+  gae_lambda: 0.821733218323567
+  clip_range: 0.30028032106674823
+  learning_rate: 0.0009682086811397772
+  ent_coef: 0.008527398284507002
+  net_arch_pi: [128, 128]
+  net_arch_vf: [128, 128]
+  activation_fn: tanh
+sac:
+  policy: MlpPolicy
+  learning_rate: 0.0003
+  buffer_size: 1000000
+  learning_starts: 100
+  batch_size: 256
+  tau: 0.005
+  gamma: 0.99
+  train_freq: 1
+  gradient_steps: 1
+  ent_coef: auto
+train:
+  timesteps: 600000
+  n_envs: 4
