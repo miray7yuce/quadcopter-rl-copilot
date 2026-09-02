@@ -1,6 +1,6 @@
 env:
   target_altitude_ft: 30.0
-  episode_seconds: 20.0
+  episode_seconds: 60.0
   control_hz: 20
   physics_hz: 240
   hover_throttle: 0.420

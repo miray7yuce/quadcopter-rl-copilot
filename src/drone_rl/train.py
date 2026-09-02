@@ -9,7 +9,7 @@ import argparse
 from pathlib import Path
 import numpy as np
 from drone_rl.acmi_writer import ACMIWriter
-from drone_rl.utils.units import ft_to_m 
+from drone_rl.utils.units import ft_to_m
 
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, EvalCallback
@@ -195,7 +195,7 @@ def main():
     )
 
     model.learn(total_timesteps=timesteps, callback=[ckpt_cb, eval_cb, acmi_snapshot_cb])
-    
+
     model.save(out / "model_final")
     venv.save(str(out / "vecnormalize.pkl"))
     print(f"Egitim tamamlandi ve kaydedildi ({args.algo}):", out)

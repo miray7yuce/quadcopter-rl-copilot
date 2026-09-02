@@ -150,6 +150,8 @@ class F450HoverEnv(gym.Env):
             "alt_err_ft": abs(alt_agl_ft - self.target_altitude),
             "lat_deg": float(f["position/lat-geod-deg"]),
             "lon_deg": float(f["position/long-gc-deg"]),
+            "x_m": float(f["position/distance-from-start-lon-mt"]),  # YENI: yerel doğu-batı (m)
+            "y_m": float(f["position/distance-from-start-lat-mt"]),  # YENI: yerel kuzey-güney (m)
             "roll_rad": float(f["attitude/phi-rad"]),
             "pitch_rad": float(f["attitude/theta-rad"]),
             "yaw_rad": float(f["attitude/psi-rad"]),
