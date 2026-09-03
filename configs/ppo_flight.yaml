@@ -1,0 +1,30 @@
+flight_env:
+  target_altitude_min_ft: 20.0
+  target_altitude_max_ft: 45.0
+  target_speed_fps: 6.0
+  episode_seconds: 60.0
+  control_hz: 20
+  physics_hz: 240
+  hover_throttle: 0.420
+  throttle_range: 0.25
+  reward_alt_weight: 0.10
+  reward_heading_weight: 0.08
+  reward_tilt_weight: 0.05
+  reward_spin_weight: 0.10
+  reward_jerk_weight: 0.05
+ppo:
+  policy: MlpPolicy
+  n_steps: 1024
+  batch_size: 256
+  n_epochs: 8
+  gamma: 0.98
+  gae_lambda: 0.821733218323567
+  clip_range: 0.30028032106674823
+  learning_rate: 0.0009682086811397772
+  ent_coef: 0.008527398284507002
+  net_arch_pi: [128, 128]
+  net_arch_vf: [128, 128]
+  activation_fn: tanh
+train:
+  timesteps: 600000
+  n_envs: 4

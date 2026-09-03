@@ -1,41 +1,28 @@
-"""Egitilmis politikayi calistirip 3D animasyon icin telemetri toplar.
+"""Egitilmis PPO politikasini calistirip 3D animasyon icin telemetri toplar."""
 
-evaluate.py'den farki: dosyaya yazmaz, dogrudan numpy array olarak
-notebook/animasyon kodunun kullanabilecegi bir sozluk dondurur.
-"""
-
+import json
 import numpy as np
-from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.vec_env import VecNormalize
 
 from drone_rl.config import load_config
-from drone_rl.env_factory import make_eval_vec_env
+from drone_rl.env_factory import make_eval_vec_env, make_flight_eval_vec_env
 from drone_rl.evaluate import resolve_model_paths, ALGO_CLASSES
 
-import json
 
 def export_telemetry_json(telem, path):
-    """run_inference_episode()'in dondurdugu telemetriyi HTML/Three.js
-    gorsellestiricisinin okuyabilecegi bir JSON dosyasina yazar.
-    Mevcut fonksiyonlara dokunmaz, sadece disariya aktarim icin eklenmistir."""
     serializable = {}
     for k, v in telem.items():
         if hasattr(v, "tolist"):
             serializable[k] = v.tolist()
         else:
-            serializable[k] = v  # control_dt, target_altitude_ft gibi skalerler
-
+            serializable[k] = v
     with open(path, "w", encoding="utf-8") as f:
         json.dump(serializable, f)
     print(f"Telemetri JSON kaydedildi: {path}")
 
 
-def run_inference_episode(algo, run, config=None, use_best=False, deterministic=True):
-    """Tek bir episode calistirir, telemetriyi array olarak dondurur.
-
-    Donen sozluk anahtarlari: t, x_m, y_m, alt_ft, roll_rad, pitch_rad,
-    yaw_rad, alt_err_ft, crashed, control_dt, target_altitude_ft
-    """
+def run_inference_episode(algo, run, config=None, task="hover", use_best=False, deterministic=True):
+    """task='hover' (varsayilan, eski davranis) veya task='flight'."""
     cfg = load_config(config)
     from pathlib import Path
     run = Path(run)
@@ -44,7 +31,11 @@ def run_inference_episode(algo, run, config=None, use_best=False, deterministic=
     if not vecnorm_path.exists():
         raise FileNotFoundError(f"VecNormalize dosyasi bulunamadi: {vecnorm_path}")
 
-    venv = make_eval_vec_env(cfg.env)
+    if task == "hover":
+        venv = make_eval_vec_env(cfg.env)
+    else:
+        venv = make_flight_eval_vec_env(cfg.flight_env)
+
     venv = VecNormalize.load(str(vecnorm_path), venv)
     venv.training = False
     venv.norm_reward = False
@@ -60,8 +51,8 @@ def run_inference_episode(algo, run, config=None, use_best=False, deterministic=
     while True:
         action, _ = model.predict(obs, deterministic=deterministic)
         obs, _, done, infos = venv.step(action)
-        telem = infos[0]  # reset'ten ONCE toplanan ham telemetri (f450_env.py'deki not gecerli)
-        records.append({
+        telem = infos[0]
+        rec = {
             "t": t,
             "x_m": telem["x_m"],
             "y_m": telem["y_m"],
@@ -71,7 +62,12 @@ def run_inference_episode(algo, run, config=None, use_best=False, deterministic=
             "yaw_rad": telem["yaw_rad"],
             "alt_err_ft": telem["alt_err_ft"],
             "crashed": telem["crashed"],
-        })
+        }
+        if "target_heading_rad" in telem:
+            rec["target_heading_rad"] = telem["target_heading_rad"]
+            rec["along_track_fps"] = telem["along_track_fps"]
+            rec["cross_track_fps"] = telem["cross_track_fps"]
+        records.append(rec)
         t += control_dt
         if done[0]:
             break
@@ -80,3 +76,4 @@ def run_inference_episode(algo, run, config=None, use_best=False, deterministic=
     out["control_dt"] = control_dt
     out["target_altitude_ft"] = raw.target_altitude
     return out
+
