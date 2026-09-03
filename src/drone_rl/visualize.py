@@ -12,6 +12,23 @@ from drone_rl.config import load_config
 from drone_rl.env_factory import make_eval_vec_env
 from drone_rl.evaluate import resolve_model_paths, ALGO_CLASSES
 
+import json
+
+def export_telemetry_json(telem, path):
+    """run_inference_episode()'in dondurdugu telemetriyi HTML/Three.js
+    gorsellestiricisinin okuyabilecegi bir JSON dosyasina yazar.
+    Mevcut fonksiyonlara dokunmaz, sadece disariya aktarim icin eklenmistir."""
+    serializable = {}
+    for k, v in telem.items():
+        if hasattr(v, "tolist"):
+            serializable[k] = v.tolist()
+        else:
+            serializable[k] = v  # control_dt, target_altitude_ft gibi skalerler
+
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(serializable, f)
+    print(f"Telemetri JSON kaydedildi: {path}")
+
 
 def run_inference_episode(algo, run, config=None, use_best=False, deterministic=True):
     """Tek bir episode calistirir, telemetriyi array olarak dondurur.
