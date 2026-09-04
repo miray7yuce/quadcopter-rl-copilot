@@ -75,6 +75,12 @@ def main():
             obs, _, done, infos = venv.step(action)
             telem = infos[0]
 
+            # Aksiyon (-1..+1) yerine gercek motor gucunu (0..1) kaydediyoruz -
+            # env'in kendi throttle donusum formulu ile ayni.
+            motor_throttle = np.clip(
+                raw.hover_throttle + action[0] * raw.throttle_range, 0.0, 1.0
+            )
+
             data = {
                 "timestamp": round(t, 4),
                 "episode": ep,
@@ -84,11 +90,17 @@ def main():
                 "yaw_rad": round(telem["yaw_rad"], 6),
                 "alt_err_ft": round(telem["alt_err_ft"], 4),
                 "crashed": telem["crashed"],
+                "motor_1": round(float(motor_throttle[0]), 4),
+                "motor_2": round(float(motor_throttle[1]), 4),
+                "motor_3": round(float(motor_throttle[2]), 4),
+                "motor_4": round(float(motor_throttle[3]), 4),
             }
             if "target_heading_rad" in telem:
                 data["target_heading_rad"] = round(telem["target_heading_rad"], 4)
                 data["along_track_fps"] = round(telem["along_track_fps"], 4)
                 data["cross_track_fps"] = round(telem["cross_track_fps"], 4)
+            if "reached_target" in telem:
+                data["reached_target"] = telem["reached_target"]
             all_telemetry.append(data)
 
             if acmi is not None:

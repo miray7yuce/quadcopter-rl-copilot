@@ -4,6 +4,17 @@ f450_env.py'deki F450HoverEnv'e HIC dokunulmadan, ayri bir env olarak
 eklenmistir. Heading burada 'hareket yonu' (course over ground) anlamina
 gelir, burun yonu (yaw) degil - yani drone burnu farkli yone bakarken bile
 komut edilen yonde ilerleyebilir.
+
+DUZELTME (v2):
+- Drone artik hedef irtifanin ALTINDAN spawn oluyor (once bir tirmanma
+  gerceklesiyor), hedefin hemen yaninda degil.
+- Hedef irtifaya ulasip orada bir sure kalinca episode BASARIYLA
+  sonlaniyor (terminated=True + success_bonus), sadece sure dolunca
+  degil.
+- Heading/hiz odulu, irtifa ilerlemesiyle orantili agirliklandiriliyor:
+  drone hala tirmanirken yon odulu zayif, hedefe yaklastikca guclenir.
+  Boylece 'once yuksel, sonra yavasca hedef yone don' seklinde bir
+  yay/spiral davranisi ortaya cikmasi tesvik edilir.
 """
 
 import numpy as np
@@ -13,9 +24,10 @@ import jsbsim
 
 
 class F450FlightEnv(gym.Env):
-    """JSBSim F450 modeli uzerinde: hedef irtifayi koru + hedef yonde
-    (dunya cercevesinde, pusula konvansiyonu: 0=Kuzey, 90=Dogu) sabit bir
-    seyir hizinda ilerle gorevi.
+    """JSBSim F450 modeli uzerinde: hedef irtifaya TIRMAN, tirmanirken
+    yavasca hedef yone (dunya cercevesinde, pusula konvansiyonu:
+    0=Kuzey, 90=Dogu) don, hedef irtifaya ulasinca episode'u basariyla
+    bitir (reset) gorevi.
 
     Her episode'da target_altitude VE target_heading RASTGELE secilir
     (F450HoverEnv'de target_altitude sabitti). Model bu ikisini gozlem
@@ -44,6 +56,12 @@ class F450FlightEnv(gym.Env):
         crash_min_alt_ft=1.0,
         crash_max_alt_offset_ft=60.0,
         crash_max_tilt_rad=1.0,
+        # --- YENI parametreler ---
+        altitude_start_offset_ft=25.0,
+        altitude_start_jitter_ft=2.0,
+        success_alt_tol_ft=1.5,
+        success_hold_seconds=1.0,
+        success_bonus=20.0,
     ):
         super().__init__()
 
@@ -85,6 +103,16 @@ class F450FlightEnv(gym.Env):
         self.crash_max_alt_offset_ft = crash_max_alt_offset_ft
         self.crash_max_tilt_rad = crash_max_tilt_rad
 
+        # --- YENI: baslangic offseti ve basari (success) ayarlari ---
+        self.altitude_start_offset_ft = altitude_start_offset_ft
+        self.altitude_start_jitter_ft = altitude_start_jitter_ft
+        self.success_alt_tol_ft = success_alt_tol_ft
+        self.success_hold_steps = max(1, int(success_hold_seconds * control_hz))
+        self.success_bonus = success_bonus
+        self._success_counter = 0
+        # Ilerleme (progress) hesaplamak icin: episode basindaki irtifa farki
+        self._initial_alt_err_ft = 1.0  # reset()'te gercek degerle guncellenir
+
         # Her episode'da rastgele secilecek hedefler - reset()'te doldurulur
         self.target_altitude = (target_altitude_min_ft + target_altitude_max_ft) / 2.0
         self.target_heading = 0.0
@@ -103,8 +131,16 @@ class F450FlightEnv(gym.Env):
         return self.substeps * self.physics_dt
 
     def _apply_initial_conditions(self):
-        h0 = self.target_altitude + self.np_random.uniform(-3.0, 3.0)
+        # DUZELTME: drone artik hedef irtifanin ALTINDAN basliyor, hemen
+        # yaninda degil - boylece gercek bir tirmanma gerceklesir.
+        jitter = self.np_random.uniform(
+            -self.altitude_start_jitter_ft, self.altitude_start_jitter_ft
+        )
+        h0 = self.target_altitude - self.altitude_start_offset_ft + jitter
+        # Yerden/crash siniri altina dusmesin diye guvenlik payi birak.
+        h0 = max(h0, self.crash_min_alt_ft + 3.0)
         self.fdm["ic/h-agl-ft"] = h0
+
         self.fdm["ic/u-fps"] = self.np_random.uniform(-1.0, 1.0)
         self.fdm["ic/v-fps"] = self.np_random.uniform(-1.0, 1.0)
         self.fdm["ic/w-fps"] = self.np_random.uniform(-1.0, 1.0)
@@ -112,16 +148,19 @@ class F450FlightEnv(gym.Env):
         self.fdm["ic/theta-rad"] = self.np_random.uniform(-0.05, 0.05)
         self.fdm["ic/psi-true-rad"] = 0.0
 
+        return abs(h0 - self.target_altitude)
+
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
-        # YENI: her episode'da hedef irtifa VE hedef yon rastgele secilir
+        # her episode'da hedef irtifa VE hedef yon rastgele secilir
         self.target_altitude = self.np_random.uniform(
             self.target_altitude_min_ft, self.target_altitude_max_ft
         )
         self.target_heading = self.np_random.uniform(0.0, 2.0 * np.pi)
 
-        self._apply_initial_conditions()
+        initial_alt_err = self._apply_initial_conditions()
+        self._initial_alt_err_ft = max(initial_alt_err, 1e-3)
         self.fdm.run_ic()
 
         for i in range(4):
@@ -133,6 +172,7 @@ class F450FlightEnv(gym.Env):
 
         self.step_count = 0
         self.prev_action = np.zeros(4, dtype=np.float32)
+        self._success_counter = 0
 
         return self._get_obs(), {}
 
@@ -158,6 +198,14 @@ class F450FlightEnv(gym.Env):
         cross = -north_vel * np.sin(h) + east_vel * np.cos(h)
         return along, cross
 
+    def _climb_progress(self, alt_err_ft):
+        """0 (hala baslangic irtifasinda) -> 1 (hedef irtifaya ulasti)
+        arasinda bir ilerleme skoru. Heading odulunu bununla carparak
+        drone once yukselirken yon odulunu zayif tutuyoruz, hedefe
+        yaklastikca guclendiriyoruz -> 'yay/spiral' davranisi."""
+        progress = 1.0 - (alt_err_ft / self._initial_alt_err_ft)
+        return float(np.clip(progress, 0.0, 1.0))
+
     def _get_obs(self):
         f = self.fdm
         alt_err = (f["position/h-agl-ft"] - self.target_altitude) / 10.0
@@ -182,7 +230,7 @@ class F450FlightEnv(gym.Env):
             dtype=np.float32,
         )
 
-    def _get_telemetry(self, crashed):
+    def _get_telemetry(self, crashed, reached):
         f = self.fdm
         alt_agl_ft = float(f["position/h-agl-ft"])
         along, cross = self._along_cross_track()
@@ -202,6 +250,7 @@ class F450FlightEnv(gym.Env):
             "cross_track_fps": float(cross),
             "target_speed_fps": float(self.target_speed_fps),
             "crashed": bool(crashed),
+            "reached_target": bool(reached),
         }
 
     def _is_crashed(self):
@@ -230,7 +279,14 @@ class F450FlightEnv(gym.Env):
 
         alt_err_ft = abs(self.fdm["position/h-agl-ft"] - self.target_altitude)
         along, cross = self._along_cross_track()
+
+        # DUZELTME: heading/hiz odulu, tirmanma ilerlemesiyle carpiliyor.
+        # Drone hala baslangic irtifasindaysa (progress~0) yon odulu
+        # zayif; hedefe yaklastikca (progress->1) guclenir. Boylece
+        # ajan once dikey harekete, sonra yatay harekete agirlik verir.
+        progress = self._climb_progress(alt_err_ft)
         heading_err = abs(self.target_speed_fps - along) + abs(cross)
+
         tilt = abs(self.fdm["attitude/phi-rad"]) + abs(self.fdm["attitude/theta-rad"])
         spin = abs(self.fdm["velocities/p-rad_sec"]) + abs(self.fdm["velocities/q-rad_sec"])
         jerk = float(np.sum(np.abs(action - self.prev_action)))
@@ -238,7 +294,7 @@ class F450FlightEnv(gym.Env):
         reward = (
             1.0
             - self.reward_alt_weight * alt_err_ft
-            - self.reward_heading_weight * heading_err
+            - self.reward_heading_weight * progress * heading_err
             - self.reward_tilt_weight * tilt
             - self.reward_spin_weight * spin
             - self.reward_jerk_weight * jerk
@@ -248,13 +304,23 @@ class F450FlightEnv(gym.Env):
         if crashed:
             reward -= self.crash_penalty
 
-        info = self._get_telemetry(crashed)
+        # DUZELTME: hedef irtifaya ulasip bir sure orada kalinca
+        # (success_hold_steps) episode BASARIYLA sonlanir.
+        if alt_err_ft < self.success_alt_tol_ft:
+            self._success_counter += 1
+        else:
+            self._success_counter = 0
+
+        reached = self._success_counter >= self.success_hold_steps
+        if reached:
+            reward += self.success_bonus
+
+        info = self._get_telemetry(crashed, reached)
 
         self.prev_action = action.copy()
 
-        terminated = bool(crashed)
+        terminated = bool(crashed or reached)
         truncated = bool(self.step_count >= self.max_steps)
 
         return obs, float(reward), terminated, truncated, info
-
 

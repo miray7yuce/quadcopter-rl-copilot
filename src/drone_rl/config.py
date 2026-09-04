@@ -28,7 +28,13 @@ class EnvConfig:
 class FlightEnvConfig:
     """F450FlightEnv icin ayarlar (hedef irtifa + hedef yon, ikisi de
     her episode'da rastgele). EnvConfig'ten BAGIMSIZ, ayri bir dataclass -
-    hover config'ini hic etkilemez."""
+    hover config'ini hic etkilemez.
+
+    DUZELTME: drone artik hedef irtifanin altitude_start_offset_ft kadar
+    ALTINDAN spawn oluyor (gercek bir tirmanma yasaniyor) ve hedef irtifaya
+    ulasip success_hold_seconds kadar orada kalinca episode basariyla
+    (success_bonus ile) sonlaniyor - artik sadece sure dolunca degil.
+    """
     target_altitude_min_ft: float = 20.0
     target_altitude_max_ft: float = 45.0
     target_speed_fps: float = 6.0
@@ -46,6 +52,12 @@ class FlightEnvConfig:
     crash_min_alt_ft: float = 1.0
     crash_max_alt_offset_ft: float = 60.0
     crash_max_tilt_rad: float = 1.0
+    # --- YENI: tirmanma baslangici + basari (success) ayarlari ---
+    altitude_start_offset_ft: float = 25.0
+    altitude_start_jitter_ft: float = 2.0
+    success_alt_tol_ft: float = 1.5
+    success_hold_seconds: float = 1.0
+    success_bonus: float = 20.0
 
 
 @dataclass
@@ -91,7 +103,5 @@ def load_config(path: Optional[str]) -> Config:
         ppo=PPOConfig(**raw.get("ppo", {})),
         train=TrainConfig(**raw.get("train", {})),
     )
-
-
 
 

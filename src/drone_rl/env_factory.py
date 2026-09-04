@@ -52,7 +52,7 @@ def make_eval_vec_env(env_config: EnvConfig):
 
 
 # ---------------------------------------------------------------------
-# Flight gorevi (YENI: hedef irtifa + hedef yon)
+# Flight gorevi (hedef irtifa + hedef yon; artik tirmanma + success reset)
 # ---------------------------------------------------------------------
 
 def make_flight_env(flight_config: FlightEnvConfig) -> F450FlightEnv:
@@ -74,6 +74,12 @@ def make_flight_env(flight_config: FlightEnvConfig) -> F450FlightEnv:
         crash_min_alt_ft=flight_config.crash_min_alt_ft,
         crash_max_alt_offset_ft=flight_config.crash_max_alt_offset_ft,
         crash_max_tilt_rad=flight_config.crash_max_tilt_rad,
+        # --- YENI ---
+        altitude_start_offset_ft=flight_config.altitude_start_offset_ft,
+        altitude_start_jitter_ft=flight_config.altitude_start_jitter_ft,
+        success_alt_tol_ft=flight_config.success_alt_tol_ft,
+        success_hold_seconds=flight_config.success_hold_seconds,
+        success_bonus=flight_config.success_bonus,
     )
 
 
