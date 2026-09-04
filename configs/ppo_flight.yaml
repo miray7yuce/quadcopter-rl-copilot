@@ -12,6 +12,12 @@ flight_env:
   reward_tilt_weight: 0.05
   reward_spin_weight: 0.10
   reward_jerk_weight: 0.05
+  # --- YENI: tirmanma baslangici + hedefe ulasinca reset (success) ---
+  altitude_start_offset_ft: 25.0
+  altitude_start_jitter_ft: 2.0
+  success_alt_tol_ft: 1.5
+  success_hold_seconds: 1.0
+  success_bonus: 20.0
 ppo:
   policy: MlpPolicy
   n_steps: 1024
