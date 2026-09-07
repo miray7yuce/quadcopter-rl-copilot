@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>F450 Flight — Real-Time Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root{
+    --bg-0:#0b0f14; --bg-1:#111820; --bg-2:#161f29; --line:#26323e;
+    --ink-0:#e8eef3; --ink-1:#9fb0bd; --ink-2:#5f7180;
+    --accent:#4fd1c5; --accent-dim:#2a6b66; --warn:#e0a05a; --danger:#e0596a;
+    --auto:#4fd1c5; --manual:#e0a05a;
+    --mono: "JetBrains Mono","SF Mono",Consolas,monospace;
+    --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; height:100%; background:var(--bg-0); color:var(--ink-0); font-family:var(--sans); }
+  #app{ display:flex; flex-direction:column; height:100vh; }
+
+  header{
+    display:flex; align-items:center; gap:18px; padding:12px 18px;
+    background:var(--bg-1); border-bottom:1px solid var(--line); flex-wrap:wrap;
+  }
+  header h1{ font-size:15px; font-weight:600; margin:0; white-space:nowrap; }
+  header h1 span{ color:var(--accent); }
+
+  .picker{ display:flex; align-items:center; gap:8px; }
+  .picker label{
+    font-size:12px; color:var(--ink-1); cursor:pointer;
+    border:1px solid var(--line); background:var(--bg-2);
+    padding:7px 12px; border-radius:6px; transition:border-color .15s;
+  }
+  .picker label:hover{ border-color:var(--accent-dim); }
+  .picker input[type=file]{ display:none; }
+  .picker .status{ font-size:11px; font-family:var(--mono); color:var(--ink-2); min-width:110px; }
+  .picker .status.ok{ color:var(--accent); }
+
+  .conn-status{
+    margin-left:auto; display:flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:12px;
+  }
+  .conn-dot{ width:8px; height:8px; border-radius:50%; background:var(--ink-2); }
+  .conn-dot.connected{ background:var(--accent); }
+  .conn-dot.disconnected{ background:var(--danger); }
+
+  .mode-badge{
+    font-family:var(--mono); font-size:11px; font-weight:700;
+    padding:4px 10px; border-radius:12px; letter-spacing:.4px;
+  }
+  .mode-badge.auto{ background:rgba(79,209,197,.15); color:var(--auto); border:1px solid var(--auto); }
+  .mode-badge.manual{ background:rgba(224,160,90,.15); color:var(--manual); border:1px solid var(--manual); }
+
+  main{ flex:1; display:grid; grid-template-columns: 1fr 320px; min-height:0; }
+
+  #viewport-wrap{ position:relative; background:radial-gradient(ellipse at 50% 30%, #131c26, #0b0f14 70%); }
+  #three-canvas{ width:100%; height:100%; display:block; }
+
+  #hud{
+    position:absolute; top:14px; left:14px;
+    background:rgba(17,24,32,.82); border:1px solid var(--line);
+    border-radius:8px; padding:10px 14px;
+    font-family:var(--mono); font-size:12px; line-height:1.65;
+    color:var(--ink-0); pointer-events:none; backdrop-filter: blur(4px);
+    min-width:190px;
+  }
+  #hud .row{ display:flex; justify-content:space-between; gap:18px; }
+  #hud .row .k{ color:var(--ink-2); }
+  #hud .row .v{ font-weight:600; }
+  #hud .crash{ color:var(--danger); }
+  #hud .success{ color:var(--accent); }
+
+  #controls-hint{
+    position:absolute; bottom:14px; left:14px;
+    background:rgba(17,24,32,.82); border:1px solid var(--line);
+    border-radius:8px; padding:10px 14px; font-size:11px; color:var(--ink-1);
+    font-family:var(--mono); line-height:1.7;
+  }
+  #controls-hint b{ color:var(--ink-0); }
+  .key-active{ color:var(--manual) !important; }
+
+  aside#charts{
+    background:var(--bg-1); border-left:1px solid var(--line);
+    padding:14px; display:flex; flex-direction:column; gap:14px; overflow:auto;
+  }
+  .chart-card{ background:var(--bg-2); border:1px solid var(--line); border-radius:8px; padding:10px 10px 6px; }
+  .chart-card .title{ font-size:11px; color:var(--ink-1); margin-bottom:6px; }
+  .chart-card canvas{ width:100%; height:110px; display:block; }
+  .legend{ display:flex; gap:12px; margin-top:4px; font-size:10px; color:var(--ink-2); }
+  .legend .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+
+  .empty-note{ color:var(--ink-2); font-size:12px; padding:18px 6px; line-height:1.6; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>F450 <span>Real-Time</span> Flight</h1>
+
+    <div class="picker">
+      <label for="stl-input">Select F450 STL Model</label>
+      <input id="stl-input" type="file" accept=".stl" />
+      <span id="stl-status" class="status">not loaded</span>
+    </div>
+
+    <span id="mode-badge" class="mode-badge auto">AUTO (PPO)</span>
+
+    <div class="conn-status">
+      <span class="conn-dot" id="conn-dot"></span>
+      <span id="conn-text">connecting…</span>
+    </div>
+  </header>
+
+  <main>
+    <section id="viewport-wrap">
+      <canvas id="three-canvas"></canvas>
+
+      <div id="hud">
+        <div class="row"><span class="k">t</span><span class="v" id="hud-t">–</span></div>
+        <div class="row"><span class="k">altitude</span><span class="v" id="hud-alt">–</span></div>
+        <div class="row"><span class="k">target alt.</span><span class="v" id="hud-target">–</span></div>
+        <div class="row"><span class="k">alt. error</span><span class="v" id="hud-alterr">–</span></div>
+        <div class="row"><span class="k">roll</span><span class="v" id="hud-roll">–</span></div>
+        <div class="row"><span class="k">pitch</span><span class="v" id="hud-pitch">–</span></div>
+        <div class="row"><span class="k">yaw</span><span class="v" id="hud-yaw">–</span></div>
+        <div class="row"><span class="k">status</span><span class="v" id="hud-crash">–</span></div>
+        <div class="row"><span class="k">motors</span><span class="v" id="hud-motors">–</span></div>
+      </div>
+
+      <div id="controls-hint">
+        <b>Controls</b><br/>
+        <span id="key-w">W</span>/<span id="key-s">S</span> forward/back &nbsp;
+        <span id="key-a">A</span>/<span id="key-d">D</span> left/right<br/>
+        <span id="key-up">↑</span>/<span id="key-down">↓</span> climb/descend<br/>
+        release all keys → PPO autopilot resumes
+      </div>
+    </section>
+
+    <aside id="charts">
+      <div class="chart-card">
+        <div class="title">Altitude Error (ft)</div>
+        <canvas id="chart-alt"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="title">Roll / Pitch (degrees)</div>
+        <canvas id="chart-tilt"></canvas>
+        <div class="legend">
+          <span><span class="dot" style="background:#4fd1c5"></span>Roll</span>
+          <span><span class="dot" style="background:#e0a05a"></span>Pitch</span>
+        </div>
+      </div>
+      <div class="empty-note" id="empty-note">
+        Select an STL model above. The flight starts automatically once it loads — PPO flies until you press a control key.
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { STLLoader } from "three/addons/loaders/STLLoader.js";
+
+/* ------------------------------------------------------------------ */
+/* Constants                                                            */
+/* ------------------------------------------------------------------ */
+const FT_PER_M = 3.28084;
+const DESIRED_SPAN_FT = 4.0;
+const TRAIL_LEN = 150;
+const CHART_WINDOW = 200; // canli grafiklerde tutulan son ornek sayisi
+
+/* ------------------------------------------------------------------ */
+/* DOM references                                                       */
+/* ------------------------------------------------------------------ */
+const canvas = document.getElementById("three-canvas");
+const stlInput = document.getElementById("stl-input");
+const stlStatus = document.getElementById("stl-status");
+const emptyNote = document.getElementById("empty-note");
+const modeBadge = document.getElementById("mode-badge");
+const connDot = document.getElementById("conn-dot");
+const connText = document.getElementById("conn-text");
+
+const hud = {
+  t: document.getElementById("hud-t"),
+  alt: document.getElementById("hud-alt"),
+  target: document.getElementById("hud-target"),
+  alterr: document.getElementById("hud-alterr"),
+  roll: document.getElementById("hud-roll"),
+  pitch: document.getElementById("hud-pitch"),
+  yaw: document.getElementById("hud-yaw"),
+  crash: document.getElementById("hud-crash"),
+  motors: document.getElementById("hud-motors"),
+};
+
+const chartCanvases = {
+  alt: document.getElementById("chart-alt"),
+  tilt: document.getElementById("chart-tilt"),
+};
+
+/* ------------------------------------------------------------------ */
+/* Three.js scene setup (identical structure to the offline viewer)     */
+/* ------------------------------------------------------------------ */
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 5000);
+camera.up.set(0, 0, 1);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.listenToKeyEvents(window);
+controls.keyPanSpeed = 20.0;
+controls.minDistance = 4;
+controls.maxDistance = 120;
+controls.zoomSpeed = 1.25;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+sun.position.set(40, -30, 60);
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0x88aacc, 0.35);
+fill.position.set(-30, 40, 20);
+scene.add(fill);
+
+let groundGrid = new THREE.GridHelper(40, 20, 0x2a3644, 0x1a232c);
+groundGrid.rotation.x = Math.PI / 2;
+scene.add(groundGrid);
+
+const targetPlaneMat = new THREE.MeshBasicMaterial({
+  color: 0x4fd1c5, transparent: true, opacity: 0.10, side: THREE.DoubleSide,
+});
+let targetPlane = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), targetPlaneMat);
+scene.add(targetPlane);
+
+const droneGroup = new THREE.Group();
+scene.add(droneGroup);
+let modelMesh = null;
+
+const shadowMarker = new THREE.Mesh(
+  new THREE.CircleGeometry(0.5, 24),
+  new THREE.MeshBasicMaterial({ color: 0xe0a05a, transparent: true, opacity: 0.85 })
+);
+scene.add(shadowMarker);
+
+const vertLineGeom = new THREE.BufferGeometry().setFromPoints([
+  new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0),
+]);
+const vertLineMat = new THREE.LineDashedMaterial({ color: 0xe0a05a, dashSize: 0.6, gapSize: 0.4, transparent: true, opacity: 0.7 });
+const vertLine = new THREE.Line(vertLineGeom, vertLineMat);
+scene.add(vertLine);
+
+let trailPoints = [];
+const trailMat = new THREE.LineBasicMaterial({ color: 0x7f93a3, transparent: true, opacity: 0.55 });
+let trailLine = new THREE.Line(new THREE.BufferGeometry(), trailMat);
+scene.add(trailLine);
+
+let cameraInitialized = false;
+
+function resizeRenderer() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / Math.max(h, 1);
+  camera.updateProjectionMatrix();
+}
+window.addEventListener("resize", resizeRenderer);
+
+/* ------------------------------------------------------------------ */
+/* STL loading                                                          */
+/* ------------------------------------------------------------------ */
+const stlLoader = new STLLoader();
+
+stlInput.addEventListener("change", (ev) => {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const geometry = stlLoader.parse(e.target.result);
+    geometry.computeBoundingBox();
+    geometry.center();
+    geometry.computeVertexNormals();
+
+    const size = new THREE.Vector3();
+    geometry.boundingBox.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const scaleFactor = DESIRED_SPAN_FT / maxDim;
+
+    const material = new THREE.MeshStandardMaterial({ color: 0x9fb4c7, metalness: 0.25, roughness: 0.55 });
+
+    if (modelMesh) droneGroup.remove(modelMesh);
+    modelMesh = new THREE.Mesh(geometry, material);
+    modelMesh.scale.setScalar(scaleFactor);
+    droneGroup.add(modelMesh);
+
+    stlStatus.textContent = "loaded ✓";
+    stlStatus.classList.add("ok");
+    emptyNote.style.display = "none";
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+/* ------------------------------------------------------------------ */
+/* WebSocket connection - live frame stream                             */
+/* ------------------------------------------------------------------ */
+let visualScale = 1.0;
+let latestFrame = null;
+
+// Kayan pencereli (rolling window) grafik verisi - tum episode'u degil,
+// sadece son CHART_WINDOW ornegi tutuyoruz.
+const chartBuf = { t: [], altErr: [], rollDeg: [], pitchDeg: [] };
+
+function pushChartSample(f) {
+  chartBuf.t.push(f.t_local);
+  chartBuf.altErr.push(f.alt_err_ft);
+  chartBuf.rollDeg.push(f.roll_rad * 180 / Math.PI);
+  chartBuf.pitchDeg.push(f.pitch_rad * 180 / Math.PI);
+  if (chartBuf.t.length > CHART_WINDOW) {
+    chartBuf.t.shift(); chartBuf.altErr.shift();
+    chartBuf.rollDeg.shift(); chartBuf.pitchDeg.shift();
+  }
+}
+
+let localClock = 0;
+
+function connect() {
+  const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws`);
+
+  ws.onopen = () => {
+    connDot.className = "conn-dot connected";
+    connText.textContent = "connected";
+  };
+  ws.onclose = () => {
+    connDot.className = "conn-dot disconnected";
+    connText.textContent = "disconnected — retrying…";
+    setTimeout(connect, 1500);
+  };
+  ws.onerror = () => { ws.close(); };
+
+  ws.onmessage = (msg) => {
+    const f = JSON.parse(msg.data);
+    if (f.episode_reset) {
+      trailPoints = [];
+      chartBuf.t = []; chartBuf.altErr = []; chartBuf.rollDeg = []; chartBuf.pitchDeg = [];
+      localClock = 0;
+    }
+    localClock += f.control_dt || 0.05;
+    f.t_local = localClock;
+    latestFrame = f;
+  };
+
+  window._sendKeys = (keys) => {
+    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(keys));
+  };
+}
+connect();
+
+/* ------------------------------------------------------------------ */
+/* Keyboard input - WASD + arrows                                       */
+/* ------------------------------------------------------------------ */
+const TRACKED_KEYS = ["w", "a", "s", "d", "ArrowUp", "ArrowDown"];
+const keyState = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false };
+const keyHintEls = {
+  w: document.getElementById("key-w"), a: document.getElementById("key-a"),
+  s: document.getElementById("key-s"), d: document.getElementById("key-d"),
+  ArrowUp: document.getElementById("key-up"), ArrowDown: document.getElementById("key-down"),
+};
+
+function normalizedKey(e) {
+  if (e.key === "ArrowUp" || e.key === "ArrowDown") return e.key;
+  const lower = e.key.toLowerCase();
+  return TRACKED_KEYS.includes(lower) ? lower : null;
+}
+
+window.addEventListener("keydown", (e) => {
+  const k = normalizedKey(e);
+  if (!k) return;
+  if (k === "ArrowUp" || k === "ArrowDown") e.preventDefault();
+  if (!keyState[k]) {
+    keyState[k] = true;
+    keyHintEls[k]?.classList.add("key-active");
+    window._sendKeys && window._sendKeys(keyState);
+  }
+});
+window.addEventListener("keyup", (e) => {
+  const k = normalizedKey(e);
+  if (!k) return;
+  if (keyState[k]) {
+    keyState[k] = false;
+    keyHintEls[k]?.classList.remove("key-active");
+    window._sendKeys && window._sendKeys(keyState);
+  }
+});
+
+/* ------------------------------------------------------------------ */
+/* Rendering a live frame                                               */
+/* ------------------------------------------------------------------ */
+function ensureCameraFramed(f) {
+  if (cameraInitialized) return;
+  cameraInitialized = true;
+
+  const gridSize = 40;
+  scene.remove(targetPlane);
+  targetPlane = new THREE.Mesh(new THREE.PlaneGeometry(gridSize, gridSize), targetPlaneMat);
+  targetPlane.position.z = f.target_altitude_ft;
+  scene.add(targetPlane);
+
+  const dist = 30;
+  const elev = THREE.MathUtils.degToRad(35);
+  const azim = THREE.MathUtils.degToRad(45);
+  camera.position.set(dist * Math.cos(elev) * Math.cos(azim), dist * Math.cos(elev) * Math.sin(azim), f.target_altitude_ft + dist * Math.sin(elev) * 0.4);
+  controls.target.set(0, 0, f.target_altitude_ft * 0.5);
+  controls.update();
+}
+
+function renderFrame(f) {
+  ensureCameraFramed(f);
+
+  const vx = f.x_m * FT_PER_M;
+  const vy = f.y_m * FT_PER_M;
+  const vz = f.alt_ft;
+
+  droneGroup.position.set(vx, vy, vz);
+  droneGroup.rotation.set(f.roll_rad, f.pitch_rad, f.yaw_rad, "XYZ");
+
+  shadowMarker.position.set(vx, vy, 0.02);
+  vertLineGeom.setFromPoints([new THREE.Vector3(vx, vy, 0), new THREE.Vector3(vx, vy, vz)]);
+  vertLine.computeLineDistances();
+
+  trailPoints.push(new THREE.Vector3(vx, vy, vz));
+  if (trailPoints.length > TRAIL_LEN) trailPoints.shift();
+  trailLine.geometry.dispose();
+  trailLine.geometry = new THREE.BufferGeometry().setFromPoints(trailPoints);
+
+  hud.t.textContent = `${f.t_local.toFixed(1)} s`;
+  hud.alt.textContent = `${f.alt_ft.toFixed(2)} ft`;
+  hud.target.textContent = `${f.target_altitude_ft.toFixed(1)} ft`;
+  hud.alterr.textContent = `${f.alt_err_ft.toFixed(2)} ft`;
+  hud.roll.textContent = `${(f.roll_rad * 180 / Math.PI).toFixed(2)}°`;
+  hud.pitch.textContent = `${(f.pitch_rad * 180 / Math.PI).toFixed(2)}°`;
+  hud.yaw.textContent = `${(f.yaw_rad * 180 / Math.PI).toFixed(2)}°`;
+
+  if (f.crashed) {
+    hud.crash.textContent = "CRASHED"; hud.crash.className = "v crash";
+  } else if (f.reached_target) {
+    hud.crash.textContent = "TARGET REACHED ✓"; hud.crash.className = "v success";
+  } else {
+    hud.crash.textContent = "normal"; hud.crash.className = "v";
+  }
+
+  if (f.motor_throttle) {
+    hud.motors.textContent = f.motor_throttle.map(v => `${Math.round(v * 100)}%`).join(" / ");
+  }
+
+  modeBadge.textContent = f.mode === "manual" ? "MANUAL" : "AUTO (PPO)";
+  modeBadge.className = `mode-badge ${f.mode === "manual" ? "manual" : "auto"}`;
+
+  pushChartSample(f);
+  drawCharts();
+}
+
+/* ------------------------------------------------------------------ */
+/* Rolling-window charts (simple canvas, no external library)          */
+/* ------------------------------------------------------------------ */
+function fitCanvas(cv) {
+  const rect = cv.getBoundingClientRect();
+  cv.width = Math.max(1, Math.floor(rect.width * devicePixelRatio));
+  cv.height = Math.max(1, Math.floor(rect.height * devicePixelRatio));
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  return ctx;
+}
+
+function drawSeriesChart(cv, series, xArr) {
+  if (xArr.length < 2) return;
+  const ctx = fitCanvas(cv);
+  const w = cv.clientWidth, h = cv.clientHeight;
+  const padL = 34, padR = 8, padT = 8, padB = 16;
+  ctx.clearRect(0, 0, w, h);
+
+  let yMin = Infinity, yMax = -Infinity;
+  series.forEach(s => s.values.forEach(v => { if (v < yMin) yMin = v; if (v > yMax) yMax = v; }));
+  if (!isFinite(yMin)) { yMin = 0; yMax = 1; }
+  if (yMax - yMin < 1e-6) { yMax += 1; yMin -= 1; }
+  const yPad = (yMax - yMin) * 0.12;
+  yMin -= yPad; yMax += yPad;
+
+  const xMin = xArr[0], xMax = xArr[xArr.length - 1] || 1;
+  const xToPx = (x) => padL + ((x - xMin) / (xMax - xMin || 1)) * (w - padL - padR);
+  const yToPx = (v) => (h - padB) - ((v - yMin) / (yMax - yMin || 1)) * (h - padT - padB);
+
+  ctx.strokeStyle = "#1f2933"; ctx.lineWidth = 1;
+  for (let g = 0; g <= 3; g++) {
+    const yy = padT + (g / 3) * (h - padT - padB);
+    ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(w - padR, yy); ctx.stroke();
+  }
+
+  ctx.font = "10px monospace"; ctx.fillStyle = "#5f7180"; ctx.textAlign = "right";
+  ctx.fillText(yMax.toFixed(1), padL - 4, padT + 8);
+  ctx.fillText(yMin.toFixed(1), padL - 4, h - padB);
+
+  series.forEach(s => {
+    ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = 1.5;
+    xArr.forEach((x, i) => {
+      const px = xToPx(x), py = yToPx(s.values[i]);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+  });
+}
+
+function drawCharts() {
+  drawSeriesChart(chartCanvases.alt, [{ values: chartBuf.altErr, color: "#4fd1c5" }], chartBuf.t);
+  drawSeriesChart(chartCanvases.tilt, [
+    { values: chartBuf.rollDeg, color: "#4fd1c5" },
+    { values: chartBuf.pitchDeg, color: "#e0a05a" },
+  ], chartBuf.t);
+}
+
+/* ------------------------------------------------------------------ */
+/* Main render loop - draws whatever the latest received frame is       */
+/* ------------------------------------------------------------------ */
+function animate() {
+  requestAnimationFrame(animate);
+  if (latestFrame) renderFrame(latestFrame);
+  controls.update();
+  resizeRenderer();
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
