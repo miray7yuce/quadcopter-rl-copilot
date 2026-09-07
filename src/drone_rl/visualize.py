@@ -52,6 +52,13 @@ def run_inference_episode(algo, run, config=None, task="hover", use_best=False, 
         action, _ = model.predict(obs, deterministic=deterministic)
         obs, _, done, infos = venv.step(action)
         telem = infos[0]
+
+        # Aksiyon (-1..+1) yerine gercek motor gucunu (0..1) kaydediyoruz -
+        # env'in kendi throttle donusum formulu ile ayni.
+        motor_throttle = np.clip(
+            raw.hover_throttle + action[0] * raw.throttle_range, 0.0, 1.0
+        )
+
         rec = {
             "t": t,
             "x_m": telem["x_m"],
@@ -62,6 +69,7 @@ def run_inference_episode(algo, run, config=None, task="hover", use_best=False, 
             "yaw_rad": telem["yaw_rad"],
             "alt_err_ft": telem["alt_err_ft"],
             "crashed": telem["crashed"],
+            "motor_throttle": motor_throttle.tolist(),
         }
         if "target_heading_rad" in telem:
             rec["target_heading_rad"] = telem["target_heading_rad"]
@@ -76,4 +84,3 @@ def run_inference_episode(algo, run, config=None, task="hover", use_best=False, 
     out["control_dt"] = control_dt
     out["target_altitude_ft"] = raw.target_altitude
     return out
-

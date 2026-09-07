@@ -1,4 +1,6 @@
 __pycache__/
+*.zip
+*.pkl
+logs/
+runs/
 .ipynb_checkpoints/
-runs/*/tb/
-runs/*/ckpt/

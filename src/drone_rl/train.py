@@ -18,6 +18,7 @@ from drone_rl.config import load_config
 from drone_rl.env_factory import (
     make_training_vec_env, make_flight_training_vec_env,
 )
+from drone_rl.policies import FlightFeaturesExtractor
 
 
 class SaveVecNormalizeCallback(BaseCallback):
@@ -79,16 +80,14 @@ class ACMISnapshotCallback(BaseCallback):
 ACTIVATION_MAP = {"tanh": nn.Tanh, "relu": nn.ReLU}
 
 
-def build_policy_kwargs(cfg_ppo):
-    has_custom = (
-        cfg_ppo.net_arch_pi is not None
-        or cfg_ppo.net_arch_vf is not None
-        or cfg_ppo.activation_fn is not None
-    )
-    if not has_custom:
-        return None
-
+def build_policy_kwargs(cfg_ppo, task: str):
+    """policy_kwargs'i olustur: her zaman net_arch/activation'i uygular;
+    task='flight' VE cfg_ppo.use_custom_extractor=True ise ayrica
+    FlightFeaturesExtractor'i (gruplandirilmis-dal ozellik cikarici)
+    de ekler. Hover gorevinde bu extractor hic kullanilmiyor - hover'in
+    gozlem boyutu/duzeni farkli (13-dim), extractor 15-dim bekliyor."""
     kwargs = {}
+
     pi_arch = cfg_ppo.net_arch_pi if cfg_ppo.net_arch_pi is not None else [64, 64]
     vf_arch = cfg_ppo.net_arch_vf if cfg_ppo.net_arch_vf is not None else [64, 64]
     kwargs["net_arch"] = dict(pi=pi_arch, vf=vf_arch)
@@ -99,14 +98,20 @@ def build_policy_kwargs(cfg_ppo):
             raise ValueError(f"Bilinmeyen activation_fn: {cfg_ppo.activation_fn!r}")
         kwargs["activation_fn"] = ACTIVATION_MAP[act_key]
 
+    if task == "flight" and getattr(cfg_ppo, "use_custom_extractor", False):
+        kwargs["features_extractor_class"] = FlightFeaturesExtractor
+        kwargs["features_extractor_kwargs"] = dict(
+            features_dim=getattr(cfg_ppo, "features_dim", 64)
+        )
+
     return kwargs
 
 
-def build_model(algo: str, cfg, venv, tensorboard_log: str):
+def build_model(algo: str, cfg, venv, tensorboard_log: str, task: str):
     if algo != "ppo":
         raise ValueError(f"Bilinmeyen algoritma: {algo!r} (sadece ppo destekleniyor)")
 
-    policy_kwargs = build_policy_kwargs(cfg.ppo)
+    policy_kwargs = build_policy_kwargs(cfg.ppo, task)
     return PPO(
         cfg.ppo.policy, venv,
         n_steps=cfg.ppo.n_steps, batch_size=cfg.ppo.batch_size, n_epochs=cfg.ppo.n_epochs,
@@ -144,7 +149,7 @@ def main():
         venv = make_flight_training_vec_env(cfg.flight_env, n_envs=n_envs, training=True, norm_reward=True)
         eval_env = make_flight_training_vec_env(cfg.flight_env, n_envs=1, training=False, norm_reward=False)
 
-    model = build_model(args.algo, cfg, venv, tensorboard_log=str(out / "tb"))
+    model = build_model(args.algo, cfg, venv, tensorboard_log=str(out / "tb"), task=args.task)
 
     ckpt_cb = CheckpointCallback(
         save_freq=max(20_000 // n_envs, 1),
@@ -184,4 +189,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
