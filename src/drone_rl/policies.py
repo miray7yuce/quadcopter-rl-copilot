@@ -1,3 +1,4 @@
+
 """F450FlightEnv icin custom policy bilesenleri.
 
 F450FlightEnv'in 15 boyutlu gozlemi (bkz. f450_flight_env.py _get_obs()):
@@ -94,7 +95,4 @@ class FlightFeaturesExtractor(BaseFeaturesExtractor):
 
         combined = torch.cat([vertical, horizontal, attitude, prev_action], dim=1)
         return self.combine(combined)
-
-
-
 
