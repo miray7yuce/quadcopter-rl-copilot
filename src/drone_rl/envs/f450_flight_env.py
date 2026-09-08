@@ -1,20 +1,54 @@
 """F450 quadcopter icin hedef irtifa + hedef yon (heading) takip gorevi.
 
 f450_env.py'deki F450HoverEnv'e HIC dokunulmadan, ayri bir env olarak
-eklenmistir. Heading burada 'hareket yonu' (course over ground) anlamina
-gelir, burun yonu (yaw) degil - yani drone burnu farkli yone bakarken bile
-komut edilen yonde ilerleyebilir.
+eklenmistir.
 
-DUZELTME (v2):
-- Drone artik hedef irtifanin ALTINDAN spawn oluyor (once bir tirmanma
-  gerceklesiyor), hedefin hemen yaninda degil.
-- Hedef irtifaya ulasip orada bir sure kalinca episode BASARIYLA
-  sonlaniyor (terminated=True + success_bonus), sadece sure dolunca
-  degil.
-- Heading/hiz odulu, irtifa ilerlemesiyle orantili agirliklandiriliyor:
-  drone hala tirmanirken yon odulu zayif, hedefe yaklastikca guclenir.
-  Boylece 'once yuksel, sonra yavasca hedef yone don' seklinde bir
-  yay/spiral davranisi ortaya cikmasi tesvik edilir.
+DUZELTME (v4) - KRITIK KONTROL ARAYUZU HATASI:
+Onceki surumler action'i `fcs/throttle-cmd-norm[i]` (motor-bazli, index'li)
+property'sine yaziyordu. F450.xml'in FlightControl.xml'i incelendiginde
+(ve gercek JSBSim fizigiyle ampirik test edildiginde) su ortaya cikti:
+  1. Bu aircraft'in FCS'i motor throttle'larini KENDI ic mixer'i
+     (Control Mixer + Effectors/ESC actuator zinciri) uzerinden
+     hesapliyor; bu zincir per-motor throttle-cmd-norm[i] degerlerini
+     DEGIL, SKALER fcs/throttle-cmd-norm (indexsiz, sadece [0]'a alias)
+     + fcs/cmdRoll_rps/cmdPitch_rps/cmdYaw_rps (PID cikislari) degerlerini
+     okuyor.
+  2. fcs/cmdRoll_rps/cmdPitch_rps/cmdYaw_rps, fcs/ScasEngage kazanciyla
+     capraziliyor - onceki kod bunu 0 yapiyordu, yani bu ic dongu
+     TAMAMEN devre disiydi.
+  Sonuc: eskiden action'in 4 boyutu da (motor sirasi ne olursa olsun)
+  SADECE ortak/kolektif throttle'i (irtifayi) etkiliyordu; roll/pitch/yaw
+  icin FIZIKSEL OLARAK HICBIR ETKI yoktu. Bu, hem irtifa salinimini
+  (PPO tek eksenli bir sistemi kontrol etmeye calisiyordu) hem de
+  "WASD/AD sadece irtifayi degistiriyor" sikayetini birebir acikliyor.
+
+  DOGRU arayuz (ampirik olarak dogrulandi):
+    fcs/aileron-cmd-norm   -> roll  (pozitif = SAGA hareket)
+    fcs/elevator-cmd-norm  -> pitch (pozitif = GERIYE hareket)
+    fcs/rudder-cmd-norm    -> yaw
+    fcs/throttle-cmd-norm (SKALER, indexsiz) -> kolektif/dikey itki
+    fcs/ScasEngage = 1     -> yukaridaki komutlarin isleyebilmesi icin
+                               ZORUNLU (rate-based inner-loop'u aktif eder)
+
+  Action semantigi, RL/manuel kontrol tarafinda sezgisel kalsin diye
+  [roll_cmd, pitch_cmd, yaw_cmd, throttle_cmd] olarak TANIMLANDI (hepsi
+  -1..1, throttle_cmd hover etrafinda olceklenir). pitch_cmd pozitif =
+  ILERI (sezgisel) olsun diye, elevator-cmd-norm = -pitch_cmd olarak
+  ters cevriliyor (olcum: elevator+ -> geriye gidiyor).
+
+  ONEMLI: Bu, action'in fizige BAGLANMA SEKLINI degistirir. Onceki
+  egitilmis model (model_final.zip) eski/kopuk arayuzle egitildigi icin
+  bu degisiklikten sonra GECERSIZ olur - YENIDEN EGITIM sart.
+
+DUZELTME (v3) - IRTIFA SONUMLEME (damping) [v4 uzerine tasindi]:
+- reward_hdot_weight: hedefe yaklastikca (progress->1) guclenen bir
+  dikey-hiz sonumleme cezasi. Tirmanma basinda (progress~0) zayif -
+  dinamik/yay seklinde tirmanmaya izin verir; hedefe yaklasinca guclu -
+  gercekten OTURMAYI ogretir. Bu, "sadece pozisyon hatasina ceza var,
+  hiz cezasi yok" eksikliginden kaynaklanan salinimi giderir.
+- success artik SADECE irtifa toleransina degil, dusuk dikey hiza da
+  bakiyor (success_hdot_tol_fps) - drone hedef bandi hizla GECEREK
+  degil, gercekten YAVASLAYIP OTURARAK basari kazaniyor.
 """
 
 import numpy as np
@@ -26,8 +60,12 @@ import jsbsim
 class F450FlightEnv(gym.Env):
     """JSBSim F450 modeli uzerinde: hedef irtifaya TIRMAN, tirmanirken
     yavasca hedef yone (dunya cercevesinde, pusula konvansiyonu:
-    0=Kuzey, 90=Dogu) don, hedef irtifaya ulasinca episode'u basariyla
-    bitir (reset) gorevi.
+    0=Kuzey, 90=Dogu) don, hedef irtifaya ulasip OTURUNCA episode'u
+    basariyla bitir (reset) gorevi.
+
+    Action (4,): [roll_cmd, pitch_cmd, yaw_cmd, throttle_cmd], hepsi
+    yaklasik -1..1 araliginda. Gercek FCS komutlarina donusum icin
+    step() icindeki aciklamaya bakin.
 
     Her episode'da target_altitude VE target_heading RASTGELE secilir
     (F450HoverEnv'de target_altitude sabitti). Model bu ikisini gozlem
@@ -56,12 +94,15 @@ class F450FlightEnv(gym.Env):
         crash_min_alt_ft=1.0,
         crash_max_alt_offset_ft=60.0,
         crash_max_tilt_rad=1.0,
-        # --- YENI parametreler ---
         altitude_start_offset_ft=25.0,
         altitude_start_jitter_ft=2.0,
         success_alt_tol_ft=1.5,
         success_hold_seconds=1.0,
         success_bonus=20.0,
+        # --- irtifa sonumleme (damping) parametreleri ---
+        reward_hdot_weight=0.12,
+        hdot_damping_min_factor=0.3,
+        success_hdot_tol_fps=1.0,
     ):
         super().__init__()
 
@@ -103,15 +144,17 @@ class F450FlightEnv(gym.Env):
         self.crash_max_alt_offset_ft = crash_max_alt_offset_ft
         self.crash_max_tilt_rad = crash_max_tilt_rad
 
-        # --- YENI: baslangic offseti ve basari (success) ayarlari ---
         self.altitude_start_offset_ft = altitude_start_offset_ft
         self.altitude_start_jitter_ft = altitude_start_jitter_ft
         self.success_alt_tol_ft = success_alt_tol_ft
         self.success_hold_steps = max(1, int(success_hold_seconds * control_hz))
         self.success_bonus = success_bonus
         self._success_counter = 0
-        # Ilerleme (progress) hesaplamak icin: episode basindaki irtifa farki
         self._initial_alt_err_ft = 1.0  # reset()'te gercek degerle guncellenir
+
+        self.reward_hdot_weight = reward_hdot_weight
+        self.hdot_damping_min_factor = hdot_damping_min_factor
+        self.success_hdot_tol_fps = success_hdot_tol_fps
 
         # Her episode'da rastgele secilecek hedefler - reset()'te doldurulur
         self.target_altitude = (target_altitude_min_ft + target_altitude_max_ft) / 2.0
@@ -131,13 +174,10 @@ class F450FlightEnv(gym.Env):
         return self.substeps * self.physics_dt
 
     def _apply_initial_conditions(self):
-        # DUZELTME: drone artik hedef irtifanin ALTINDAN basliyor, hemen
-        # yaninda degil - boylece gercek bir tirmanma gerceklesir.
         jitter = self.np_random.uniform(
             -self.altitude_start_jitter_ft, self.altitude_start_jitter_ft
         )
         h0 = self.target_altitude - self.altitude_start_offset_ft + jitter
-        # Yerden/crash siniri altina dusmesin diye guvenlik payi birak.
         h0 = max(h0, self.crash_min_alt_ft + 3.0)
         self.fdm["ic/h-agl-ft"] = h0
 
@@ -153,7 +193,6 @@ class F450FlightEnv(gym.Env):
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
-        # her episode'da hedef irtifa VE hedef yon rastgele secilir
         self.target_altitude = self.np_random.uniform(
             self.target_altitude_min_ft, self.target_altitude_max_ft
         )
@@ -165,10 +204,21 @@ class F450FlightEnv(gym.Env):
 
         for i in range(4):
             self.fdm[f"propulsion/engine[{i}]/set-running"] = 1
-        self.fdm["fcs/ScasEngage"] = 0
 
-        for i in range(4):
-            self.fdm[f"fcs/throttle-cmd-norm[{i}]"] = self.hover_throttle
+        # DUZELTME (v4): ScasEngage=1 OLMAK ZORUNDA. 0 iken aileron/
+        # elevator/rudder komutlari FCS'in ic PID zincirinde (gain=
+        # ScasEngage) sifirlaniyor ve motorlara HICBIR farkli komut
+        # ulasmiyordu - eskiden buradaki deger 0'di, bu YUZDEN roll/
+        # pitch fiziksel olarak calismiyordu.
+        self.fdm["fcs/ScasEngage"] = 1
+
+        # Kontrol yuzeylerini notr, kolektif throttle'i hover'a ayarla.
+        # DUZELTME (v4): artik per-motor fcs/throttle-cmd-norm[i] DEGIL,
+        # aircraft'in gercekten okudugu SKALER fcs/throttle-cmd-norm.
+        self.fdm["fcs/aileron-cmd-norm"] = 0.0
+        self.fdm["fcs/elevator-cmd-norm"] = 0.0
+        self.fdm["fcs/rudder-cmd-norm"] = 0.0
+        self.fdm["fcs/throttle-cmd-norm"] = self.hover_throttle
 
         self.step_count = 0
         self.prev_action = np.zeros(4, dtype=np.float32)
@@ -177,9 +227,6 @@ class F450FlightEnv(gym.Env):
         return self._get_obs(), {}
 
     def _world_frame_velocity(self):
-        """Govde-cercevesi (body-frame) u,v hizlarini, mevcut yaw (psi)
-        acisini kullanarak dunya-cercevesi (kuzey, dogu) hizlarina cevirir.
-        Yaw zamanla suruklenirse bile bu donusum otomatik dogru kalir."""
         f = self.fdm
         u = f["velocities/u-fps"]
         v = f["velocities/v-fps"]
@@ -189,9 +236,6 @@ class F450FlightEnv(gym.Env):
         return north_vel, east_vel
 
     def _along_cross_track(self):
-        """Dunya-cercevesi hizi, hedef yone gore 'ileri (along-track)' ve
-        'yana kayma (cross-track)' bilesenlerine ayirir. Aci hesabi
-        (atan2) kullanmadigimiz icin dusuk hizda tekillik/gurultu olmaz."""
         north_vel, east_vel = self._world_frame_velocity()
         h = self.target_heading
         along = north_vel * np.cos(h) + east_vel * np.sin(h)
@@ -200,9 +244,10 @@ class F450FlightEnv(gym.Env):
 
     def _climb_progress(self, alt_err_ft):
         """0 (hala baslangic irtifasinda) -> 1 (hedef irtifaya ulasti)
-        arasinda bir ilerleme skoru. Heading odulunu bununla carparak
-        drone once yukselirken yon odulunu zayif tutuyoruz, hedefe
-        yaklastikca guclendiriyoruz -> 'yay/spiral' davranisi."""
+        arasinda bir ilerleme skoru. Hem heading odulunu hem de h-dot
+        sonumleme cezasini bununla carparak: drone tirmanirken odul/ceza
+        zayif (dinamik/yay hareketine izin ver), hedefe yaklastikca
+        guclu (yon dogrulugu VE irtifa sonumleme onceliklenir)."""
         progress = 1.0 - (alt_err_ft / self._initial_alt_err_ft)
         return float(np.clip(progress, 0.0, 1.0))
 
@@ -234,10 +279,16 @@ class F450FlightEnv(gym.Env):
         f = self.fdm
         alt_agl_ft = float(f["position/h-agl-ft"])
         along, cross = self._along_cross_track()
+        # Gercek motor pos-norm degerleri (JSBSim engine sirasi:
+        # 0=front right, 1=aft left, 2=front left, 3=aft right - bkz.
+        # Propulsion.xml). Artik action'dan TAHMIN edilmiyor, dogrudan
+        # FCS'in gercekten uyguladigi degerler okunuyor.
+        motor_throttle = [float(f[f"fcs/throttle-pos-norm[{i}]"]) for i in range(4)]
         return {
             "alt_ft": alt_agl_ft,
             "alt_sl_ft": float(f["position/h-sl-ft"]),
             "alt_err_ft": abs(alt_agl_ft - self.target_altitude),
+            "hdot_fps": float(f["velocities/h-dot-fps"]),
             "lat_deg": float(f["position/lat-geod-deg"]),
             "lon_deg": float(f["position/long-gc-deg"]),
             "x_m": float(f["position/distance-from-start-lon-mt"]),
@@ -249,6 +300,7 @@ class F450FlightEnv(gym.Env):
             "along_track_fps": float(along),
             "cross_track_fps": float(cross),
             "target_speed_fps": float(self.target_speed_fps),
+            "motor_throttle": motor_throttle,
             "crashed": bool(crashed),
             "reached_target": bool(reached),
         }
@@ -264,26 +316,39 @@ class F450FlightEnv(gym.Env):
 
     def step(self, action):
         action = np.asarray(action, dtype=np.float32).reshape(4)
+        roll_cmd, pitch_cmd, yaw_cmd, throttle_cmd = action
 
-        throttles = np.clip(
-            self.hover_throttle + action * self.throttle_range, 0.0, 1.0
-        )
+        # DUZELTME (v4): aircraft'in GERCEKTEN okudugu FCS komutlari.
+        # aileron/elevator/rudder-cmd-norm dogrudan -1..1 araliginda
+        # (JSBSim'in pilotRoll/Pitch/Yaw_norm summer'lari zaten bu
+        # araliga clip ediyor). elevator-cmd-norm = -pitch_cmd: cunku
+        # ampirik testte elevator POZITIF verildiginde drone GERIYE
+        # gidiyor (u-fps negatif oluyor) - pitch_cmd'i "ileri=pozitif"
+        # sezgisiyle tanimladigimiz icin burada isareti ceviriyoruz.
+        # aileron-cmd-norm = +roll_cmd: ampirik testte aileron POZITIF
+        # verildiginde drone SAGA gidiyor (v-fps pozitif) - roll_cmd
+        # "saga=pozitif" sezgisiyle zaten dogrudan uyuyor.
+        aileron = float(np.clip(roll_cmd, -1.0, 1.0))
+        elevator = float(np.clip(-pitch_cmd, -1.0, 1.0))
+        rudder = float(np.clip(yaw_cmd, -1.0, 1.0))
+        throttle = float(np.clip(
+            self.hover_throttle + throttle_cmd * self.throttle_range, 0.0, 1.0
+        ))
 
         for _ in range(self.substeps):
-            for i in range(4):
-                self.fdm[f"fcs/throttle-cmd-norm[{i}]"] = float(throttles[i])
+            self.fdm["fcs/aileron-cmd-norm"] = aileron
+            self.fdm["fcs/elevator-cmd-norm"] = elevator
+            self.fdm["fcs/rudder-cmd-norm"] = rudder
+            self.fdm["fcs/throttle-cmd-norm"] = throttle
             self.fdm.run()
 
         self.step_count += 1
         obs = self._get_obs()
 
         alt_err_ft = abs(self.fdm["position/h-agl-ft"] - self.target_altitude)
+        hdot_fps = self.fdm["velocities/h-dot-fps"]
         along, cross = self._along_cross_track()
 
-        # DUZELTME: heading/hiz odulu, tirmanma ilerlemesiyle carpiliyor.
-        # Drone hala baslangic irtifasindaysa (progress~0) yon odulu
-        # zayif; hedefe yaklastikca (progress->1) guclenir. Boylece
-        # ajan once dikey harekete, sonra yatay harekete agirlik verir.
         progress = self._climb_progress(alt_err_ft)
         heading_err = abs(self.target_speed_fps - along) + abs(cross)
 
@@ -291,9 +356,16 @@ class F450FlightEnv(gym.Env):
         spin = abs(self.fdm["velocities/p-rad_sec"]) + abs(self.fdm["velocities/q-rad_sec"])
         jerk = float(np.sum(np.abs(action - self.prev_action)))
 
+        # irtifa sonumleme (damping) cezasi - progress ile guclenir.
+        damping_factor = self.hdot_damping_min_factor + (
+            1.0 - self.hdot_damping_min_factor
+        ) * progress
+        hdot_penalty = self.reward_hdot_weight * damping_factor * abs(hdot_fps)
+
         reward = (
             1.0
             - self.reward_alt_weight * alt_err_ft
+            - hdot_penalty
             - self.reward_heading_weight * progress * heading_err
             - self.reward_tilt_weight * tilt
             - self.reward_spin_weight * spin
@@ -304,9 +376,10 @@ class F450FlightEnv(gym.Env):
         if crashed:
             reward -= self.crash_penalty
 
-        # DUZELTME: hedef irtifaya ulasip bir sure orada kalinca
-        # (success_hold_steps) episode BASARIYLA sonlanir.
-        if alt_err_ft < self.success_alt_tol_ft:
+        # basari: irtifa toleransi ICINDE VE dikey hiz yeterince dusuk
+        alt_ok = alt_err_ft < self.success_alt_tol_ft
+        hdot_ok = abs(hdot_fps) < self.success_hdot_tol_fps
+        if alt_ok and hdot_ok:
             self._success_counter += 1
         else:
             self._success_counter = 0
@@ -323,4 +396,3 @@ class F450FlightEnv(gym.Env):
         truncated = bool(self.step_count >= self.max_steps)
 
         return obs, float(reward), terminated, truncated, info
-

@@ -32,8 +32,13 @@ class FlightEnvConfig:
 
     Drone hedef irtifanin altitude_start_offset_ft kadar ALTINDAN spawn
     oluyor (gercek bir tirmanma yasaniyor) ve hedef irtifaya ulasip
-    success_hold_seconds kadar orada kalinca episode basariyla
-    (success_bonus ile) sonlaniyor.
+    success_hold_seconds kadar orada YAVASLAYIP kalinca episode
+    basariyla (success_bonus ile) sonlaniyor.
+
+    reward_hdot_weight/hdot_damping_min_factor, hedefe yaklastikca
+    guclenen bir irtifa sonumleme (damping) cezasi ekler - salinimi
+    (hedefi asip-donme) onlemek icin. success_hdot_tol_fps ise 'basari'
+    sayilabilmesi icin dikey hizin da yeterince dusuk olmasini sartlar.
     """
     target_altitude_min_ft: float = 20.0
     target_altitude_max_ft: float = 45.0
@@ -57,6 +62,9 @@ class FlightEnvConfig:
     success_alt_tol_ft: float = 1.5
     success_hold_seconds: float = 1.0
     success_bonus: float = 20.0
+    reward_hdot_weight: float = 0.12
+    hdot_damping_min_factor: float = 0.3
+    success_hdot_tol_fps: float = 1.0
 
 
 @dataclass
@@ -73,7 +81,6 @@ class PPOConfig:
     net_arch_pi: Optional[List[int]] = None
     net_arch_vf: Optional[List[int]] = None
     activation_fn: Optional[str] = None
-    # --- YENI: custom feature extractor (sadece task=flight'ta kullanilir) ---
     use_custom_extractor: bool = False
     features_dim: int = 64
 
@@ -105,7 +112,3 @@ def load_config(path: Optional[str]) -> Config:
         ppo=PPOConfig(**raw.get("ppo", {})),
         train=TrainConfig(**raw.get("train", {})),
     )
-
-
-
-

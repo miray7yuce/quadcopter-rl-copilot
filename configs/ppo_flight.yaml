@@ -18,6 +18,17 @@ flight_env:
   success_alt_tol_ft: 1.5
   success_hold_seconds: 3.0
   success_bonus: 20.0
+  # --- YENI (v3): irtifa sonumleme (damping) - salinimi onlemek icin ---
+  # reward_hdot_weight: hedefe TAM vardiginda (progress=1) dikey hiza
+  #   uygulanan cezanin maksimum agirligi.
+  # hdot_damping_min_factor: tirmanma basinda (progress=0) bu agirligin
+  #   ne kadar zayif olacagi (0.3 = tam agirligin %30'u) - dinamik/yay
+  #   seklinde tirmanmaya izin verir, sadece hedefe yaklasinca sonumler.
+  # success_hdot_tol_fps: 'basari' sayilmasi icin irtifa toleransinin
+  #   yaninda dikey hizin da bu esigin altinda olmasi gerekir.
+  reward_hdot_weight: 0.12
+  hdot_damping_min_factor: 0.3
+  success_hdot_tol_fps: 1.0
 ppo:
   policy: MlpPolicy
   n_steps: 1024
@@ -31,7 +42,6 @@ ppo:
   net_arch_pi: [128, 128]
   net_arch_vf: [128, 128]
   activation_fn: tanh
-  # --- custom feature extractor (FlightFeaturesExtractor) ---
   use_custom_extractor: true
   features_dim: 64
 train:

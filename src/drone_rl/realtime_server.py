@@ -1,19 +1,36 @@
-"""F450 flight - gercek zamanli (WASD + ok tuslariyla oynanabilir) backend.
+"""F450 flight - gercek zamanli (WASDEF ile oynanabilir) backend.
 
 Colab icinde calisir: FastAPI + WebSocket ile her karede (frame) ortami
-bir adim ilerletir, ya PPO'nun urettigi aksiyonu ya da WASD/ok
-tuslarindan gelen aksiyonu kullanir, sonucu tarayiciya gonderir.
+bir adim ilerletir, ya PPO'nun urettigi aksiyonu ya da WASDEF tuslarindan
+gelen aksiyonu kullanir, sonucu tarayiciya gonderir.
 
 Kontroller (tarayicida):
-  W / S       -> ileri / geri (pitch)
-  A / D       -> sola / saga (roll)
-  Yukari Ok   -> yukselme (throttle+)
-  Asagi Ok    -> alcalma (throttle-)
+  W / S       -> ileri / geri (pitch_cmd)
+  A / D       -> sola / saga (roll_cmd)
+  E / F       -> yukselme / alcalma (throttle_cmd)
+  Ok tuslari  -> SADECE kamera kadrajini oynatir, drone'a hicbir etkisi yok
   Hicbir tus basili degilse -> PPO otomatik ucusa devam eder
 
-Retraining GEREKMIYOR - ayni egitilmis model (model_final.zip +
-vecnormalize.pkl) burada da kullaniliyor, sadece nerede/nasil
-calistirdigimiz degisiyor.
+DUZELTME (v4): action artik motor-bazli bir mix DEGIL, dogrudan
+F450FlightEnv.step()'in bekledigi [roll_cmd, pitch_cmd, yaw_cmd,
+throttle_cmd] 4-vektoru (env dosyasindaki v4 aciklamasina bakin - bu
+aircraft'in gercek kontrol arayuzu aileron/elevator/rudder/throttle
+skalerleridir, motor-bazli degil). Onceki motor-mix yaklasimi (mix_motors,
+MOTOR_MIX_MODE) TAMAMEN KALDIRILDI cunku o arayuz zaten fiziksel olarak
+hicbir etki uretmiyordu.
+
+DUZELTME (v4): irtifada "runtime PD-hold" hack'i KALDIRILDI. Salinim
+sorunu artik PPO'nun kendisinin (yeni reward + DUZGUN CALISAN kontrol
+arayuzuyle YENIDEN egitilerek) ogrenmesi gereken bir sey - sunucu
+tarafinda ek bir zorlama/duzeltme YOK. PPO ne ogrendiyse oynatilan tam
+olarak odur.
+
+ONEMLI: Bu dosya, env'deki v4 kontrol-arayuzu duzeltmesiyle BIRLIKTE
+kullanilmalidir. Eski (model_final.zip) model bu YENI arayuzle egitilmedi
+- yeniden egitim yapmadan bu sunucuyu calistirirsaniz PPO'nun ciktilari
+(artik gercekten calisan roll/pitch/throttle komutlarina donusecegi icin)
+muhtemelen kontrolsuz/cakisma seklinde davranir. Once train.py ile
+--task flight yeniden egitin.
 """
 
 import asyncio
@@ -32,81 +49,65 @@ from drone_rl.evaluate import resolve_model_paths
 
 
 # --- Manuel kontrol hissi icin ayarlanabilir sabitler ---
-# Bunlar fiziksel dogruluk degil, "oyun hissi" sabitleri - istedigin gibi
-# degistirebilirsin. Onceki degerlere (0.30/0.30/0.40) gore buyutuldu,
-# cunku kucuk degerler quadin gercek kutlesi/ataleti yuzunden cok yavas
-# hizlanip yavasliyordu - daha buyuk degerler daha "gercek zamanli" hissettirir.
-PITCH_MAG = 0.55   # W/S -> ileri/geri
-ROLL_MAG = 0.55    # A/D -> sola/saga
-ALT_MAG = 0.65     # E/F -> yukselme/alcalma
+# Bunlar fiziksel dogruluk degil, "oyun hissi" sabitleri. Env'in step()
+# fonksiyonundaki action semantigiyle (roll_cmd, pitch_cmd, yaw_cmd,
+# throttle_cmd, hepsi -1..1) DOGRUDAN uyumlu.
+PITCH_MAG = 0.45   # W/S -> ileri/geri (pitch_cmd)
+ROLL_MAG = 0.45    # A/D -> sola/saga (roll_cmd)
+ALT_MAG = 0.65     # E/F -> yukselme/alcalma (throttle_cmd)
 
 # Cevirirken (W/A/S/D) irtifayi sabit tutan geri besleme (feedback)
-# katsayisi. Drone yana/one yatinca toplam itki artik tam dikey olmadigi
-# icin dogal olarak alcalir (gercek quadcopterlarda da boyledir) - bu
-# katsayi o kaybi telafi ediyor.
+# katsayisi. Bu SADECE manuel ucus kullanilabilirligi icindir (drone
+# yatinca toplam itkinin dikey bileseni dogal olarak azalir, bu da onu
+# telafi eder) - PPO'nun otomatik ucusuna HICBIR sekilde karismaz, o
+# tamamen ayri bir kod yolunda (asagida "auto" mode) calisir.
 ALT_HOLD_KP = 0.08
 ALT_HOLD_MAX = 0.5
 
 
 class ManualController:
-    """W/A/S/D = ileri/geri/sola/saga (pitch/roll ile), E/F = yukselme/alcalma.
+    """W/A/S/D = ileri/geri/sola/saga (pitch_cmd/roll_cmd), E/F =
+    yukselme/alcalma (throttle_cmd). yaw_cmd her zaman 0 (klavyede
+    kontrolu yok - kullanici istegi geregi).
 
     W/A/S/D basiliyken E/F basili DEGILSE, egilme (tilt) kaynakli dogal
-    irtifa kaybini otomatik telafi ederek irtifayi kilitli tutar - yoksa
-    "A/D irtifayi da degistiriyor" gibi kafa karistirici bir yan etki
-    olur (bu FIZIKSEL bir etki, motor mixing hatasi degil: drone
-    yatinca toplam itkinin dikey bilesimi azalir).
-
-    E veya F basilinca kilit birakilir, dogrudan tam guclu yukselme/
-    alcalma komutu verilir. Tum tuslar birakilinca (PPO otomatik pilota
-    donulunce) kilit sifirlanir - manuel kontrole tekrar girildiginde
-    O ANKI irtifadan yeniden kilitlenir, eski/bayat bir degerden degil.
+    irtifa kaybini otomatik telafi ederek irtifayi kilitli tutar. E veya
+    F basilinca kilit birakilir. Tum tuslar birakilinca (PPO'ya
+    donulunce) kilit sifirlanir.
     """
 
     def __init__(self):
         self.alt_lock = None
 
     def compute_action(self, keys: dict, current_alt_ft: float) -> np.ndarray:
-        pitch = PITCH_MAG if keys.get("w") else (-PITCH_MAG if keys.get("s") else 0.0)
-        roll = ROLL_MAG if keys.get("d") else (-ROLL_MAG if keys.get("a") else 0.0)
+        pitch_cmd = PITCH_MAG if keys.get("w") else (-PITCH_MAG if keys.get("s") else 0.0)
+        roll_cmd = ROLL_MAG if keys.get("d") else (-ROLL_MAG if keys.get("a") else 0.0)
+        yaw_cmd = 0.0
 
         if keys.get("e") or keys.get("f"):
             self.alt_lock = None
-            throttle = ALT_MAG if keys.get("e") else -ALT_MAG
+            throttle_cmd = ALT_MAG if keys.get("e") else -ALT_MAG
         else:
             if self.alt_lock is None:
                 self.alt_lock = current_alt_ft
-            throttle = float(np.clip(
+            throttle_cmd = float(np.clip(
                 ALT_HOLD_KP * (self.alt_lock - current_alt_ft), -ALT_HOLD_MAX, ALT_HOLD_MAX
             ))
 
-        motor_fl = throttle + pitch + roll
-        motor_fr = throttle + pitch - roll
-        motor_rl = throttle - pitch + roll
-        motor_rr = throttle - pitch - roll
-
-        action = np.array([motor_fl, motor_fr, motor_rl, motor_rr], dtype=np.float32)
-        return np.clip(action, -1.0, 1.0)
+        return np.array([roll_cmd, pitch_cmd, yaw_cmd, throttle_cmd], dtype=np.float32)
 
     def reset_lock(self):
         self.alt_lock = None
 
 
 def any_key_pressed(keys: dict) -> bool:
-    # DIKKAT: ok tuslari artik burada YOK - onlar sadece kamera icin,
-    # drone kontrolune dahil degiller (E/F irtifa icin kullaniliyor).
+    # Ok tuslari burada YOK - onlar sadece kamera icin, drone kontrolune
+    # hicbir sekilde dahil degiller.
     return any(keys.get(k) for k in ("w", "a", "s", "d", "e", "f"))
 
 
 class NormalizerStats:
-    """VecNormalize'in mean/var degerlerini tasiyan hafif bir tasiyici.
-
-    Egitimde kullanilan normalize etme formulunu (obs -> normalized obs),
-    tek bir canli gozlem uzerinde MANUEL olarak uygulayabilmek icin -
-    canli dongude gercek bir VecEnv/VecNormalize wrapper'i kullanmiyoruz
-    (tek ortam, tek adim, sürekli acik kalan bir dongu oldugu icin daha
-    basit). Bu formul VecNormalize.normalize_obs() ile birebir ayni.
-    """
+    """VecNormalize'in mean/var degerlerini tasiyan hafif bir tasiyici."""
 
     def __init__(self, vecnorm: VecNormalize):
         self.mean = vecnorm.obs_rms.mean.astype(np.float32)
@@ -127,9 +128,6 @@ def load_policy(run: str, config: str, use_best: bool = False):
     if not vecnorm_path.exists():
         raise FileNotFoundError(f"VecNormalize dosyasi bulunamadi: {vecnorm_path}")
 
-    # Gercek bir egitim/eval dongusu kurmuyoruz - sadece VecNormalize'in
-    # ogrendigi mean/var istatistiklerini disari cikarmak icin gecici
-    # (dummy) bir vec-env uzerinden yukluyoruz.
     dummy_venv = make_flight_eval_vec_env(cfg.flight_env)
     vecnorm = VecNormalize.load(str(vecnorm_path), dummy_venv)
     stats = NormalizerStats(vecnorm)
@@ -140,7 +138,6 @@ def load_policy(run: str, config: str, use_best: bool = False):
 
 app = FastAPI()
 
-# start_server() cagrildiginda doldurulur; /ws endpoint'i buradan okur.
 STATE = {"model": None, "stats": None, "cfg": None, "html_path": None}
 
 
@@ -149,10 +146,6 @@ def index():
     return FileResponse(STATE["html_path"])
 
 
-# Basariyla hedefe ulasildiktan sonra, hemen resetlemeden once ekranda
-# ne kadar sure daha (saniye) izleyelim - saf gorsellestirme amacli,
-# env'in kendi terminated=True mantigini (egitimde kullanilan) DEGISTIRMIYORUZ,
-# sadece sunucu tarafinda "reset()'i cagirmayi geciktiriyoruz".
 SUCCESS_LINGER_SECONDS = 3.0
 
 
@@ -167,18 +160,10 @@ async def flight_loop(websocket: WebSocket):
     env = make_flight_env(cfg.flight_env)
     obs, _ = env.reset()
 
-    # None: normal ucus. Sayi: "basariyla ulasti, su kadar adim sonra
-    # resetlenecek" geri sayimi. Bu sayede terminated=True dondugu anda
-    # DEGIL, SUCCESS_LINGER_SECONDS kadar sonra reset() cagriliyor -
-    # boylece "TARGET REACHED" durumunu ekranda birkac saniye gorebiliyoruz.
     linger_steps_total = max(1, int(SUCCESS_LINGER_SECONDS / env.control_dt))
     linger_remaining = None
     manual_ctrl = ManualController()
 
-    # WASD durumu ayri bir "receiver" task'inde tutuluyor, boylece ana
-    # fizik dongusu tus mesaji beklemek zorunda kalmadan kendi hizinda
-    # (control_dt) akmaya devam edebiliyor. Poll+timeout yontemi yerine
-    # bu, hem daha az CPU harcar hem tus olaylarini kacirmaz.
     current_keys = {}
 
     async def receiver():
@@ -202,6 +187,9 @@ async def flight_loop(websocket: WebSocket):
                 mode = "manual"
             else:
                 manual_ctrl.reset_lock()
+                # Tamamen PPO. Salinim/oturma davranisi TAMAMEN modelin
+                # kendi ogrendigi seydir - sunucu tarafinda hicbir
+                # duzeltme/zorlama uygulanmiyor.
                 norm_obs = stats.normalize(obs).reshape(1, -1)
                 action, _ = model.predict(norm_obs, deterministic=True)
                 action = action[0]
@@ -212,21 +200,13 @@ async def flight_loop(websocket: WebSocket):
             episode_reset = False
 
             if linger_remaining is not None:
-                # Basari sonrasi "bekleme" penceresindeyiz. Cakisma olursa
-                # beklemeden hemen resetle; yoksa geri sayimi azalt.
                 linger_remaining -= 1
                 if info.get("crashed") or linger_remaining <= 0:
                     obs, _ = env.reset()
                     episode_reset = True
                     linger_remaining = None
-                # yoksa: reset ETME, env'in terminated=True demesine ragmen
-                # step() atmaya devam ediyoruz - JSBSim'in fizigi bunu
-                # umursamiyor, sadece bizim reset() cagirip cagirmamamiz
-                # onemli.
             elif terminated or truncated:
                 if info.get("reached_target") and not info.get("crashed"):
-                    # Basariyla ulasti - hemen resetlemek yerine bekleme
-                    # geri sayimini baslat.
                     linger_remaining = linger_steps_total
                 else:
                     obs, _ = env.reset()
@@ -237,9 +217,9 @@ async def flight_loop(websocket: WebSocket):
             payload["episode_reset"] = episode_reset
             payload["target_altitude_ft"] = env.target_altitude
             payload["control_dt"] = env.control_dt
-            payload["motor_throttle"] = np.clip(
-                env.hover_throttle + action * env.throttle_range, 0.0, 1.0
-            ).tolist()
+            # motor_throttle artik env._get_telemetry() icinde, fdm'den
+            # OKUNAN gercek fcs/throttle-pos-norm[i] degerleri (bkz. v4
+            # notu) - burada ayrica hesaplanmiyor.
 
             await websocket.send_text(json.dumps(payload))
             await asyncio.sleep(env.control_dt)
