@@ -1,8 +1,4 @@
-"""Egitim ve degerlendirme icin ortak F450 ortami/VecEnv kurulum yardimcilari.
-
-Hem F450HoverEnv (hover gorevi) hem F450FlightEnv (irtifa+heading gorevi)
-icin ayri fonksiyon setleri barindirir. Biri digerini etkilemez.
-"""
+"""Egitim ve degerlendirme icin ortak F450 ortami/VecEnv kurulum yardimcilari."""
 
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
@@ -11,10 +7,6 @@ from drone_rl.envs.f450_env import F450HoverEnv
 from drone_rl.envs.f450_flight_env import F450FlightEnv
 from drone_rl.config import EnvConfig, FlightEnvConfig
 
-
-# ---------------------------------------------------------------------
-# Hover gorevi (degismedi)
-# ---------------------------------------------------------------------
 
 def make_env(env_config: EnvConfig) -> F450HoverEnv:
     return F450HoverEnv(
@@ -51,11 +43,6 @@ def make_eval_vec_env(env_config: EnvConfig):
     return DummyVecEnv([lambda: make_env(env_config)])
 
 
-# ---------------------------------------------------------------------
-# Flight gorevi (hedef irtifa + hedef yon; tirmanma + success reset +
-# v3: irtifa sonumleme/damping)
-# ---------------------------------------------------------------------
-
 def make_flight_env(flight_config: FlightEnvConfig) -> F450FlightEnv:
     return F450FlightEnv(
         target_altitude_min_ft=flight_config.target_altitude_min_ft,
@@ -80,19 +67,30 @@ def make_flight_env(flight_config: FlightEnvConfig) -> F450FlightEnv:
         success_alt_tol_ft=flight_config.success_alt_tol_ft,
         success_hold_seconds=flight_config.success_hold_seconds,
         success_bonus=flight_config.success_bonus,
-        # --- YENI (v3) ---
         reward_hdot_weight=flight_config.reward_hdot_weight,
         hdot_damping_min_factor=flight_config.hdot_damping_min_factor,
         success_hdot_tol_fps=flight_config.success_hdot_tol_fps,
+        reward_yawrate_weight=flight_config.reward_yawrate_weight,
+        roll_authority=flight_config.roll_authority,
+        pitch_authority=flight_config.pitch_authority,
+        yaw_authority=flight_config.yaw_authority,
+        control_surface_tau_s=flight_config.control_surface_tau_s,
+        crash_max_yawrate_rps=flight_config.crash_max_yawrate_rps,
+        max_horizontal_range_ft=flight_config.max_horizontal_range_ft,
     )
+
+
+# YENI: normalize edilmemis (raw) VecEnv - warm-start senaryosunda,
+# VecNormalize'i disaridan (onceki asamadan) yuklemek icin gerekli.
+def make_flight_raw_vec_env(flight_config: FlightEnvConfig, n_envs: int):
+    def _make():
+        return Monitor(make_flight_env(flight_config))
+    return DummyVecEnv([_make for _ in range(n_envs)])
 
 
 def make_flight_training_vec_env(flight_config: FlightEnvConfig, n_envs: int,
                                   training: bool, norm_reward: bool, clip_obs: float = 10.0):
-    def _make():
-        return Monitor(make_flight_env(flight_config))
-
-    venv = DummyVecEnv([_make for _ in range(n_envs)])
+    venv = make_flight_raw_vec_env(flight_config, n_envs)
     venv = VecNormalize(
         venv, norm_obs=True, norm_reward=norm_reward, clip_obs=clip_obs, training=training
     )

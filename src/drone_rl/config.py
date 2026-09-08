@@ -27,18 +27,22 @@ class EnvConfig:
 @dataclass
 class FlightEnvConfig:
     """F450FlightEnv icin ayarlar (hedef irtifa + hedef yon, ikisi de
-    her episode'da rastgele). EnvConfig'ten BAGIMSIZ, ayri bir dataclass -
-    hover config'ini hic etkilemez.
+    her episode'da rastgele). EnvConfig'ten BAGIMSIZ, ayri bir dataclass.
 
-    Drone hedef irtifanin altitude_start_offset_ft kadar ALTINDAN spawn
-    oluyor (gercek bir tirmanma yasaniyor) ve hedef irtifaya ulasip
-    success_hold_seconds kadar orada YAVASLAYIP kalinca episode
-    basariyla (success_bonus ile) sonlaniyor.
-
-    reward_hdot_weight/hdot_damping_min_factor, hedefe yaklastikca
-    guclenen bir irtifa sonumleme (damping) cezasi ekler - salinimi
-    (hedefi asip-donme) onlemek icin. success_hdot_tol_fps ise 'basari'
-    sayilabilmesi icin dikey hizin da yeterince dusuk olmasini sartlar.
+    v6:
+    - max_horizontal_range_ft: drone'un baslangic noktasindan
+      uzaklasabilecegi MAKSIMUM yatay mesafe - asilirsa crash sayilir.
+      Amac: (1) durum uzayini sinirlayip egitimi kolaylastirmak, (2)
+      simulator ekranindaki grid'i SABIT/GARANTILI bir sinir haline
+      getirmek (kayan/sonsuz grid hack'i yerine).
+    - reward_heading_weight 0.08->0.14: yon takibinin daha belirgin/
+      amacli gorunmesi icin guclendirildi (onceki agirlik cok zayifti,
+      "amacsiz/rastgele" gorunumune katkida bulunuyordu).
+    - reward_jerk_weight 0.05->0.08: komut seviyesinde ek pürüzsüzlük -
+      fiziksel yuzey yumusatmasina (control_surface_tau_s) EK olarak.
+    v5: reward_yawrate_weight, roll/pitch/yaw_authority,
+        control_surface_tau_s, crash_max_tilt_rad=0.6, crash_max_yawrate_rps.
+    v3: reward_hdot_weight, hdot_damping_min_factor, success_hdot_tol_fps.
     """
     target_altitude_min_ft: float = 20.0
     target_altitude_max_ft: float = 45.0
@@ -49,14 +53,14 @@ class FlightEnvConfig:
     hover_throttle: float = 0.420
     throttle_range: float = 0.25
     reward_alt_weight: float = 0.10
-    reward_heading_weight: float = 0.08
+    reward_heading_weight: float = 0.14
     reward_tilt_weight: float = 0.05
     reward_spin_weight: float = 0.10
-    reward_jerk_weight: float = 0.05
+    reward_jerk_weight: float = 0.08
     crash_penalty: float = 50.0
     crash_min_alt_ft: float = 1.0
     crash_max_alt_offset_ft: float = 60.0
-    crash_max_tilt_rad: float = 1.0
+    crash_max_tilt_rad: float = 0.6
     altitude_start_offset_ft: float = 25.0
     altitude_start_jitter_ft: float = 2.0
     success_alt_tol_ft: float = 1.5
@@ -65,6 +69,14 @@ class FlightEnvConfig:
     reward_hdot_weight: float = 0.12
     hdot_damping_min_factor: float = 0.3
     success_hdot_tol_fps: float = 1.0
+    reward_yawrate_weight: float = 0.06
+    roll_authority: float = 0.6
+    pitch_authority: float = 0.6
+    yaw_authority: float = 0.45
+    control_surface_tau_s: float = 0.08
+    crash_max_yawrate_rps: float = 20.0
+    # --- YENI (v6) ---
+    max_horizontal_range_ft: float = 90.0
 
 
 @dataclass

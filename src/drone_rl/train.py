@@ -2,6 +2,13 @@
 
 --task hover  -> F450HoverEnv (sabit irtifa)
 --task flight -> F450FlightEnv (rastgele irtifa + rastgele heading)
+
+YENI: --warm-start <onceki run klasoru> - CURRICULUM egitimi icin.
+Onceki asamanin model_final.zip + vecnormalize.pkl dosyalarini yukleyip
+YENI config (orn. heading reward acilmis) ile EGITIME DEVAM eder.
+Gozlem/aksiyon uzayi iki asamada da AYNI kalmali (sadece reward
+agirliklari/crash sinirlari degisebilir) - aksi halde warm-start
+gecersiz olur.
 """
 
 import argparse
@@ -13,12 +20,14 @@ from drone_rl.utils.units import ft_to_m
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, EvalCallback
+from stable_baselines3.common.vec_env import VecNormalize
 
 from drone_rl.config import load_config
 from drone_rl.env_factory import (
-    make_training_vec_env, make_flight_training_vec_env,
+    make_training_vec_env, make_flight_training_vec_env, make_flight_raw_vec_env,
 )
 from drone_rl.policies import FlightFeaturesExtractor
+from drone_rl.evaluate import resolve_model_paths
 
 
 class SaveVecNormalizeCallback(BaseCallback):
@@ -81,11 +90,6 @@ ACTIVATION_MAP = {"tanh": nn.Tanh, "relu": nn.ReLU}
 
 
 def build_policy_kwargs(cfg_ppo, task: str):
-    """policy_kwargs'i olustur: her zaman net_arch/activation'i uygular;
-    task='flight' VE cfg_ppo.use_custom_extractor=True ise ayrica
-    FlightFeaturesExtractor'i (gruplandirilmis-dal ozellik cikarici)
-    de ekler. Hover gorevinde bu extractor hic kullanilmiyor - hover'in
-    gozlem boyutu/duzeni farkli (13-dim), extractor 15-dim bekliyor."""
     kwargs = {}
 
     pi_arch = cfg_ppo.net_arch_pi if cfg_ppo.net_arch_pi is not None else [64, 64]
@@ -126,13 +130,17 @@ def build_model(algo: str, cfg, venv, tensorboard_log: str, task: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--algo", type=str, choices=["ppo"], default="ppo")
-    ap.add_argument("--task", type=str, choices=["hover", "flight"], default="hover",
-                     help="hover: sabit irtifa | flight: rastgele irtifa+heading")
+    ap.add_argument("--task", type=str, choices=["hover", "flight"], default="hover")
     ap.add_argument("--config", type=str, default=None)
     ap.add_argument("--timesteps", type=int, default=None)
     ap.add_argument("--n-envs", type=int, default=None)
     ap.add_argument("--out", type=str, default="/content/runs/run")
     ap.add_argument("--eval-freq", type=int, default=10000)
+    # YENI: curriculum icin warm-start.
+    ap.add_argument("--warm-start", type=str, default=None,
+                     help="Onceki bir run klasoru (model_final.zip + vecnormalize.pkl "
+                          "icerir) - egitime SIFIRDAN degil, buradan devam edilir. "
+                          "Sadece --task flight ile kullanilabilir.")
     args = ap.parse_args()
 
     cfg = load_config(args.config)
@@ -143,13 +151,37 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     if args.task == "hover":
+        if args.warm_start:
+            raise ValueError("--warm-start su an sadece --task flight ile destekleniyor.")
         venv = make_training_vec_env(cfg.env, n_envs=n_envs, training=True, norm_reward=True)
         eval_env = make_training_vec_env(cfg.env, n_envs=1, training=False, norm_reward=False)
     else:
-        venv = make_flight_training_vec_env(cfg.flight_env, n_envs=n_envs, training=True, norm_reward=True)
-        eval_env = make_flight_training_vec_env(cfg.flight_env, n_envs=1, training=False, norm_reward=False)
+        raw_venv = make_flight_raw_vec_env(cfg.flight_env, n_envs=n_envs)
+        raw_eval_venv = make_flight_raw_vec_env(cfg.flight_env, n_envs=1)
 
-    model = build_model(args.algo, cfg, venv, tensorboard_log=str(out / "tb"), task=args.task)
+        if args.warm_start:
+            _, warm_vecnorm_path = resolve_model_paths(Path(args.warm_start), use_best=False)
+            print(f"[warm-start] VecNormalize yukleniyor: {warm_vecnorm_path}")
+            venv = VecNormalize.load(str(warm_vecnorm_path), raw_venv)
+            venv.training = True
+            venv.norm_reward = True
+
+            eval_env = VecNormalize.load(str(warm_vecnorm_path), raw_eval_venv)
+            eval_env.training = False
+            eval_env.norm_reward = False
+        else:
+            venv = VecNormalize(raw_venv, norm_obs=True, norm_reward=True,
+                                 clip_obs=10.0, training=True)
+            eval_env = VecNormalize(raw_eval_venv, norm_obs=True, norm_reward=False,
+                                     clip_obs=10.0, training=False)
+
+    if args.warm_start:
+        warm_model_path, _ = resolve_model_paths(Path(args.warm_start), use_best=False)
+        print(f"[warm-start] Model yukleniyor: {warm_model_path}")
+        model = PPO.load(str(warm_model_path), env=venv, device="cpu",
+                          tensorboard_log=str(out / "tb"))
+    else:
+        model = build_model(args.algo, cfg, venv, tensorboard_log=str(out / "tb"), task=args.task)
 
     ckpt_cb = CheckpointCallback(
         save_freq=max(20_000 // n_envs, 1),
@@ -178,7 +210,8 @@ def main():
         control_dt=raw_eval_env.control_dt,
     )
 
-    model.learn(total_timesteps=timesteps, callback=[ckpt_cb, eval_cb, acmi_snapshot_cb])
+    model.learn(total_timesteps=timesteps, callback=[ckpt_cb, eval_cb, acmi_snapshot_cb],
+                reset_num_timesteps=(args.warm_start is None))
 
     model.save(out / "model_final")
     venv.save(str(out / "vecnormalize.pkl"))
@@ -189,6 +222,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

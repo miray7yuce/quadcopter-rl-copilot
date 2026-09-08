@@ -9,7 +9,7 @@
     --bg-0:#0b0f14; --bg-1:#111820; --bg-2:#161f29; --line:#26323e;
     --ink-0:#e8eef3; --ink-1:#9fb0bd; --ink-2:#5f7180;
     --accent:#4fd1c5; --accent-dim:#2a6b66; --warn:#e0a05a; --danger:#e0596a;
-    --auto:#4fd1c5; --manual:#e0a05a;
+    --auto:#4fd1c5; --manual:#e0a05a; --hold:#7c9eff;
     --mono: "JetBrains Mono","SF Mono",Consolas,monospace;
     --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   }
@@ -49,6 +49,7 @@
   }
   .mode-badge.auto{ background:rgba(79,209,197,.15); color:var(--auto); border:1px solid var(--auto); }
   .mode-badge.manual{ background:rgba(224,160,90,.15); color:var(--manual); border:1px solid var(--manual); }
+  .mode-badge.hold{ background:rgba(124,158,255,.15); color:var(--hold); border:1px solid var(--hold); }
 
   main{ flex:1; display:grid; grid-template-columns: 1fr 320px; min-height:0; }
 
@@ -76,7 +77,26 @@
     font-family:var(--mono); line-height:1.7;
   }
   #controls-hint b{ color:var(--ink-0); }
-  .key-active{ color:var(--manual) !important; }
+
+  #keypad{
+    position:absolute; bottom:14px; right:14px;
+    background:rgba(17,24,32,.82); border:1px solid var(--line);
+    border-radius:8px; padding:10px; backdrop-filter: blur(4px);
+  }
+  .krow{ display:flex; gap:6px; justify-content:center; margin-bottom:6px; }
+  .krow:last-child{ margin-bottom:0; }
+  .kc{
+    width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; border:1px solid var(--line); border-radius:6px;
+    background:var(--bg-2); color:var(--ink-1); font-family:var(--mono);
+    font-size:13px; font-weight:700; transition:background .08s, color .08s, border-color .08s, transform .08s;
+  }
+  .kc small{ font-size:7px; font-weight:400; color:inherit; opacity:.8; }
+  .kc.spacer{ visibility:hidden; }
+  .kc.active{
+    background:var(--manual); color:#1a1208; border-color:var(--manual);
+    transform:scale(1.12);
+  }
 
   aside#charts{
     background:var(--bg-1); border-left:1px solid var(--line);
@@ -128,11 +148,16 @@
 
       <div id="controls-hint">
         <b>Controls</b><br/>
-        <span id="key-w">W</span>/<span id="key-s">S</span> forward/back &nbsp;
-        <span id="key-a">A</span>/<span id="key-d">D</span> left/right<br/>
-        <span id="key-e">E</span>/<span id="key-f">F</span> climb/descend<br/>
+        W/S forward/back &nbsp; A/D left/right<br/>
+        E/F climb/descend<br/>
         arrow keys pan the camera view (no effect on the drone)<br/>
         release all keys → PPO autopilot resumes
+      </div>
+
+      <div id="keypad">
+        <div class="krow"><span class="kc spacer">·</span><span class="kc" id="kc-w">W</span><span class="kc spacer">·</span></div>
+        <div class="krow"><span class="kc" id="kc-a">A</span><span class="kc" id="kc-s">S</span><span class="kc" id="kc-d">D</span></div>
+        <div class="krow"><span class="kc" id="kc-e">E<small>up</small></span><span class="kc" id="kc-f">F<small>down</small></span></div>
       </div>
     </section>
 
@@ -170,17 +195,11 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { STLLoader } from "three/addons/loaders/STLLoader.js";
 
-/* ------------------------------------------------------------------ */
-/* Constants                                                            */
-/* ------------------------------------------------------------------ */
 const FT_PER_M = 3.28084;
 const DESIRED_SPAN_FT = 4.0;
 const TRAIL_LEN = 150;
-const CHART_WINDOW = 200; // canli grafiklerde tutulan son ornek sayisi
+const CHART_WINDOW = 200;
 
-/* ------------------------------------------------------------------ */
-/* DOM references                                                       */
-/* ------------------------------------------------------------------ */
 const canvas = document.getElementById("three-canvas");
 const stlInput = document.getElementById("stl-input");
 const stlStatus = document.getElementById("stl-status");
@@ -206,9 +225,6 @@ const chartCanvases = {
   tilt: document.getElementById("chart-tilt"),
 };
 
-/* ------------------------------------------------------------------ */
-/* Three.js scene setup (identical structure to the offline viewer)     */
-/* ------------------------------------------------------------------ */
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 5000);
 camera.up.set(0, 0, 1);
@@ -222,7 +238,7 @@ controls.dampingFactor = 0.08;
 controls.listenToKeyEvents(window);
 controls.keyPanSpeed = 20.0;
 controls.minDistance = 4;
-controls.maxDistance = 120;
+controls.maxDistance = 400;
 controls.zoomSpeed = 1.25;
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.55));
@@ -233,15 +249,15 @@ const fill = new THREE.DirectionalLight(0x88aacc, 0.35);
 fill.position.set(-30, 40, 20);
 scene.add(fill);
 
-let groundGrid = new THREE.GridHelper(40, 20, 0x2a3644, 0x1a232c);
-groundGrid.rotation.x = Math.PI / 2;
-scene.add(groundGrid);
-
+// DUZELTME (v6): grid ve hedef duzlemi artik SABIT (dunya merkezli),
+// boyutu ilk frame'de gelen max_horizontal_range_ft'ten turetiliyor.
+// Onceki "kayan/sonsuz grid" hack'i kaldirildi - artik gercek bir
+// fiziksel sinir (env'de crash kosulu) oldugu icin buna gerek yok.
+let groundGrid = null;
+let targetPlane = null;
 const targetPlaneMat = new THREE.MeshBasicMaterial({
   color: 0x4fd1c5, transparent: true, opacity: 0.10, side: THREE.DoubleSide,
 });
-let targetPlane = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), targetPlaneMat);
-scene.add(targetPlane);
 
 const droneGroup = new THREE.Group();
 scene.add(droneGroup);
@@ -265,7 +281,7 @@ const trailMat = new THREE.LineBasicMaterial({ color: 0x7f93a3, transparent: tru
 let trailLine = new THREE.Line(new THREE.BufferGeometry(), trailMat);
 scene.add(trailLine);
 
-let cameraInitialized = false;
+let sceneInitialized = false;
 
 function resizeRenderer() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -275,9 +291,6 @@ function resizeRenderer() {
 }
 window.addEventListener("resize", resizeRenderer);
 
-/* ------------------------------------------------------------------ */
-/* STL loading                                                          */
-/* ------------------------------------------------------------------ */
 const stlLoader = new STLLoader();
 
 stlInput.addEventListener("change", (ev) => {
@@ -309,14 +322,7 @@ stlInput.addEventListener("change", (ev) => {
   reader.readAsArrayBuffer(file);
 });
 
-/* ------------------------------------------------------------------ */
-/* WebSocket connection - live frame stream                             */
-/* ------------------------------------------------------------------ */
-let visualScale = 1.0;
 let latestFrame = null;
-
-// Kayan pencereli (rolling window) grafik verisi - tum episode'u degil,
-// sadece son CHART_WINDOW ornegi tutuyoruz.
 const chartBuf = { t: [], altErr: [], rollDeg: [], pitchDeg: [] };
 
 function pushChartSample(f) {
@@ -353,6 +359,7 @@ function connect() {
       trailPoints = [];
       chartBuf.t = []; chartBuf.altErr = []; chartBuf.rollDeg = []; chartBuf.pitchDeg = [];
       localClock = 0;
+      sceneInitialized = false; // yeni episode'da sahneyi yeniden cerceve
     }
     localClock += f.control_dt || 0.05;
     f.t_local = localClock;
@@ -365,20 +372,15 @@ function connect() {
 }
 connect();
 
-/* ------------------------------------------------------------------ */
-/* Keyboard input - WASD + arrows                                       */
-/* ------------------------------------------------------------------ */
 const TRACKED_KEYS = ["w", "a", "s", "d", "e", "f"];
 const keyState = { w: false, a: false, s: false, d: false, e: false, f: false };
 const keyHintEls = {
-  w: document.getElementById("key-w"), a: document.getElementById("key-a"),
-  s: document.getElementById("key-s"), d: document.getElementById("key-d"),
-  e: document.getElementById("key-e"), f: document.getElementById("key-f"),
+  w: document.getElementById("kc-w"), a: document.getElementById("kc-a"),
+  s: document.getElementById("kc-s"), d: document.getElementById("kc-d"),
+  e: document.getElementById("kc-e"), f: document.getElementById("kc-f"),
 };
 
 function normalizedKey(e) {
-  // DIKKAT: ok tuslari artik burada YOK - onlar drone'u degil, sadece
-  // OrbitControls uzerinden kamerayi kontrol ediyor (kendi ic listener'iyla).
   const lower = e.key.toLowerCase();
   return TRACKED_KEYS.includes(lower) ? lower : null;
 }
@@ -388,7 +390,7 @@ window.addEventListener("keydown", (e) => {
   if (!k) return;
   if (!keyState[k]) {
     keyState[k] = true;
-    keyHintEls[k]?.classList.add("key-active");
+    keyHintEls[k]?.classList.add("active");
     window._sendKeys && window._sendKeys(keyState);
   }
 });
@@ -397,34 +399,62 @@ window.addEventListener("keyup", (e) => {
   if (!k) return;
   if (keyState[k]) {
     keyState[k] = false;
-    keyHintEls[k]?.classList.remove("key-active");
+    keyHintEls[k]?.classList.remove("active");
     window._sendKeys && window._sendKeys(keyState);
   }
 });
 
-/* ------------------------------------------------------------------ */
-/* Rendering a live frame                                               */
-/* ------------------------------------------------------------------ */
-function ensureCameraFramed(f) {
-  if (cameraInitialized) return;
-  cameraInitialized = true;
+// DUZELTME (v6): "ensureCameraFramed" -> "ensureSceneFramed" - artik
+// hem kamerayi hem grid/hedef-duzlemini, BIR KERE (episode basinda),
+// max_horizontal_range_ft (fiziksel sinir) + o episode'un hedef
+// irtifasina gore boyutlandiriyor. Sabit/dar bir FOV (45) korunuyor,
+// SADECE mesafe (dist) ayarlanarak tum alan kadraja sigdiriliyor -
+// boylece drone SIMULASYON SONUNA KADAR kadraj disina cikamaz, ama
+// gorunum de asiri genis/distorted olmaz. Onceki "chase-cam" (her
+// karede kamerayi drone'a kaydiran mantik) TAMAMEN KALDIRILDI - hem
+// artik gerekmiyor (sinir zaten fiziksel/garanti) hem de ok-tuslariyla
+// yapilan manuel kadraj ayarina karisiyordu.
+function ensureSceneFramed(f) {
+  if (sceneInitialized) return;
+  sceneInitialized = true;
 
-  const gridSize = 40;
-  scene.remove(targetPlane);
-  targetPlane = new THREE.Mesh(new THREE.PlaneGeometry(gridSize, gridSize), targetPlaneMat);
+  const horizRangeFt = f.max_horizontal_range_ft || 90;
+  const arenaHalfExtentFt = horizRangeFt * 1.15; // gorsel pay
+
+  if (groundGrid) scene.remove(groundGrid);
+  const gridSpan = arenaHalfExtentFt * 2;
+  const divisions = Math.max(10, Math.round(gridSpan / 4));
+  groundGrid = new THREE.GridHelper(gridSpan, divisions, 0x2a3644, 0x1a232c);
+  groundGrid.rotation.x = Math.PI / 2;
+  groundGrid.position.set(0, 0, 0);
+  scene.add(groundGrid);
+
+  if (targetPlane) scene.remove(targetPlane);
+  targetPlane = new THREE.Mesh(new THREE.PlaneGeometry(gridSpan, gridSpan), targetPlaneMat);
   targetPlane.position.z = f.target_altitude_ft;
   scene.add(targetPlane);
 
-  const dist = 30;
-  const elev = THREE.MathUtils.degToRad(35);
+  // Kamera: dar/sabit FOV korunarak, TUM ARENAYI (yatay sinir + irtifa)
+  // kapsayacak minimum mesafeye yerlestiriliyor.
+  const verticalExtentFt = Math.max(f.target_altitude_ft, 20) * 1.35;
+  const framingRadiusFt = Math.max(arenaHalfExtentFt, verticalExtentFt);
+  const dist = framingRadiusFt / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 0.95;
+
+  const elev = THREE.MathUtils.degToRad(32);
   const azim = THREE.MathUtils.degToRad(45);
-  camera.position.set(dist * Math.cos(elev) * Math.cos(azim), dist * Math.cos(elev) * Math.sin(azim), f.target_altitude_ft + dist * Math.sin(elev) * 0.4);
-  controls.target.set(0, 0, f.target_altitude_ft * 0.5);
+  const centerZ = f.target_altitude_ft * 0.5;
+
+  camera.position.set(
+    dist * Math.cos(elev) * Math.cos(azim),
+    dist * Math.cos(elev) * Math.sin(azim),
+    centerZ + dist * Math.sin(elev) * 0.6
+  );
+  controls.target.set(0, 0, centerZ);
   controls.update();
 }
 
 function renderFrame(f) {
-  ensureCameraFramed(f);
+  ensureSceneFramed(f);
 
   const vx = f.x_m * FT_PER_M;
   const vy = f.y_m * FT_PER_M;
@@ -462,16 +492,21 @@ function renderFrame(f) {
     hud.motors.textContent = f.motor_throttle.map(v => `${Math.round(v * 100)}%`).join(" / ");
   }
 
-  modeBadge.textContent = f.mode === "manual" ? "MANUAL" : "AUTO (PPO)";
-  modeBadge.className = `mode-badge ${f.mode === "manual" ? "manual" : "auto"}`;
+  if (f.mode === "manual") {
+    modeBadge.textContent = "MANUAL";
+    modeBadge.className = "mode-badge manual";
+  } else if (f.mode === "auto-hold") {
+    modeBadge.textContent = "AUTO (HOLD)";
+    modeBadge.className = "mode-badge hold";
+  } else {
+    modeBadge.textContent = "AUTO (PPO)";
+    modeBadge.className = "mode-badge auto";
+  }
 
   pushChartSample(f);
   drawCharts();
 }
 
-/* ------------------------------------------------------------------ */
-/* Rolling-window charts (simple canvas, no external library)          */
-/* ------------------------------------------------------------------ */
 function fitCanvas(cv) {
   const rect = cv.getBoundingClientRect();
   cv.width = Math.max(1, Math.floor(rect.width * devicePixelRatio));
@@ -527,9 +562,6 @@ function drawCharts() {
   ], chartBuf.t);
 }
 
-/* ------------------------------------------------------------------ */
-/* Main render loop - draws whatever the latest received frame is       */
-/* ------------------------------------------------------------------ */
 function animate() {
   requestAnimationFrame(animate);
   if (latestFrame) renderFrame(latestFrame);

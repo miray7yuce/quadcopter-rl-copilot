@@ -1,0 +1,53 @@
+# AŞAMA 1 - SADECE irtifa tirmanma+tutma. heading_weight=0.0, yani
+# ajanin heading/yon takibiyle HIC ugrasmasina gerek yok - butun
+# odagi tirmanip oturmayi ogrenmek. Diger her sey (crash sinirlari,
+# authority, yumusatma) AYNI - boylece Asama 2'ye warm-start ederken
+# gozlem/aksiyon uzayi/fizik AYNEN korunuyor, sadece reward degisiyor.
+flight_env:
+  target_altitude_min_ft: 20.0
+  target_altitude_max_ft: 45.0
+  target_speed_fps: 6.0
+  episode_seconds: 60.0
+  control_hz: 20
+  physics_hz: 240
+  hover_throttle: 0.420
+  throttle_range: 0.25
+  reward_alt_weight: 0.10
+  reward_heading_weight: 0.0    # <-- ASAMA 1: heading KAPALI
+  reward_tilt_weight: 0.05
+  reward_spin_weight: 0.10
+  reward_jerk_weight: 0.08
+  altitude_start_offset_ft: 25.0
+  altitude_start_jitter_ft: 2.0
+  success_alt_tol_ft: 1.5
+  success_hold_seconds: 3.0
+  success_bonus: 20.0
+  reward_hdot_weight: 0.12
+  hdot_damping_min_factor: 0.3
+  success_hdot_tol_fps: 1.0
+  reward_yawrate_weight: 0.06
+  roll_authority: 0.6
+  pitch_authority: 0.6
+  yaw_authority: 0.45
+  control_surface_tau_s: 0.08
+  crash_max_tilt_rad: 0.6
+  crash_max_yawrate_rps: 20.0
+  max_horizontal_range_ft: 90.0
+ppo:
+  policy: MlpPolicy
+  n_steps: 2048
+  batch_size: 256
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  learning_rate: 0.0003
+  ent_coef: 0.0
+  net_arch_pi: [128, 128]
+  net_arch_vf: [128, 128]
+  activation_fn: tanh
+  use_custom_extractor: true
+  features_dim: 64
+train:
+  timesteps: 300000
+  n_envs: 4

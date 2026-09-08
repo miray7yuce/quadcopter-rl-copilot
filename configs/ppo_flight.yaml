@@ -1,3 +1,4 @@
+# ASAMA 2 - Asama 1'in warm-start'i uzerine heading_weight ACILIYOR.
 flight_env:
   target_altitude_min_ft: 20.0
   target_altitude_max_ft: 45.0
@@ -8,42 +9,41 @@ flight_env:
   hover_throttle: 0.420
   throttle_range: 0.25
   reward_alt_weight: 0.10
-  reward_heading_weight: 0.08
+  reward_heading_weight: 0.14
   reward_tilt_weight: 0.05
   reward_spin_weight: 0.10
-  reward_jerk_weight: 0.05
-  # --- tirmanma baslangici + hedefe ulasinca reset (success) ---
+  reward_jerk_weight: 0.08
   altitude_start_offset_ft: 25.0
   altitude_start_jitter_ft: 2.0
   success_alt_tol_ft: 1.5
   success_hold_seconds: 3.0
   success_bonus: 20.0
-  # --- YENI (v3): irtifa sonumleme (damping) - salinimi onlemek icin ---
-  # reward_hdot_weight: hedefe TAM vardiginda (progress=1) dikey hiza
-  #   uygulanan cezanin maksimum agirligi.
-  # hdot_damping_min_factor: tirmanma basinda (progress=0) bu agirligin
-  #   ne kadar zayif olacagi (0.3 = tam agirligin %30'u) - dinamik/yay
-  #   seklinde tirmanmaya izin verir, sadece hedefe yaklasinca sonumler.
-  # success_hdot_tol_fps: 'basari' sayilmasi icin irtifa toleransinin
-  #   yaninda dikey hizin da bu esigin altinda olmasi gerekir.
   reward_hdot_weight: 0.12
   hdot_damping_min_factor: 0.3
   success_hdot_tol_fps: 1.0
+  reward_yawrate_weight: 0.06
+  roll_authority: 0.6
+  pitch_authority: 0.6
+  yaw_authority: 0.45
+  control_surface_tau_s: 0.08
+  crash_max_tilt_rad: 0.6
+  crash_max_yawrate_rps: 20.0
+  max_horizontal_range_ft: 90.0
 ppo:
   policy: MlpPolicy
-  n_steps: 1024
+  n_steps: 2048
   batch_size: 256
-  n_epochs: 8
-  gamma: 0.98
-  gae_lambda: 0.821733218323567
-  clip_range: 0.30028032106674823
-  learning_rate: 0.0009682086811397772
-  ent_coef: 0.008527398284507002
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  learning_rate: 0.0003
+  ent_coef: 0.0
   net_arch_pi: [128, 128]
   net_arch_vf: [128, 128]
   activation_fn: tanh
   use_custom_extractor: true
   features_dim: 64
 train:
-  timesteps: 600000
+  timesteps: 700000
   n_envs: 4
