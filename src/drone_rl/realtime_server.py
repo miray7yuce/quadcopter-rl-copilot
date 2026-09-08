@@ -33,41 +33,69 @@ from drone_rl.evaluate import resolve_model_paths
 
 # --- Manuel kontrol hissi icin ayarlanabilir sabitler ---
 # Bunlar fiziksel dogruluk degil, "oyun hissi" sabitleri - istedigin gibi
-# degistirebilirsin (0.1-0.5 arasi makul bir aralik).
-PITCH_MAG = 0.30
-ROLL_MAG = 0.30
-ALT_MAG = 0.40
+# degistirebilirsin. Onceki degerlere (0.30/0.30/0.40) gore buyutuldu,
+# cunku kucuk degerler quadin gercek kutlesi/ataleti yuzunden cok yavas
+# hizlanip yavasliyordu - daha buyuk degerler daha "gercek zamanli" hissettirir.
+PITCH_MAG = 0.55   # W/S -> ileri/geri
+ROLL_MAG = 0.55    # A/D -> sola/saga
+ALT_MAG = 0.65     # E/F -> yukselme/alcalma
+
+# Cevirirken (W/A/S/D) irtifayi sabit tutan geri besleme (feedback)
+# katsayisi. Drone yana/one yatinca toplam itki artik tam dikey olmadigi
+# icin dogal olarak alcalir (gercek quadcopterlarda da boyledir) - bu
+# katsayi o kaybi telafi ediyor.
+ALT_HOLD_KP = 0.08
+ALT_HOLD_MAX = 0.5
 
 
-def manual_action_from_keys(keys: dict) -> np.ndarray:
-    """WASD + ok tuslarini 4 motorun aksiyonuna (-1..1) cevirir.
+class ManualController:
+    """W/A/S/D = ileri/geri/sola/saga (pitch/roll ile), E/F = yukselme/alcalma.
 
-    UYARI - motor mixing varsayimi: JSBSim'in F450 modelinde 4 motorun
-    (fcs/throttle-cmd-norm[0..3]) hangi fiziksel koseye (on-sol, on-sag,
-    arka-sol, arka-sag) karsilik geldigini buradan goremiyoruz - bu
-    bilgi JSBSim model dosyasinin icinde tanimli, disaridan erisilemiyor.
+    W/A/S/D basiliyken E/F basili DEGILSE, egilme (tilt) kaynakli dogal
+    irtifa kaybini otomatik telafi ederek irtifayi kilitli tutar - yoksa
+    "A/D irtifayi da degistiriyor" gibi kafa karistirici bir yan etki
+    olur (bu FIZIKSEL bir etki, motor mixing hatasi degil: drone
+    yatinca toplam itkinin dikey bilesimi azalir).
 
-    Asagidaki mixing YAYGIN bir X-quad konvansiyonu varsayiyor (motor
-    sirasi: [on-sol, on-sag, arka-sol, arka-sag]). Test ettiginde "ileri"
-    tusu geriye gidiyor ya da "sola" tusu saga donduruyorsa, PITCH_MAG
-    veya ROLL_MAG'in isaretini (+/-) ters cevirmen yeterli - fiziksel
-    bir hata degil, sadece varsayim yanlis yone denk gelmis demektir.
+    E veya F basilinca kilit birakilir, dogrudan tam guclu yukselme/
+    alcalma komutu verilir. Tum tuslar birakilinca (PPO otomatik pilota
+    donulunce) kilit sifirlanir - manuel kontrole tekrar girildiginde
+    O ANKI irtifadan yeniden kilitlenir, eski/bayat bir degerden degil.
     """
-    pitch = PITCH_MAG if keys.get("w") else (-PITCH_MAG if keys.get("s") else 0.0)
-    roll = ROLL_MAG if keys.get("d") else (-ROLL_MAG if keys.get("a") else 0.0)
-    throttle = ALT_MAG if keys.get("ArrowUp") else (-ALT_MAG if keys.get("ArrowDown") else 0.0)
 
-    motor_fl = throttle + pitch + roll
-    motor_fr = throttle + pitch - roll
-    motor_rl = throttle - pitch + roll
-    motor_rr = throttle - pitch - roll
+    def __init__(self):
+        self.alt_lock = None
 
-    action = np.array([motor_fl, motor_fr, motor_rl, motor_rr], dtype=np.float32)
-    return np.clip(action, -1.0, 1.0)
+    def compute_action(self, keys: dict, current_alt_ft: float) -> np.ndarray:
+        pitch = PITCH_MAG if keys.get("w") else (-PITCH_MAG if keys.get("s") else 0.0)
+        roll = ROLL_MAG if keys.get("d") else (-ROLL_MAG if keys.get("a") else 0.0)
+
+        if keys.get("e") or keys.get("f"):
+            self.alt_lock = None
+            throttle = ALT_MAG if keys.get("e") else -ALT_MAG
+        else:
+            if self.alt_lock is None:
+                self.alt_lock = current_alt_ft
+            throttle = float(np.clip(
+                ALT_HOLD_KP * (self.alt_lock - current_alt_ft), -ALT_HOLD_MAX, ALT_HOLD_MAX
+            ))
+
+        motor_fl = throttle + pitch + roll
+        motor_fr = throttle + pitch - roll
+        motor_rl = throttle - pitch + roll
+        motor_rr = throttle - pitch - roll
+
+        action = np.array([motor_fl, motor_fr, motor_rl, motor_rr], dtype=np.float32)
+        return np.clip(action, -1.0, 1.0)
+
+    def reset_lock(self):
+        self.alt_lock = None
 
 
 def any_key_pressed(keys: dict) -> bool:
-    return any(keys.get(k) for k in ("w", "a", "s", "d", "ArrowUp", "ArrowDown"))
+    # DIKKAT: ok tuslari artik burada YOK - onlar sadece kamera icin,
+    # drone kontrolune dahil degiller (E/F irtifa icin kullaniliyor).
+    return any(keys.get(k) for k in ("w", "a", "s", "d", "e", "f"))
 
 
 class NormalizerStats:
@@ -121,6 +149,13 @@ def index():
     return FileResponse(STATE["html_path"])
 
 
+# Basariyla hedefe ulasildiktan sonra, hemen resetlemeden once ekranda
+# ne kadar sure daha (saniye) izleyelim - saf gorsellestirme amacli,
+# env'in kendi terminated=True mantigini (egitimde kullanilan) DEGISTIRMIYORUZ,
+# sadece sunucu tarafinda "reset()'i cagirmayi geciktiriyoruz".
+SUCCESS_LINGER_SECONDS = 3.0
+
+
 @app.websocket("/ws")
 async def flight_loop(websocket: WebSocket):
     await websocket.accept()
@@ -131,6 +166,14 @@ async def flight_loop(websocket: WebSocket):
 
     env = make_flight_env(cfg.flight_env)
     obs, _ = env.reset()
+
+    # None: normal ucus. Sayi: "basariyla ulasti, su kadar adim sonra
+    # resetlenecek" geri sayimi. Bu sayede terminated=True dondugu anda
+    # DEGIL, SUCCESS_LINGER_SECONDS kadar sonra reset() cagriliyor -
+    # boylece "TARGET REACHED" durumunu ekranda birkac saniye gorebiliyoruz.
+    linger_steps_total = max(1, int(SUCCESS_LINGER_SECONDS / env.control_dt))
+    linger_remaining = None
+    manual_ctrl = ManualController()
 
     # WASD durumu ayri bir "receiver" task'inde tutuluyor, boylece ana
     # fizik dongusu tus mesaji beklemek zorunda kalmadan kendi hizinda
@@ -154,9 +197,11 @@ async def flight_loop(websocket: WebSocket):
             keys = current_keys
 
             if any_key_pressed(keys):
-                action = manual_action_from_keys(keys)
+                current_alt_ft = env.fdm["position/h-agl-ft"]
+                action = manual_ctrl.compute_action(keys, current_alt_ft)
                 mode = "manual"
             else:
+                manual_ctrl.reset_lock()
                 norm_obs = stats.normalize(obs).reshape(1, -1)
                 action, _ = model.predict(norm_obs, deterministic=True)
                 action = action[0]
@@ -165,9 +210,27 @@ async def flight_loop(websocket: WebSocket):
             obs, reward, terminated, truncated, info = env.step(action)
 
             episode_reset = False
-            if terminated or truncated:
-                obs, _ = env.reset()
-                episode_reset = True
+
+            if linger_remaining is not None:
+                # Basari sonrasi "bekleme" penceresindeyiz. Cakisma olursa
+                # beklemeden hemen resetle; yoksa geri sayimi azalt.
+                linger_remaining -= 1
+                if info.get("crashed") or linger_remaining <= 0:
+                    obs, _ = env.reset()
+                    episode_reset = True
+                    linger_remaining = None
+                # yoksa: reset ETME, env'in terminated=True demesine ragmen
+                # step() atmaya devam ediyoruz - JSBSim'in fizigi bunu
+                # umursamiyor, sadece bizim reset() cagirip cagirmamamiz
+                # onemli.
+            elif terminated or truncated:
+                if info.get("reached_target") and not info.get("crashed"):
+                    # Basariyla ulasti - hemen resetlemek yerine bekleme
+                    # geri sayimini baslat.
+                    linger_remaining = linger_steps_total
+                else:
+                    obs, _ = env.reset()
+                    episode_reset = True
 
             payload = dict(info)
             payload["mode"] = mode

@@ -130,7 +130,8 @@
         <b>Controls</b><br/>
         <span id="key-w">W</span>/<span id="key-s">S</span> forward/back &nbsp;
         <span id="key-a">A</span>/<span id="key-d">D</span> left/right<br/>
-        <span id="key-up">↑</span>/<span id="key-down">↓</span> climb/descend<br/>
+        <span id="key-e">E</span>/<span id="key-f">F</span> climb/descend<br/>
+        arrow keys pan the camera view (no effect on the drone)<br/>
         release all keys → PPO autopilot resumes
       </div>
     </section>
@@ -367,16 +368,17 @@ connect();
 /* ------------------------------------------------------------------ */
 /* Keyboard input - WASD + arrows                                       */
 /* ------------------------------------------------------------------ */
-const TRACKED_KEYS = ["w", "a", "s", "d", "ArrowUp", "ArrowDown"];
-const keyState = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false };
+const TRACKED_KEYS = ["w", "a", "s", "d", "e", "f"];
+const keyState = { w: false, a: false, s: false, d: false, e: false, f: false };
 const keyHintEls = {
   w: document.getElementById("key-w"), a: document.getElementById("key-a"),
   s: document.getElementById("key-s"), d: document.getElementById("key-d"),
-  ArrowUp: document.getElementById("key-up"), ArrowDown: document.getElementById("key-down"),
+  e: document.getElementById("key-e"), f: document.getElementById("key-f"),
 };
 
 function normalizedKey(e) {
-  if (e.key === "ArrowUp" || e.key === "ArrowDown") return e.key;
+  // DIKKAT: ok tuslari artik burada YOK - onlar drone'u degil, sadece
+  // OrbitControls uzerinden kamerayi kontrol ediyor (kendi ic listener'iyla).
   const lower = e.key.toLowerCase();
   return TRACKED_KEYS.includes(lower) ? lower : null;
 }
@@ -384,7 +386,6 @@ function normalizedKey(e) {
 window.addEventListener("keydown", (e) => {
   const k = normalizedKey(e);
   if (!k) return;
-  if (k === "ArrowUp" || k === "ArrowDown") e.preventDefault();
   if (!keyState[k]) {
     keyState[k] = true;
     keyHintEls[k]?.classList.add("key-active");
