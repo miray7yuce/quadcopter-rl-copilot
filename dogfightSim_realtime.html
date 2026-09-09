@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>F450 Dogfight — Self-Play Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root{
+    --bg-0:#0b0f14; --bg-1:#111820; --bg-2:#161f29; --line:#26323e;
+    --ink-0:#e8eef3; --ink-1:#9fb0bd; --ink-2:#5f7180;
+    --training:#4fd1c5; --best:#e0a05a; --danger:#e0596a;
+    --mono: "JetBrains Mono","SF Mono",Consolas,monospace;
+    --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; height:100%; background:var(--bg-0); color:var(--ink-0); font-family:var(--sans); }
+  #app{ display:flex; flex-direction:column; height:100vh; }
+
+  header{
+    display:flex; align-items:center; gap:14px; padding:12px 18px;
+    background:var(--bg-1); border-bottom:1px solid var(--line); flex-wrap:wrap;
+  }
+  header h1{ font-size:15px; font-weight:600; margin:0; white-space:nowrap; }
+  header h1 span{ color:var(--training); }
+
+  .toggle-group{ display:flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .toggle-group button{
+    background:var(--bg-2); color:var(--ink-1); border:none; padding:7px 14px;
+    font-size:12px; font-family:var(--mono); cursor:pointer;
+  }
+  .toggle-group button.active{ background:var(--training); color:#04211e; font-weight:700; }
+
+  .conn-status{
+    margin-left:auto; display:flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:12px;
+  }
+  .conn-dot{ width:8px; height:8px; border-radius:50%; background:var(--ink-2); }
+  .conn-dot.connected{ background:var(--training); }
+  .conn-dot.disconnected{ background:var(--danger); }
+
+  main{ flex:1; position:relative; min-height:0; }
+  #three-canvas{ width:100%; height:100%; display:block; }
+
+  #scoreboard{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    display:flex; gap:0; background:rgba(17,24,32,.88); border:1px solid var(--line);
+    border-radius:10px; overflow:hidden; font-family:var(--mono); backdrop-filter: blur(4px);
+  }
+  .score-cell{ padding:10px 22px; text-align:center; min-width:110px; }
+  .score-cell.training{ border-right:1px solid var(--line); }
+  .score-cell .label{ font-size:10px; color:var(--ink-2); letter-spacing:.5px; }
+  .score-cell.training .label{ color:var(--training); }
+  .score-cell.best .label{ color:var(--best); }
+  .score-cell .value{ font-size:26px; font-weight:700; margin-top:2px; }
+  .score-cell.scoring{ animation: flash 0.5s ease-in-out; }
+  @keyframes flash{ 0%,100%{background:transparent;} 50%{background:rgba(255,255,255,.15);} }
+
+  #hud{
+    position:absolute; bottom:14px; left:14px;
+    background:rgba(17,24,32,.85); border:1px solid var(--line);
+    border-radius:8px; padding:10px 14px; font-family:var(--mono); font-size:12px;
+    line-height:1.7; color:var(--ink-0); backdrop-filter: blur(4px); min-width:190px;
+  }
+  #hud .row{ display:flex; justify-content:space-between; gap:18px; }
+  #hud .row .k{ color:var(--ink-2); }
+  #hud .cone-status.active{ color:var(--danger); font-weight:700; }
+  #hud .reset-reason{ color:var(--best); }
+
+  #finished-overlay{
+    position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+    background:rgba(11,15,20,.75); backdrop-filter: blur(3px);
+  }
+  #finished-overlay.show{ display:flex; }
+  #finished-overlay .box{
+    background:var(--bg-1); border:1px solid var(--line); border-radius:12px;
+    padding:28px 40px; text-align:center;
+  }
+  #finished-overlay h2{ margin:0 0 8px; color:var(--training); }
+  #finished-overlay p{ margin:0; color:var(--ink-1); font-family:var(--mono); font-size:13px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>F450 <span>Dogfight</span> — Self-Play</h1>
+    <div class="toggle-group">
+      <button id="btn-3d" class="active">3D</button>
+      <button id="btn-2d">2D (top-down)</button>
+    </div>
+    <div class="conn-status">
+      <span class="conn-dot" id="conn-dot"></span>
+      <span id="conn-text">connecting…</span>
+    </div>
+  </header>
+
+  <main>
+    <canvas id="three-canvas"></canvas>
+
+    <div id="scoreboard">
+      <div class="score-cell training" id="cell-training">
+        <div class="label">TRAINING</div>
+        <div class="value" id="score-training">0</div>
+      </div>
+      <div class="score-cell best" id="cell-best">
+        <div class="label">BEST</div>
+        <div class="value" id="score-best">0</div>
+      </div>
+    </div>
+
+    <div id="hud">
+      <div class="row"><span class="k">range</span><span class="v" id="hud-range">–</span></div>
+      <div class="row"><span class="k">step</span><span class="v" id="hud-step">–</span></div>
+      <div class="row"><span class="k">episode</span><span class="v" id="hud-episode">–</span></div>
+      <div class="row"><span class="k">son reset</span><span class="v reset-reason" id="hud-reset-reason">–</span></div>
+      <div class="row"><span class="k">TRAINING → cone</span><span class="v cone-status" id="hud-cone-mine">–</span></div>
+      <div class="row"><span class="k">BEST → cone</span><span class="v cone-status" id="hud-cone-opp">–</span></div>
+    </div>
+
+    <div id="finished-overlay">
+      <div class="box">
+        <h2>SIMULATION COMPLETE</h2>
+        <p id="finished-summary">–</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const ARENA_HALF_FT = 220;
+
+const canvas = document.getElementById("three-canvas");
+const connDot = document.getElementById("conn-dot");
+const connText = document.getElementById("conn-text");
+const scoreTrainingEl = document.getElementById("score-training");
+const scoreBestEl = document.getElementById("score-best");
+const cellTraining = document.getElementById("cell-training");
+const cellBest = document.getElementById("cell-best");
+const hud = {
+  range: document.getElementById("hud-range"),
+  step: document.getElementById("hud-step"),
+  episode: document.getElementById("hud-episode"),
+  resetReason: document.getElementById("hud-reset-reason"),
+  coneMine: document.getElementById("hud-cone-mine"),
+  coneOpp: document.getElementById("hud-cone-opp"),
+};
+const finishedOverlay = document.getElementById("finished-overlay");
+const finishedSummary = document.getElementById("finished-summary");
+
+const RESET_REASON_LABELS = {
+  collision: "ÇARPIŞMA",
+  self_crash: "TRAINING düştü/sınır dışı",
+  opponent_crash: "BEST düştü/sınır dışı",
+  timeout: "süre doldu",
+};
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 3000);
+camera.up.set(0, 0, 1);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 0, 150);
+camera.position.set(300, -300, 350);
+controls.update();
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+sun.position.set(200, -150, 300);
+scene.add(sun);
+
+const grid = new THREE.GridHelper(ARENA_HALF_FT * 2 * 1.15, 40, 0x2a3644, 0x1a232c);
+grid.rotation.x = Math.PI / 2;
+scene.add(grid);
+
+/* -------------------------------------------------------------- */
+/* Basit "X" ucak ikonu - 3D (kalin, golgeli) ve 2D (duz, sadece    */
+/* yaw'a gore donen) icin AYRI mesh'ler. Burun yonu 4 kolun disinda */
+/* AYRI bir kucuk isaretci ile (tam +X ekseni, gercek psi ile       */
+/* birebir hizali) belirtiliyor.                                    */
+/* -------------------------------------------------------------- */
+const ARM_ANGLES_DEG = [45, 135, 225, 315];
+const ARM_LEN = 2.6, ARM_W = 0.35, HUB_R = 0.5;
+
+function buildAircraftIcon(bodyColorHex, noseColorHex) {
+  const group = new THREE.Group();
+
+  // ---- 3D govde (kalin, isikli, tam roll/pitch/yaw ile doner) ----
+  const mesh3d = new THREE.Group();
+  const bodyMat3d = new THREE.MeshStandardMaterial({ color: bodyColorHex, metalness: 0.2, roughness: 0.6 });
+  const armGeom3d = new THREE.BoxGeometry(ARM_LEN, ARM_W, ARM_W);
+  ARM_ANGLES_DEG.forEach((deg) => {
+    const arm = new THREE.Mesh(armGeom3d, bodyMat3d);
+    const rad = THREE.MathUtils.degToRad(deg);
+    arm.position.set(Math.cos(rad) * (ARM_LEN / 2), Math.sin(rad) * (ARM_LEN / 2), 0);
+    arm.rotation.z = rad;
+    mesh3d.add(arm);
+  });
+  mesh3d.add(new THREE.Mesh(new THREE.SphereGeometry(HUB_R, 12, 12), bodyMat3d));
+  const noseMat3d = new THREE.MeshStandardMaterial({ color: noseColorHex, metalness: 0.1, roughness: 0.4 });
+  const nose3d = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.1, 10), noseMat3d);
+  nose3d.rotation.z = -Math.PI / 2;
+  nose3d.position.set(ARM_LEN * 0.85, 0, 0);
+  mesh3d.add(nose3d);
+  group.add(mesh3d);
+
+  // ---- 2D govde (DUZ - roll/pitch YOK SAYILIR, sadece yaw) ----
+  const mesh2d = new THREE.Group();
+  const bodyMat2d = new THREE.MeshBasicMaterial({ color: bodyColorHex, side: THREE.DoubleSide });
+  const armGeom2d = new THREE.PlaneGeometry(ARM_LEN, ARM_W);
+  ARM_ANGLES_DEG.forEach((deg) => {
+    const arm = new THREE.Mesh(armGeom2d, bodyMat2d);
+    const rad = THREE.MathUtils.degToRad(deg);
+    arm.position.set(Math.cos(rad) * (ARM_LEN / 2), Math.sin(rad) * (ARM_LEN / 2), 0);
+    arm.rotation.z = rad;
+    mesh2d.add(arm);
+  });
+  const noseMat2d = new THREE.MeshBasicMaterial({ color: noseColorHex, side: THREE.DoubleSide });
+  const nose2d = new THREE.Mesh(new THREE.CircleGeometry(0.5, 12), noseMat2d);
+  nose2d.position.set(ARM_LEN * 0.9, 0, 0.01);
+  mesh2d.add(nose2d);
+  mesh2d.visible = false;
+  group.add(mesh2d);
+
+  return { group, mesh3d, mesh2d };
+}
+
+function makeCone3d(colorHex, halfAngleDeg, rangeFt) {
+  const radius = rangeFt * Math.tan(THREE.MathUtils.degToRad(halfAngleDeg));
+  const geom = new THREE.ConeGeometry(radius, rangeFt, 24, 1, true);
+  geom.translate(0, -rangeFt / 2, 0);
+  geom.rotateZ(-Math.PI / 2);
+  const mat = new THREE.MeshBasicMaterial({
+    color: colorHex, transparent: true, opacity: 0.10, side: THREE.DoubleSide, depthWrite: false,
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.visible = true;
+  return mesh;
+}
+
+function makeCone2d(colorHex, halfAngleDeg, rangeFt) {
+  const halfRad = THREE.MathUtils.degToRad(halfAngleDeg);
+  const geom = new THREE.CircleGeometry(rangeFt, 24, -halfRad, halfRad * 2);
+  const mat = new THREE.MeshBasicMaterial({
+    color: colorHex, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false,
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.visible = false;
+  return mesh;
+}
+
+const trainingIcon = buildAircraftIcon(0x4fd1c5, 0xffffff);
+scene.add(trainingIcon.group);
+const trainingCone3d = makeCone3d(0x4fd1c5, 30, 120);
+trainingIcon.mesh3d.add(trainingCone3d);
+const trainingCone2d = makeCone2d(0x4fd1c5, 30, 120);
+trainingIcon.mesh2d.add(trainingCone2d);
+
+const bestIcon = buildAircraftIcon(0xe0a05a, 0xffffff);
+scene.add(bestIcon.group);
+const bestCone3d = makeCone3d(0xe0a05a, 30, 120);
+bestIcon.mesh3d.add(bestCone3d);
+const bestCone2d = makeCone2d(0xe0a05a, 30, 120);
+bestIcon.mesh2d.add(bestCone2d);
+
+let conesSized = false;
+function ensureConeSize(f) {
+  if (conesSized) return;
+  conesSized = true;
+  [trainingCone3d, bestCone3d].forEach((c) => {
+    c.geometry.dispose();
+    const radius = f.cone_range_ft * Math.tan(THREE.MathUtils.degToRad(f.cone_half_angle_deg));
+    c.geometry = new THREE.ConeGeometry(radius, f.cone_range_ft, 24, 1, true);
+    c.geometry.translate(0, -f.cone_range_ft / 2, 0);
+    c.geometry.rotateZ(-Math.PI / 2);
+  });
+  [trainingCone2d, bestCone2d].forEach((c) => {
+    c.geometry.dispose();
+    const halfRad = THREE.MathUtils.degToRad(f.cone_half_angle_deg);
+    c.geometry = new THREE.CircleGeometry(f.cone_range_ft, 24, -halfRad, halfRad * 2);
+  });
+}
+
+const trailTraining = [];
+const trailBest = [];
+const TRAIL_LEN = 200;
+let trailLineTraining = new THREE.Line(new THREE.BufferGeometry(),
+  new THREE.LineBasicMaterial({ color: 0x4fd1c5, transparent: true, opacity: 0.5 }));
+let trailLineBest = new THREE.Line(new THREE.BufferGeometry(),
+  new THREE.LineBasicMaterial({ color: 0xe0a05a, transparent: true, opacity: 0.5 }));
+scene.add(trailLineTraining);
+scene.add(trailLineBest);
+
+function resizeRenderer() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / Math.max(h, 1);
+  camera.updateProjectionMatrix();
+}
+window.addEventListener("resize", resizeRenderer);
+
+/* -------------------------------------------------------------- */
+/* 2D / 3D toggle                                                   */
+/* -------------------------------------------------------------- */
+let is2D = false;
+document.getElementById("btn-3d").addEventListener("click", () => setMode(false));
+document.getElementById("btn-2d").addEventListener("click", () => setMode(true));
+
+function setMode(twoD) {
+  is2D = twoD;
+  document.getElementById("btn-3d").classList.toggle("active", !twoD);
+  document.getElementById("btn-2d").classList.toggle("active", twoD);
+
+  trainingIcon.mesh3d.visible = !twoD;
+  trainingIcon.mesh2d.visible = twoD;
+  bestIcon.mesh3d.visible = !twoD;
+  bestIcon.mesh2d.visible = twoD;
+
+  if (twoD) {
+    controls.minPolarAngle = 0;
+    controls.maxPolarAngle = 0.001;
+    camera.position.set(controls.target.x, controls.target.y, controls.target.z + 500);
+  } else {
+    controls.minPolarAngle = 0;
+    controls.maxPolarAngle = Math.PI;
+  }
+  controls.update();
+}
+
+/* -------------------------------------------------------------- */
+/* WebSocket                                                        */
+/* -------------------------------------------------------------- */
+let latestFrame = null;
+let lastMyScore = 0, lastOppScore = 0;
+
+function connect() {
+  const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws`);
+
+  ws.onopen = () => { connDot.className = "conn-dot connected"; connText.textContent = "connected"; };
+  ws.onclose = () => {
+    connDot.className = "conn-dot disconnected"; connText.textContent = "disconnected — retrying…";
+    setTimeout(connect, 1500);
+  };
+  ws.onerror = () => ws.close();
+  ws.onmessage = (msg) => { latestFrame = JSON.parse(msg.data); };
+}
+connect();
+
+function renderFrame(f) {
+  ensureConeSize(f);
+
+  const [sn, se, salt] = f.self_pos;
+  const [on, oe, oalt] = f.opp_pos;
+  const [sroll, spitch, syaw] = f.self_attitude;
+  const [oroll, opitch, oyaw] = f.opp_attitude;
+
+  trainingIcon.group.position.set(sn, se, salt);
+  trainingIcon.mesh3d.rotation.set(sroll, spitch, syaw, "XYZ");
+  trainingIcon.mesh2d.rotation.set(0, 0, syaw);
+
+  bestIcon.group.position.set(on, oe, oalt);
+  bestIcon.mesh3d.rotation.set(oroll, opitch, oyaw, "XYZ");
+  bestIcon.mesh2d.rotation.set(0, 0, oyaw);
+
+  trailTraining.push(new THREE.Vector3(sn, se, salt));
+  if (trailTraining.length > TRAIL_LEN) trailTraining.shift();
+  trailLineTraining.geometry.dispose();
+  trailLineTraining.geometry = new THREE.BufferGeometry().setFromPoints(trailTraining);
+
+  trailBest.push(new THREE.Vector3(on, oe, oalt));
+  if (trailBest.length > TRAIL_LEN) trailBest.shift();
+  trailLineBest.geometry.dispose();
+  trailLineBest.geometry = new THREE.BufferGeometry().setFromPoints(trailBest);
+
+  hud.range.textContent = `${f.range_ft.toFixed(1)} ft`;
+  hud.step.textContent = f.step;
+  hud.episode.textContent = f.episode_count;
+  hud.resetReason.textContent = f.last_reset_reason ? (RESET_REASON_LABELS[f.last_reset_reason] || f.last_reset_reason) : "—";
+  hud.coneMine.textContent = f.opp_in_my_cone ? "IN CONE ✓" : "—";
+  hud.coneMine.classList.toggle("active", f.opp_in_my_cone);
+  hud.coneOpp.textContent = f.me_in_opp_cone ? "IN CONE ✓" : "—";
+  hud.coneOpp.classList.toggle("active", f.me_in_opp_cone);
+
+  scoreTrainingEl.textContent = f.my_score;
+  scoreBestEl.textContent = f.opp_score;
+  if (f.my_score > lastMyScore) { cellTraining.classList.add("scoring"); setTimeout(() => cellTraining.classList.remove("scoring"), 500); }
+  if (f.opp_score > lastOppScore) { cellBest.classList.add("scoring"); setTimeout(() => cellBest.classList.remove("scoring"), 500); }
+  lastMyScore = f.my_score; lastOppScore = f.opp_score;
+
+  if (f.finished) {
+    finishedOverlay.classList.add("show");
+    finishedSummary.textContent = `TRAINING ${f.my_score} — ${f.opp_score} BEST  (${f.episode_count} episode, ${f.step} adım)`;
+  }
+
+  if (!is2D) {
+    const midX = (sn + on) / 2, midY = (se + oe) / 2, midZ = (salt + oalt) / 2;
+    controls.target.lerp(new THREE.Vector3(midX, midY, midZ), 0.03);
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (latestFrame) renderFrame(latestFrame);
+  controls.update();
+  resizeRenderer();
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>

@@ -1,3 +1,6 @@
 __pycache__/
-.ipynb_checkpoints
-runs/*/ckpt/
+*.zip
+*.pkl
+logs/
+runs/
+.ipynb_checkpoints/
