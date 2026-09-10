@@ -1,13 +1,6 @@
 __pycache__/
-*.pyc
+*.zip
+*.pkl
 logs/
+runs/
 .ipynb_checkpoints/
-
-# Model checkpoint'leri (model_final.zip, vecnormalize.pkl, best_model/,
-# checkpoint pool) ARTIK dahil ediliyor - onceki *.zip/*.pkl/runs/
-# satirlari bunlari YANLISLIKLA engelliyordu.
-# Sadece egitim sirasinda biriken ARA checkpoint'leri ve gecici
-# promotion adaylarini disliyoruz (bunlar cok yer kaplar, ise yaramaz):
-runs/*/ckpt/
-runs/*/_promo_candidate_*
-runs/*/tb/

@@ -1,21 +1,21 @@
 """Iki F450 arasinda 'dogfight' gorevi - birbirini kovalayip radar
 konisine alma. TAM 3D fizik.
 
-DUZELTME (v3):
-- info dict'e HER IKI drone icin de (self + opp) kinematik telemetri
-  (hdot) ve odul bileseni kirilimi (align/exposure/standoff/control)
-  eklendi - demo ekraninda IKI drone icin de ayri ayri veri gosterebilmek
-  icin. opp_* alanlari SADECE gorsellestirme/tani amacli - egitim
-  odulune hicbir etkisi yok (egitim hala sadece "self" perspektifinden
-  hesaplanan reward'i kullanir).
+v5: Stage B'de rakip HER reset()'te havuzdan yeniden orneklenir.
+v4: KRITIK konum duzeltmesi - mutlak enlem/boylam (ic/lat-gc-deg,
+    ic/long-gc-deg) kullaniliyor. Eskiden "distance-from-start-*"
+    property'leri kullaniliyordu, bunlar HER FDM'IN KENDI baslangicina
+    gore olcum yapiyordu (iki FDM arasi PAYLASILAN referans DEGIL) -
+    iki drone pratikte HEP ayni noktada spawn oluyordu. Ampirik JSBSim
+    testiyle dogrulanan duzeltme.
+v3: info dict'e her iki drone icin kinematik + odul kirilimi eklendi.
 
---- (v2 notlari, hala gecerli) ---
-- standoff_penalty CAP'LI (config.py notu).
-- reset_reason info alani eklendi.
-- reset() icinde spawn konumu artik GERCEKTEN uygulaniyor (onceki
-  surumde x_ft/y_ft hesaplaniyordu ama fdm'e hic yazilmiyordu - iki
-  drone her zaman ayni noktada spawn oluyordu, bu da her episode
-  basinda ANINDA carpisma/reset'e yol aciyordu).
+--- KIM RL ILE CALISIYOR? ---
+- fdm_self: HER ZAMAN dis taraftan (PPO) gelen action ile suruluyor.
+- fdm_opp: self.opponent_controller uzerinden - Stage A'da scripted
+  (RL degil), Stage B'de dondurulmus/inference-only bir PPO modeli.
+- reward SADECE fdm_self icin hesaplanir, opp hicbir zaman bu adimda
+  ogrenmez (frozen opponent self-play deseni).
 """
 
 import math
@@ -26,7 +26,9 @@ import gymnasium as gym
 from gymnasium import spaces
 import jsbsim
 
-FT_PER_M = 3.28084
+LAT0_DEG = 0.0
+LON0_DEG = 0.0
+FT_PER_DEG_LAT = 364567.2
 
 
 class BaseOpponentController:
@@ -97,7 +99,8 @@ class PPOOpponentController(BaseOpponentController):
 class DogfightEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, cfg, opponent_controller: Optional[BaseOpponentController] = None):
+    def __init__(self, cfg, opponent_controller: Optional[BaseOpponentController] = None,
+                 opponent_pool=None, opponent_latest_prob: float = 0.7):
         super().__init__()
         self.cfg = cfg
 
@@ -123,6 +126,8 @@ class DogfightEnv(gym.Env):
         self.fdm_opp.set_dt(self.physics_dt)
 
         self.opponent_controller = opponent_controller or ScriptedCircleOpponent()
+        self.opponent_pool = opponent_pool
+        self.opponent_latest_prob = opponent_latest_prob
 
         self._surface_self = np.zeros(3, dtype=np.float64)
         self._surface_opp = np.zeros(3, dtype=np.float64)
@@ -151,7 +156,10 @@ class DogfightEnv(gym.Env):
         model_path, vecnorm_path = model_vecnorm_tuple
         self.opponent_controller = load_opponent_controller(model_path, vecnorm_path)
 
-    def _init_fdm(self, fdm, alt_ft, heading_deg):
+    def _init_fdm(self, fdm, alt_ft, heading_deg, north_ft=0.0, east_ft=0.0):
+        ft_per_deg_lon = FT_PER_DEG_LAT * math.cos(math.radians(LAT0_DEG))
+        fdm["ic/lat-gc-deg"] = LAT0_DEG + north_ft / FT_PER_DEG_LAT
+        fdm["ic/long-gc-deg"] = LON0_DEG + east_ft / ft_per_deg_lon
         fdm["ic/h-agl-ft"] = alt_ft
         fdm["ic/u-fps"] = 0.0
         fdm["ic/v-fps"] = 0.0
@@ -172,6 +180,12 @@ class DogfightEnv(gym.Env):
         super().reset(seed=seed)
         cfg = self.cfg
 
+        if self.opponent_pool is not None:
+            sampled = self.opponent_pool.sample(self.opponent_latest_prob, rng=self.np_random)
+            if sampled is not None:
+                from drone_rl.dogfight.env_factory import load_opponent_controller
+                self.opponent_controller = load_opponent_controller(*sampled)
+
         rng = self.np_random
         rng_range = rng.uniform(cfg.spawn_range_min_ft, cfg.spawn_range_max_ft)
         bearing_deg = rng.uniform(0.0, 360.0)
@@ -180,13 +194,11 @@ class DogfightEnv(gym.Env):
         heading_self = rng.uniform(0.0, 360.0)
         heading_opp = rng.uniform(0.0, 360.0)
 
-        self._init_fdm(self.fdm_self, alt_self, heading_self)
-        self._init_fdm(self.fdm_opp, alt_opp, heading_opp)
+        dn_target = rng_range * math.cos(math.radians(bearing_deg))
+        de_target = rng_range * math.sin(math.radians(bearing_deg))
 
-        self.fdm_opp["position/distance-from-start-lat-mt"] = \
-            (rng_range * math.sin(math.radians(bearing_deg))) / FT_PER_M
-        self.fdm_opp["position/distance-from-start-lon-mt"] = \
-            (rng_range * math.cos(math.radians(bearing_deg))) / FT_PER_M
+        self._init_fdm(self.fdm_self, alt_self, heading_self, north_ft=0.0, east_ft=0.0)
+        self._init_fdm(self.fdm_opp, alt_opp, heading_opp, north_ft=dn_target, east_ft=de_target)
 
         self._surface_self[:] = 0.0
         self._surface_opp[:] = 0.0
@@ -211,10 +223,13 @@ class DogfightEnv(gym.Env):
         return n, e, u
 
     def _position(self, fdm):
-        north_m = fdm["position/distance-from-start-lat-mt"]
-        east_m = fdm["position/distance-from-start-lon-mt"]
+        lat = fdm["position/lat-gc-deg"]
+        lon = fdm["position/long-gc-deg"]
+        ft_per_deg_lon = FT_PER_DEG_LAT * math.cos(math.radians(LAT0_DEG))
+        north_ft = (lat - LAT0_DEG) * FT_PER_DEG_LAT
+        east_ft = (lon - LON0_DEG) * ft_per_deg_lon
         alt_ft = fdm["position/h-agl-ft"]
-        return north_m * FT_PER_M, east_m * FT_PER_M, alt_ft
+        return north_ft, east_ft, alt_ft
 
     def _relative_geom(self, fdm_a, fdm_b):
         na, ea, ua = self._position(fdm_a)
@@ -327,7 +342,6 @@ class DogfightEnv(gym.Env):
             + self.cfg.reward_jerk_weight * jerk
         )
 
-        # YENI (v3): sadece GORSELLESTIRME/TANI icin - opponent'in AYNAsi.
         opp_tilt = abs(self.fdm_opp["attitude/phi-rad"]) + abs(self.fdm_opp["attitude/theta-rad"])
         opp_spin = abs(self.fdm_opp["velocities/p-rad_sec"]) + abs(self.fdm_opp["velocities/q-rad_sec"])
         opp_yaw_rate_pen = abs(self.fdm_opp["velocities/r-rad_sec"])
@@ -419,6 +433,3 @@ class DogfightEnv(gym.Env):
         }
 
         return obs, float(reward), terminated, truncated, info
-
-
-

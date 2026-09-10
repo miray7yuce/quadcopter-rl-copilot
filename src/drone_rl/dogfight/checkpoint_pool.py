@@ -1,12 +1,3 @@
-"""Self-play icin checkpoint havuzu - PFSP-lite.
-
-Her promotion'da yeni bir versiyon (v1, v2, ...) diske kopyalanir ve
-manifest.json'a eklenir. sample() cagrildiginda %opponent_latest_prob
-ihtimalle EN GUNCEL versiyon, geri kalaninda RASTGELE eski bir versiyon
-donulur - tek-sabit-opponent'e karsi asiri ozellesme (cyclic collapse)
-riskini azaltmak icin.
-"""
-
 import json
 import shutil
 from pathlib import Path

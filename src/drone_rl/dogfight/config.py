@@ -1,5 +1,3 @@
-"""Dogfight gorevi icin config dataclass'lari."""
-
 from dataclasses import dataclass, field
 from typing import Optional, List
 import yaml
@@ -19,20 +17,12 @@ class DogfightEnvConfig:
     control_surface_tau_s: float = 0.08
 
     cone_half_angle_deg: float = 30.0
-    cone_range_ft: float = 120.0
+    cone_range_ft: float = 70.0  # v4: 120'den kisaltildi (gorsel + oyun mantigi)
 
     standoff_target_ft: float = 40.0
     standoff_weight_start: float = 0.02
     standoff_weight_end: float = 0.08
     standoff_ramp_steps: int = 400_000
-    # YENI: standoff cezasi artik SINIRSIZ kuadratik degil - bu deger
-    # ((range-target)/target)^2 icin bir UST SINIR. Onceki surumde
-    # spawn mesafesi (60-150ft) hedeften (40ft) uzak oldugunda bu terim
-    # TEK BASINA episode odulunu domine ediyordu (ornegin 150ft'te
-    # ~7.56 - agirlikla carpilinca adim basina ~0.68 ceza, 900 adimlik
-    # bir episode'da devasa birikim). Simdi min(kare_terim, cap) ile
-    # sinirlaniyor - max etkisi diger odul terimleriyle (align_reward
-    # max 0.20 gibi) KARSILASTIRILABILIR olacak sekilde.
     standoff_penalty_cap: float = 2.0
 
     reward_align_weight: float = 0.20
@@ -110,4 +100,3 @@ def load_dogfight_config(path: Optional[str]) -> DogfightConfig:
         train=TrainConfig(**raw.get("train", {})),
         promotion=PromotionConfig(**raw.get("promotion", {})),
     )
-

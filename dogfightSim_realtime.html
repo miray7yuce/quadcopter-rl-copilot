@@ -97,6 +97,25 @@
   .compare-table tr.section-row td{
     padding-top:12px; color:var(--ink-1); font-weight:700; border-bottom:1px solid var(--line);
   }
+
+  /* -- YENI: canli guncelleme bildirimleri (toast) -- */
+  #toast-container{
+    position:absolute; top:14px; right:14px; display:flex; flex-direction:column;
+    gap:8px; align-items:flex-end; pointer-events:none; z-index:20;
+  }
+  .toast{
+    background:rgba(17,24,32,.95); border:1px solid var(--line); border-left:3px solid var(--training);
+    border-radius:8px; padding:10px 16px; font-family:var(--mono); font-size:12px;
+    color:var(--ink-0); box-shadow:0 4px 14px rgba(0,0,0,.4);
+    animation: toast-in 0.3s ease-out, toast-out 0.4s ease-in 4.6s forwards;
+    max-width:280px;
+  }
+  .toast.best{ border-left-color:var(--best); }
+  .toast .toast-title{ font-weight:700; margin-bottom:2px; }
+  .toast.training .toast-title{ color:var(--training); }
+  .toast.best .toast-title{ color:var(--best); }
+  @keyframes toast-in{ from{ opacity:0; transform:translateX(20px);} to{ opacity:1; transform:translateX(0);} }
+  @keyframes toast-out{ from{ opacity:1; } to{ opacity:0; transform:translateX(20px);} }
 </style>
 </head>
 <body>
@@ -116,6 +135,8 @@
   <main>
     <div id="viewport-wrap">
       <canvas id="three-canvas"></canvas>
+
+      <div id="toast-container"></div>
 
       <div id="scoreboard">
         <div class="score-cell training" id="cell-training">
@@ -195,6 +216,7 @@ const scoreTrainingEl = document.getElementById("score-training");
 const scoreBestEl = document.getElementById("score-best");
 const cellTraining = document.getElementById("cell-training");
 const cellBest = document.getElementById("cell-best");
+const toastContainer = document.getElementById("toast-container");
 const hud = {
   range: document.getElementById("hud-range"),
   step: document.getElementById("hud-step"),
@@ -224,6 +246,26 @@ const RESET_REASON_LABELS = {
   timeout: "süre doldu",
 };
 
+/* -------------------------------------------------------------- */
+/* YENI: canli guncelleme bildirimleri (toast)                      */
+/* -------------------------------------------------------------- */
+function showToast(kind, title, detail) {
+  const el = document.createElement("div");
+  el.className = `toast ${kind}`;
+  el.innerHTML = `<div class="toast-title">${title}</div><div>${detail}</div>`;
+  toastContainer.appendChild(el);
+  setTimeout(() => el.remove(), 5000);
+}
+
+function handleEvent(event) {
+  if (!event) return;
+  if (event.type === "training_updated") {
+    showToast("training", "TRAINING güncellendi", "Eğitim ilerledi, yeni model yüklendi.");
+  } else if (event.type === "best_updated") {
+    showToast("best", "BEST güncellendi", `Promotion gerçekleşti → v${event.version}`);
+  }
+}
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 3000);
 camera.up.set(0, 0, 1);
@@ -248,11 +290,8 @@ grid.rotation.x = Math.PI / 2;
 scene.add(grid);
 
 /* -------------------------------------------------------------- */
-/* Basit "X" ucak ikonu. DUZELTME (v3):                              */
-/* - Ayri "burun isaretcisi" KALDIRILDI - radar konisi zaten onu     */
-/*   gosteriyor, fazladan isaretciye gerek yok.                      */
-/* - Koni yonu duzeltildi: eskiden rotateZ(-PI/2) koniyi TERS (arka) */
-/*   yone ceviriyordu - simdi rotateZ(+PI/2) ile dogru (+X/on) yone. */
+/* Basit "X" ucak ikonu - burun isaretcisi YOK, koni yonu +X'e      */
+/* isaret edecek sekilde duzeltildi.                                 */
 /* -------------------------------------------------------------- */
 const ARM_ANGLES_DEG = [45, 135, 225, 315];
 const ARM_LEN = 2.6, ARM_W = 0.35, HUB_R = 0.5;
@@ -293,7 +332,7 @@ function makeCone3d(colorHex, halfAngleDeg, rangeFt) {
   const radius = rangeFt * Math.tan(THREE.MathUtils.degToRad(halfAngleDeg));
   const geom = new THREE.ConeGeometry(radius, rangeFt, 24, 1, true);
   geom.translate(0, -rangeFt / 2, 0);
-  geom.rotateZ(Math.PI / 2); // DUZELTME: +PI/2 -> +X (on) yonune isaret eder
+  geom.rotateZ(Math.PI / 2); // +X (on) yonune isaret eder
   const mat = new THREE.MeshBasicMaterial({
     color: colorHex, transparent: true, opacity: 0.10, side: THREE.DoubleSide, depthWrite: false,
   });
@@ -334,7 +373,7 @@ function ensureConeSize(f) {
     const radius = f.cone_range_ft * Math.tan(THREE.MathUtils.degToRad(f.cone_half_angle_deg));
     c.geometry = new THREE.ConeGeometry(radius, f.cone_range_ft, 24, 1, true);
     c.geometry.translate(0, -f.cone_range_ft / 2, 0);
-    c.geometry.rotateZ(Math.PI / 2); // DUZELTME: ayni isaret duzeltmesi
+    c.geometry.rotateZ(Math.PI / 2);
   });
   [trainingCone2d, bestCone2d].forEach((c) => {
     c.geometry.dispose();
@@ -399,7 +438,11 @@ function connect() {
     setTimeout(connect, 1500);
   };
   ws.onerror = () => ws.close();
-  ws.onmessage = (msg) => { latestFrame = JSON.parse(msg.data); };
+  ws.onmessage = (msg) => {
+    const f = JSON.parse(msg.data);
+    if (f.event) handleEvent(f.event);
+    latestFrame = f;
+  };
 }
 connect();
 

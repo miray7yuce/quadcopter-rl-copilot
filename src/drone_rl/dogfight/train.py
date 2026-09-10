@@ -1,20 +1,3 @@
-"""Dogfight PPO egitimi.
-
-Kullanim:
-  # Stage A - scripted rakibe karsi temel taktik
-  python -m drone_rl.dogfight.train --stage a \
-    --config configs/dogfight_stage_a.yaml --out runs/dogfight_stage_a
-
-  # Stage A modelini havuza (pool) v1 olarak tohumla
-  python -m drone_rl.dogfight.train --seed-pool \
-    --from runs/dogfight_stage_a --pool runs/dogfight_pool
-
-  # Stage B - self-play + promotion + checkpoint pool
-  python -m drone_rl.dogfight.train --stage b \
-    --config configs/dogfight_stage_b.yaml --out runs/dogfight_stage_b \
-    --pool runs/dogfight_pool
-"""
-
 import argparse
 from pathlib import Path
 
@@ -44,8 +27,6 @@ def build_policy_kwargs(cfg_ppo):
 
 
 class StandoffCurriculumCallback(BaseCallback):
-    """standoff_weight'i egitim boyunca LINEER olarak start->end'e tasir."""
-
     def __init__(self, w_start, w_end, ramp_steps):
         super().__init__()
         self.w_start = w_start
@@ -59,10 +40,24 @@ class StandoffCurriculumCallback(BaseCallback):
         return True
 
 
+class PeriodicSnapshotCallback(BaseCallback):
+    def __init__(self, out_dir: Path, save_freq: int):
+        super().__init__()
+        self.snapshot_dir = Path(out_dir) / "live_snapshot"
+        self.snapshot_dir.mkdir(parents=True, exist_ok=True)
+        self.save_freq = max(save_freq, 1)
+
+    def _on_step(self) -> bool:
+        if self.n_calls % self.save_freq == 0:
+            vecnorm = self.model.get_vec_normalize_env()
+            self.model.save(str(self.snapshot_dir / "model"))
+            if vecnorm is not None:
+                vecnorm.save(str(self.snapshot_dir / "vecnormalize.pkl"))
+        return True
+
+
 def _evaluate_vs_fixed(model, vecnorm_stats: NormalizerStats, env_cfg,
                         fixed_opponent, n_episodes: int):
-    """model'i (LIVE, henuz kaydedilmemis) fixed_opponent'e karsi
-    n_episodes boyunca deterministic oynatir. mean_reward + win_rate doner."""
     env = make_dogfight_env(env_cfg, fixed_opponent=fixed_opponent)
     rewards, wins = [], 0
     for _ in range(n_episodes):
@@ -82,11 +77,6 @@ def _evaluate_vs_fixed(model, vecnorm_stats: NormalizerStats, env_cfg,
 
 
 class PromotionCallback(BaseCallback):
-    """Periyodik olarak trainee'yi mevcut best'e karsi degerlendirir.
-    3 ardisik turda win_rate + mean_reward-iyilesme esiklerini gecerse
-    yeni bir versiyon olarak havuza kaydeder ve TUM egitim env'lerinin
-    opponent'ini hot-reload eder."""
-
     def __init__(self, pool: CheckpointPool, env_cfg, promo_cfg, out_dir: Path):
         super().__init__()
         self.pool = pool
@@ -101,7 +91,7 @@ class PromotionCallback(BaseCallback):
 
         latest = self.pool.latest()
         if latest is None:
-            print("[promotion] havuz bos, atlaniyor (once --seed-pool calistirin)")
+            print("[promotion] havuz bos, atlaniyor")
             return True
 
         vecnorm_train = self.model.get_vec_normalize_env()
@@ -155,6 +145,7 @@ def main():
     ap.add_argument("--pool", type=str, default=None)
     ap.add_argument("--timesteps", type=int, default=None)
     ap.add_argument("--n-envs", type=int, default=None)
+    ap.add_argument("--snapshot-freq", type=int, default=10000)
 
     ap.add_argument("--seed-pool", action="store_true")
     ap.add_argument("--from", dest="from_run", type=str)
@@ -168,10 +159,8 @@ def main():
         run_dir = Path(args.from_run)
         model_path = run_dir / "model_final.zip"
         vecnorm_path = run_dir / "vecnormalize.pkl"
-        # Stage A'nin scripted rakibe karsi son degerlendirmesi -
-        # bootstrap baseline mean_reward icin hizli bir eval.
+
         cfg = load_dogfight_config(None)
-        stats_venv = None
         from stable_baselines3.common.vec_env import DummyVecEnv
         from stable_baselines3.common.monitor import Monitor
         from drone_rl.dogfight.dogfight_env import DogfightEnv
@@ -179,12 +168,8 @@ def main():
         vecnorm = VecNormalize.load(str(vecnorm_path), dummy)
         stats = NormalizerStats(vecnorm)
         model = PPO.load(str(model_path), device="cpu")
-        mean_reward, win_rate = _evaluate_vs_fixed(
-            model, stats, cfg.env, None, n_episodes=1
-        ) if False else (0.0, 0.0)
-        # NOT: v1'in "rakibi" scripted oldugundan, standart _evaluate_vs_fixed
-        # (PPO-vs-PPO) kullanilamaz - basit bir dogrudan degerlendirme yapalim:
-        env = DogfightEnv(cfg.env)  # varsayilan: ScriptedCircleOpponent
+
+        env = DogfightEnv(cfg.env)
         rewards, wins = [], 0
         for _ in range(20):
             obs, _ = env.reset()
@@ -203,7 +188,7 @@ def main():
         win_rate = wins / 20
 
         version = pool.add(str(model_path), str(vecnorm_path), mean_reward, win_rate,
-                            note="stage-a seed (scripted opponent'e karsi)")
+                            note="stage-a seed")
         print(f"Havuz tohumlandi: v{version}, mean_reward={mean_reward:.2f}, win_rate={win_rate:.2f}")
         return
 
@@ -233,14 +218,15 @@ def main():
     standoff_cb = StandoffCurriculumCallback(
         cfg.env.standoff_weight_start, cfg.env.standoff_weight_end, cfg.env.standoff_ramp_steps
     )
-    callbacks = [ckpt_cb, standoff_cb]
+    snapshot_cb = PeriodicSnapshotCallback(out, save_freq=max(args.snapshot_freq // n_envs, 1))
+    callbacks = [ckpt_cb, standoff_cb, snapshot_cb]
 
     if args.stage == "b":
         if not args.pool:
             raise ValueError("--stage b icin --pool gerekli")
         pool = CheckpointPool(args.pool)
         if len(pool) == 0:
-            raise ValueError("Havuz bos - once --seed-pool ile Stage A modelini tohumlayin")
+            raise ValueError("Havuz bos - once --seed-pool calistirin")
         promo_cb = PromotionCallback(pool, cfg.env, cfg.promotion, out)
         callbacks.append(promo_cb)
 
@@ -253,6 +239,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

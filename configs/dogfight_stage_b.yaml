@@ -9,11 +9,12 @@ env:
   yaw_authority: 0.45
   control_surface_tau_s: 0.08
   cone_half_angle_deg: 30.0
-  cone_range_ft: 120.0
+  cone_range_ft: 70.0
   standoff_target_ft: 40.0
   standoff_weight_start: 0.05
   standoff_weight_end: 0.09
   standoff_ramp_steps: 300000
+  standoff_penalty_cap: 2.0
   reward_align_weight: 0.20
   reward_exposure_weight: 0.15
   reward_cone_hold: 0.08
@@ -56,5 +57,3 @@ promotion:
   win_rate_threshold: 0.55
   mean_reward_improve_pct: 8.0
   consecutive_passes_required: 3
-
-
