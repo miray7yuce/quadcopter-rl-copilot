@@ -1,0 +1,10 @@
+[
+  {
+    "version": 1,
+    "model": "/content/repo/runs/dogfight_pool/v1/model.zip",
+    "vecnorm": "/content/repo/runs/dogfight_pool/v1/vecnormalize.pkl",
+    "mean_reward": -29.506097806780257,
+    "win_rate": 0.1,
+    "note": "stage-a seed (scripted opponent'e karsi)"
+  }
+]
