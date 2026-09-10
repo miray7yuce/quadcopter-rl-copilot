@@ -38,7 +38,8 @@
   .conn-dot.connected{ background:var(--training); }
   .conn-dot.disconnected{ background:var(--danger); }
 
-  main{ flex:1; position:relative; min-height:0; }
+  main{ flex:1; display:grid; grid-template-columns: 1fr 300px; min-height:0; }
+  #viewport-wrap{ position:relative; }
   #three-canvas{ width:100%; height:100%; display:block; }
 
   #scoreboard{
@@ -77,6 +78,25 @@
   }
   #finished-overlay h2{ margin:0 0 8px; color:var(--training); }
   #finished-overlay p{ margin:0; color:var(--ink-1); font-family:var(--mono); font-size:13px; }
+
+  aside#compare{
+    background:var(--bg-1); border-left:1px solid var(--line);
+    padding:14px; overflow:auto; font-family:var(--mono); font-size:11px;
+  }
+  aside#compare h3{ margin:0 0 10px; font-size:11px; color:var(--ink-2); font-weight:600; letter-spacing:.5px; }
+  .compare-table{ width:100%; border-collapse:collapse; }
+  .compare-table th{
+    text-align:right; padding:5px 6px; font-size:10px; font-weight:700;
+    border-bottom:1px solid var(--line);
+  }
+  .compare-table th.metric-col{ text-align:left; color:var(--ink-2); font-weight:400; }
+  .compare-table th.training-col{ color:var(--training); }
+  .compare-table th.best-col{ color:var(--best); }
+  .compare-table td{ padding:5px 6px; text-align:right; border-bottom:1px solid rgba(38,50,62,.5); }
+  .compare-table td.metric-name{ text-align:left; color:var(--ink-2); }
+  .compare-table tr.section-row td{
+    padding-top:12px; color:var(--ink-1); font-weight:700; border-bottom:1px solid var(--line);
+  }
 </style>
 </head>
 <body>
@@ -94,34 +114,62 @@
   </header>
 
   <main>
-    <canvas id="three-canvas"></canvas>
+    <div id="viewport-wrap">
+      <canvas id="three-canvas"></canvas>
 
-    <div id="scoreboard">
-      <div class="score-cell training" id="cell-training">
-        <div class="label">TRAINING</div>
-        <div class="value" id="score-training">0</div>
+      <div id="scoreboard">
+        <div class="score-cell training" id="cell-training">
+          <div class="label">TRAINING</div>
+          <div class="value" id="score-training">0</div>
+        </div>
+        <div class="score-cell best" id="cell-best">
+          <div class="label">BEST</div>
+          <div class="value" id="score-best">0</div>
+        </div>
       </div>
-      <div class="score-cell best" id="cell-best">
-        <div class="label">BEST</div>
-        <div class="value" id="score-best">0</div>
+
+      <div id="hud">
+        <div class="row"><span class="k">range</span><span class="v" id="hud-range">–</span></div>
+        <div class="row"><span class="k">step</span><span class="v" id="hud-step">–</span></div>
+        <div class="row"><span class="k">episode</span><span class="v" id="hud-episode">–</span></div>
+        <div class="row"><span class="k">son reset</span><span class="v reset-reason" id="hud-reset-reason">–</span></div>
+        <div class="row"><span class="k">TRAINING → cone</span><span class="v cone-status" id="hud-cone-mine">–</span></div>
+        <div class="row"><span class="k">BEST → cone</span><span class="v cone-status" id="hud-cone-opp">–</span></div>
+      </div>
+
+      <div id="finished-overlay">
+        <div class="box">
+          <h2>SIMULATION COMPLETE</h2>
+          <p id="finished-summary">–</p>
+        </div>
       </div>
     </div>
 
-    <div id="hud">
-      <div class="row"><span class="k">range</span><span class="v" id="hud-range">–</span></div>
-      <div class="row"><span class="k">step</span><span class="v" id="hud-step">–</span></div>
-      <div class="row"><span class="k">episode</span><span class="v" id="hud-episode">–</span></div>
-      <div class="row"><span class="k">son reset</span><span class="v reset-reason" id="hud-reset-reason">–</span></div>
-      <div class="row"><span class="k">TRAINING → cone</span><span class="v cone-status" id="hud-cone-mine">–</span></div>
-      <div class="row"><span class="k">BEST → cone</span><span class="v cone-status" id="hud-cone-opp">–</span></div>
-    </div>
-
-    <div id="finished-overlay">
-      <div class="box">
-        <h2>SIMULATION COMPLETE</h2>
-        <p id="finished-summary">–</p>
-      </div>
-    </div>
+    <aside id="compare">
+      <h3>CANLI KARŞILAŞTIRMA</h3>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="metric-col">metrik</th>
+            <th class="training-col">TRAINING</th>
+            <th class="best-col">BEST</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="section-row"><td colspan="3">Kinematik</td></tr>
+          <tr><td class="metric-name">roll (°)</td><td id="cmp-roll-t">–</td><td id="cmp-roll-b">–</td></tr>
+          <tr><td class="metric-name">pitch (°)</td><td id="cmp-pitch-t">–</td><td id="cmp-pitch-b">–</td></tr>
+          <tr><td class="metric-name">yaw (°)</td><td id="cmp-yaw-t">–</td><td id="cmp-yaw-b">–</td></tr>
+          <tr><td class="metric-name">irtifa (ft)</td><td id="cmp-alt-t">–</td><td id="cmp-alt-b">–</td></tr>
+          <tr><td class="metric-name">dikey hız (ft/s)</td><td id="cmp-hdot-t">–</td><td id="cmp-hdot-b">–</td></tr>
+          <tr class="section-row"><td colspan="3">Ödül bileşenleri (adım başı)</td></tr>
+          <tr><td class="metric-name">align</td><td id="cmp-align-t">–</td><td id="cmp-align-b">–</td></tr>
+          <tr><td class="metric-name">exposure</td><td id="cmp-exposure-t">–</td><td id="cmp-exposure-b">–</td></tr>
+          <tr><td class="metric-name">standoff</td><td id="cmp-standoff-t">–</td><td id="cmp-standoff-b">–</td></tr>
+          <tr><td class="metric-name">control</td><td id="cmp-control-t">–</td><td id="cmp-control-b">–</td></tr>
+        </tbody>
+      </table>
+    </aside>
   </main>
 </div>
 
@@ -154,6 +202,17 @@ const hud = {
   resetReason: document.getElementById("hud-reset-reason"),
   coneMine: document.getElementById("hud-cone-mine"),
   coneOpp: document.getElementById("hud-cone-opp"),
+};
+const cmp = {
+  rollT: document.getElementById("cmp-roll-t"), rollB: document.getElementById("cmp-roll-b"),
+  pitchT: document.getElementById("cmp-pitch-t"), pitchB: document.getElementById("cmp-pitch-b"),
+  yawT: document.getElementById("cmp-yaw-t"), yawB: document.getElementById("cmp-yaw-b"),
+  altT: document.getElementById("cmp-alt-t"), altB: document.getElementById("cmp-alt-b"),
+  hdotT: document.getElementById("cmp-hdot-t"), hdotB: document.getElementById("cmp-hdot-b"),
+  alignT: document.getElementById("cmp-align-t"), alignB: document.getElementById("cmp-align-b"),
+  exposureT: document.getElementById("cmp-exposure-t"), exposureB: document.getElementById("cmp-exposure-b"),
+  standoffT: document.getElementById("cmp-standoff-t"), standoffB: document.getElementById("cmp-standoff-b"),
+  controlT: document.getElementById("cmp-control-t"), controlB: document.getElementById("cmp-control-b"),
 };
 const finishedOverlay = document.getElementById("finished-overlay");
 const finishedSummary = document.getElementById("finished-summary");
@@ -189,18 +248,18 @@ grid.rotation.x = Math.PI / 2;
 scene.add(grid);
 
 /* -------------------------------------------------------------- */
-/* Basit "X" ucak ikonu - 3D (kalin, golgeli) ve 2D (duz, sadece    */
-/* yaw'a gore donen) icin AYRI mesh'ler. Burun yonu 4 kolun disinda */
-/* AYRI bir kucuk isaretci ile (tam +X ekseni, gercek psi ile       */
-/* birebir hizali) belirtiliyor.                                    */
+/* Basit "X" ucak ikonu. DUZELTME (v3):                              */
+/* - Ayri "burun isaretcisi" KALDIRILDI - radar konisi zaten onu     */
+/*   gosteriyor, fazladan isaretciye gerek yok.                      */
+/* - Koni yonu duzeltildi: eskiden rotateZ(-PI/2) koniyi TERS (arka) */
+/*   yone ceviriyordu - simdi rotateZ(+PI/2) ile dogru (+X/on) yone. */
 /* -------------------------------------------------------------- */
 const ARM_ANGLES_DEG = [45, 135, 225, 315];
 const ARM_LEN = 2.6, ARM_W = 0.35, HUB_R = 0.5;
 
-function buildAircraftIcon(bodyColorHex, noseColorHex) {
+function buildAircraftIcon(bodyColorHex) {
   const group = new THREE.Group();
 
-  // ---- 3D govde (kalin, isikli, tam roll/pitch/yaw ile doner) ----
   const mesh3d = new THREE.Group();
   const bodyMat3d = new THREE.MeshStandardMaterial({ color: bodyColorHex, metalness: 0.2, roughness: 0.6 });
   const armGeom3d = new THREE.BoxGeometry(ARM_LEN, ARM_W, ARM_W);
@@ -212,14 +271,8 @@ function buildAircraftIcon(bodyColorHex, noseColorHex) {
     mesh3d.add(arm);
   });
   mesh3d.add(new THREE.Mesh(new THREE.SphereGeometry(HUB_R, 12, 12), bodyMat3d));
-  const noseMat3d = new THREE.MeshStandardMaterial({ color: noseColorHex, metalness: 0.1, roughness: 0.4 });
-  const nose3d = new THREE.Mesh(new THREE.ConeGeometry(0.45, 1.1, 10), noseMat3d);
-  nose3d.rotation.z = -Math.PI / 2;
-  nose3d.position.set(ARM_LEN * 0.85, 0, 0);
-  mesh3d.add(nose3d);
   group.add(mesh3d);
 
-  // ---- 2D govde (DUZ - roll/pitch YOK SAYILIR, sadece yaw) ----
   const mesh2d = new THREE.Group();
   const bodyMat2d = new THREE.MeshBasicMaterial({ color: bodyColorHex, side: THREE.DoubleSide });
   const armGeom2d = new THREE.PlaneGeometry(ARM_LEN, ARM_W);
@@ -230,10 +283,6 @@ function buildAircraftIcon(bodyColorHex, noseColorHex) {
     arm.rotation.z = rad;
     mesh2d.add(arm);
   });
-  const noseMat2d = new THREE.MeshBasicMaterial({ color: noseColorHex, side: THREE.DoubleSide });
-  const nose2d = new THREE.Mesh(new THREE.CircleGeometry(0.5, 12), noseMat2d);
-  nose2d.position.set(ARM_LEN * 0.9, 0, 0.01);
-  mesh2d.add(nose2d);
   mesh2d.visible = false;
   group.add(mesh2d);
 
@@ -244,13 +293,11 @@ function makeCone3d(colorHex, halfAngleDeg, rangeFt) {
   const radius = rangeFt * Math.tan(THREE.MathUtils.degToRad(halfAngleDeg));
   const geom = new THREE.ConeGeometry(radius, rangeFt, 24, 1, true);
   geom.translate(0, -rangeFt / 2, 0);
-  geom.rotateZ(-Math.PI / 2);
+  geom.rotateZ(Math.PI / 2); // DUZELTME: +PI/2 -> +X (on) yonune isaret eder
   const mat = new THREE.MeshBasicMaterial({
     color: colorHex, transparent: true, opacity: 0.10, side: THREE.DoubleSide, depthWrite: false,
   });
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.visible = true;
-  return mesh;
+  return new THREE.Mesh(geom, mat);
 }
 
 function makeCone2d(colorHex, halfAngleDeg, rangeFt) {
@@ -264,14 +311,14 @@ function makeCone2d(colorHex, halfAngleDeg, rangeFt) {
   return mesh;
 }
 
-const trainingIcon = buildAircraftIcon(0x4fd1c5, 0xffffff);
+const trainingIcon = buildAircraftIcon(0x4fd1c5);
 scene.add(trainingIcon.group);
 const trainingCone3d = makeCone3d(0x4fd1c5, 30, 120);
 trainingIcon.mesh3d.add(trainingCone3d);
 const trainingCone2d = makeCone2d(0x4fd1c5, 30, 120);
 trainingIcon.mesh2d.add(trainingCone2d);
 
-const bestIcon = buildAircraftIcon(0xe0a05a, 0xffffff);
+const bestIcon = buildAircraftIcon(0xe0a05a);
 scene.add(bestIcon.group);
 const bestCone3d = makeCone3d(0xe0a05a, 30, 120);
 bestIcon.mesh3d.add(bestCone3d);
@@ -287,7 +334,7 @@ function ensureConeSize(f) {
     const radius = f.cone_range_ft * Math.tan(THREE.MathUtils.degToRad(f.cone_half_angle_deg));
     c.geometry = new THREE.ConeGeometry(radius, f.cone_range_ft, 24, 1, true);
     c.geometry.translate(0, -f.cone_range_ft / 2, 0);
-    c.geometry.rotateZ(-Math.PI / 2);
+    c.geometry.rotateZ(Math.PI / 2); // DUZELTME: ayni isaret duzeltmesi
   });
   [trainingCone2d, bestCone2d].forEach((c) => {
     c.geometry.dispose();
@@ -314,9 +361,6 @@ function resizeRenderer() {
 }
 window.addEventListener("resize", resizeRenderer);
 
-/* -------------------------------------------------------------- */
-/* 2D / 3D toggle                                                   */
-/* -------------------------------------------------------------- */
 let is2D = false;
 document.getElementById("btn-3d").addEventListener("click", () => setMode(false));
 document.getElementById("btn-2d").addEventListener("click", () => setMode(true));
@@ -342,9 +386,6 @@ function setMode(twoD) {
   controls.update();
 }
 
-/* -------------------------------------------------------------- */
-/* WebSocket                                                        */
-/* -------------------------------------------------------------- */
 let latestFrame = null;
 let lastMyScore = 0, lastOppScore = 0;
 
@@ -361,6 +402,8 @@ function connect() {
   ws.onmessage = (msg) => { latestFrame = JSON.parse(msg.data); };
 }
 connect();
+
+function fmt(v, digits = 2) { return (typeof v === "number" ? v.toFixed(digits) : "–"); }
 
 function renderFrame(f) {
   ensureConeSize(f);
@@ -396,6 +439,25 @@ function renderFrame(f) {
   hud.coneMine.classList.toggle("active", f.opp_in_my_cone);
   hud.coneOpp.textContent = f.me_in_opp_cone ? "IN CONE ✓" : "—";
   hud.coneOpp.classList.toggle("active", f.me_in_opp_cone);
+
+  cmp.rollT.textContent = fmt(sroll * 180 / Math.PI, 1);
+  cmp.rollB.textContent = fmt(oroll * 180 / Math.PI, 1);
+  cmp.pitchT.textContent = fmt(spitch * 180 / Math.PI, 1);
+  cmp.pitchB.textContent = fmt(opitch * 180 / Math.PI, 1);
+  cmp.yawT.textContent = fmt(((syaw * 180 / Math.PI) + 360) % 360, 1);
+  cmp.yawB.textContent = fmt(((oyaw * 180 / Math.PI) + 360) % 360, 1);
+  cmp.altT.textContent = fmt(salt, 1);
+  cmp.altB.textContent = fmt(oalt, 1);
+  cmp.hdotT.textContent = fmt(f.self_hdot_fps, 2);
+  cmp.hdotB.textContent = fmt(f.opp_hdot_fps, 2);
+  cmp.alignT.textContent = fmt(f.align_reward, 3);
+  cmp.alignB.textContent = fmt(f.opp_align_reward, 3);
+  cmp.exposureT.textContent = fmt(-f.exposure_penalty, 3);
+  cmp.exposureB.textContent = fmt(-f.opp_exposure_penalty, 3);
+  cmp.standoffT.textContent = fmt(-f.standoff_penalty, 3);
+  cmp.standoffB.textContent = fmt(-f.opp_standoff_penalty, 3);
+  cmp.controlT.textContent = fmt(-f.control_penalty, 3);
+  cmp.controlB.textContent = fmt(-f.opp_control_penalty, 3);
 
   scoreTrainingEl.textContent = f.my_score;
   scoreBestEl.textContent = f.opp_score;

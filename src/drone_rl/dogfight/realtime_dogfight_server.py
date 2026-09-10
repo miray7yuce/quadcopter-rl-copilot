@@ -1,13 +1,7 @@
 """Dogfight canli demo sunucusu.
 
-DUZELTME (v2):
-- Skor artik SUNUCU TARAFINDA KUMULATIF tutuluyor (cumulative_my_score/
-  cumulative_opp_score) - env.reset() her episode'da kendi ic sayacini
-  sifirlasa da (RL egitimi icin DOGRU davranis), demo ekranindaki skor
-  artik episode gecisleri arasinda KORUNUYOR.
-- payload'a "reset_reason" ve "episode_count" eklendi - HANGI sebeple
-  (collision/self_crash/opponent_crash/timeout) resetlendigini
-  gosteriyor.
+DUZELTME (v3): payload'a HER IKI drone icin de kinematik + odul
+bileseni telemetrisi eklendi (bkz. dogfight_env.py v3 notu).
 """
 
 import asyncio
@@ -67,9 +61,20 @@ async def dogfight_loop(websocket: WebSocket):
                 "opp_pos": info["opp_pos"],
                 "self_attitude": info["self_attitude"],
                 "opp_attitude": info["opp_attitude"],
+                "self_hdot_fps": info["self_hdot_fps"],
+                "opp_hdot_fps": info["opp_hdot_fps"],
                 "range_ft": info["range_ft"],
+                "closing_fps": info["closing_fps"],
                 "opp_in_my_cone": info["opp_in_my_cone"],
                 "me_in_opp_cone": info["me_in_opp_cone"],
+                "align_reward": info["align_reward"],
+                "exposure_penalty": info["exposure_penalty"],
+                "standoff_penalty": info["standoff_penalty"],
+                "control_penalty": info["control_penalty"],
+                "opp_align_reward": info["opp_align_reward"],
+                "opp_exposure_penalty": info["opp_exposure_penalty"],
+                "opp_standoff_penalty": info["opp_standoff_penalty"],
+                "opp_control_penalty": info["opp_control_penalty"],
                 "my_score": cumulative_my_score + info["my_score"],
                 "opp_score": cumulative_opp_score + info["opp_score"],
                 "episode_count": episode_count,
@@ -130,4 +135,5 @@ def start_server(training_model_path: str, training_vecnorm_path: str,
     )
     thread.start()
     print(f"Dogfight sunucusu baslatildi (port {port}).")
+
 

@@ -1,18 +1,21 @@
 """Iki F450 arasinda 'dogfight' gorevi - birbirini kovalayip radar
 konisine alma. TAM 3D fizik.
 
-DUZELTME (v2):
-- standoff_penalty artik CAP'LI (bkz. config.py notu) - sinirsiz
-  kuadratik ceza, uzak spawn'larda odulu domine edip hem egitim
-  sinyalini bozuyor hem de "surekli crash/reset oluyor gibi" izlenimi
-  yaratan asiri negatif odullere yol aciyordu.
-- info dict'e "reset_reason" eklendi ("collision"/"self_crash"/
-  "opponent_crash"/"timeout"/None) - demo sunucusunun HANGI sebeple
-  resetlendigini gostermesi icin.
-- info dict'e odul bileseni kirilimi eklendi (align_reward,
-  exposure_penalty, standoff_penalty, control_penalty, cone_net) -
-  ileride "hangi terim domine ediyor" diye tekrar tahmin yurutmemek
-  icin dogrudan olculebilir hale getirildi.
+DUZELTME (v3):
+- info dict'e HER IKI drone icin de (self + opp) kinematik telemetri
+  (hdot) ve odul bileseni kirilimi (align/exposure/standoff/control)
+  eklendi - demo ekraninda IKI drone icin de ayri ayri veri gosterebilmek
+  icin. opp_* alanlari SADECE gorsellestirme/tani amacli - egitim
+  odulune hicbir etkisi yok (egitim hala sadece "self" perspektifinden
+  hesaplanan reward'i kullanir).
+
+--- (v2 notlari, hala gecerli) ---
+- standoff_penalty CAP'LI (config.py notu).
+- reset_reason info alani eklendi.
+- reset() icinde spawn konumu artik GERCEKTEN uygulaniyor (onceki
+  surumde x_ft/y_ft hesaplaniyordu ama fdm'e hic yazilmiyordu - iki
+  drone her zaman ayni noktada spawn oluyordu, bu da her episode
+  basinda ANINDA carpisma/reset'e yol aciyordu).
 """
 
 import math
@@ -180,13 +183,6 @@ class DogfightEnv(gym.Env):
         self._init_fdm(self.fdm_self, alt_self, heading_self)
         self._init_fdm(self.fdm_opp, alt_opp, heading_opp)
 
-        # opp'u self'e gore rng_range/bearing_deg kadar oteledigimiz icin
-        # once ic ile sifirlayip sonra world konumunu manuel kaydiramiyoruz
-        # (JSBSim ic/... sadece baslangic; konum farki icin ayri bir
-        # yaklasim: opp'u AYNI (0,0) noktasindan baslatip, ilk substep'te
-        # onu spawn ofsetine tasiyamayiz - bunun yerine dogrudan
-        # "position/distance-from-start-*" ofsetlerini reset SONRASI
-        # set ediyoruz).
         self.fdm_opp["position/distance-from-start-lat-mt"] = \
             (rng_range * math.sin(math.radians(bearing_deg))) / FT_PER_M
         self.fdm_opp["position/distance-from-start-lon-mt"] = \
@@ -331,6 +327,20 @@ class DogfightEnv(gym.Env):
             + self.cfg.reward_jerk_weight * jerk
         )
 
+        # YENI (v3): sadece GORSELLESTIRME/TANI icin - opponent'in AYNAsi.
+        opp_tilt = abs(self.fdm_opp["attitude/phi-rad"]) + abs(self.fdm_opp["attitude/theta-rad"])
+        opp_spin = abs(self.fdm_opp["velocities/p-rad_sec"]) + abs(self.fdm_opp["velocities/q-rad_sec"])
+        opp_yaw_rate_pen = abs(self.fdm_opp["velocities/r-rad_sec"])
+        opp_jerk = float(np.sum(np.abs(opp_action - self.prev_action_opp)))
+        opp_control_penalty = (
+            self.cfg.reward_tilt_weight * opp_tilt
+            + self.cfg.reward_spin_weight * opp_spin
+            + self.cfg.reward_yawrate_weight * opp_yaw_rate_pen
+            + self.cfg.reward_jerk_weight * opp_jerk
+        )
+        opp_align_reward = self.cfg.reward_align_weight * align_opp_to_me
+        opp_exposure_penalty = self.cfg.reward_exposure_weight * align_mine
+
         cone_net = 0.0
         if opp_in_my_cone:
             cone_net += self.cfg.reward_cone_hold
@@ -388,6 +398,12 @@ class DogfightEnv(gym.Env):
             "standoff_penalty": standoff_penalty,
             "control_penalty": control_penalty,
             "cone_net": cone_net,
+            "opp_align_reward": opp_align_reward,
+            "opp_exposure_penalty": opp_exposure_penalty,
+            "opp_standoff_penalty": standoff_penalty,
+            "opp_control_penalty": opp_control_penalty,
+            "self_hdot_fps": float(self.fdm_self["velocities/h-dot-fps"]),
+            "opp_hdot_fps": float(self.fdm_opp["velocities/h-dot-fps"]),
             "self_pos": self._position(self.fdm_self),
             "opp_pos": self._position(self.fdm_opp),
             "self_attitude": (
