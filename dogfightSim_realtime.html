@@ -30,6 +30,16 @@
   }
   .toggle-group button.active{ background:var(--training); color:#04211e; font-weight:700; }
 
+  /* YENI: egitim timestep rozeti */
+  .timestep-badge{
+    display:flex; align-items:center; gap:6px;
+    font-family:var(--mono); font-size:12px; color:var(--ink-1);
+    background:var(--bg-2); border:1px solid var(--line); border-radius:6px;
+    padding:7px 12px; white-space:nowrap;
+  }
+  .timestep-badge .k{ color:var(--ink-2); }
+  .timestep-badge .v{ color:var(--ink-0); font-weight:700; }
+
   .conn-status{
     margin-left:auto; display:flex; align-items:center; gap:8px;
     font-family:var(--mono); font-size:12px;
@@ -97,8 +107,12 @@
   .compare-table tr.section-row td{
     padding-top:12px; color:var(--ink-1); font-weight:700; border-bottom:1px solid var(--line);
   }
+  /* YENI: toplam odul satiri vurgusu */
+  .compare-table tr.total-row td{
+    padding-top:8px; border-top:1px solid var(--line); font-weight:700; color:var(--ink-0);
+  }
 
-  /* -- YENI: canli guncelleme bildirimleri (toast) -- */
+  /* -- canli guncelleme bildirimleri (toast) -- */
   #toast-container{
     position:absolute; top:14px; right:14px; display:flex; flex-direction:column;
     gap:8px; align-items:flex-end; pointer-events:none; z-index:20;
@@ -125,6 +139,9 @@
     <div class="toggle-group">
       <button id="btn-3d" class="active">3D</button>
       <button id="btn-2d">2D (top-down)</button>
+    </div>
+    <div class="timestep-badge">
+      <span class="k">timestep</span><span class="v" id="hud-timestep">–</span>
     </div>
     <div class="conn-status">
       <span class="conn-dot" id="conn-dot"></span>
@@ -188,6 +205,7 @@
           <tr><td class="metric-name">exposure</td><td id="cmp-exposure-t">–</td><td id="cmp-exposure-b">–</td></tr>
           <tr><td class="metric-name">standoff</td><td id="cmp-standoff-t">–</td><td id="cmp-standoff-b">–</td></tr>
           <tr><td class="metric-name">control</td><td id="cmp-control-t">–</td><td id="cmp-control-b">–</td></tr>
+          <tr class="total-row"><td class="metric-name">TOPLAM ödül</td><td id="cmp-reward-t">–</td><td id="cmp-reward-b">–</td></tr>
         </tbody>
       </table>
     </aside>
@@ -207,7 +225,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-const ARENA_HALF_FT = 220;
+// YENI: max_horizontal_range_ft 220->300 oldugu icin gorsel arena da
+// buyutuldu, boylece izgara gercek oyun alanini kapsiyor.
+const ARENA_HALF_FT = 300;
 
 const canvas = document.getElementById("three-canvas");
 const connDot = document.getElementById("conn-dot");
@@ -217,6 +237,7 @@ const scoreBestEl = document.getElementById("score-best");
 const cellTraining = document.getElementById("cell-training");
 const cellBest = document.getElementById("cell-best");
 const toastContainer = document.getElementById("toast-container");
+const timestepValueEl = document.getElementById("hud-timestep");
 const hud = {
   range: document.getElementById("hud-range"),
   step: document.getElementById("hud-step"),
@@ -235,6 +256,7 @@ const cmp = {
   exposureT: document.getElementById("cmp-exposure-t"), exposureB: document.getElementById("cmp-exposure-b"),
   standoffT: document.getElementById("cmp-standoff-t"), standoffB: document.getElementById("cmp-standoff-b"),
   controlT: document.getElementById("cmp-control-t"), controlB: document.getElementById("cmp-control-b"),
+  rewardT: document.getElementById("cmp-reward-t"), rewardB: document.getElementById("cmp-reward-b"),
 };
 const finishedOverlay = document.getElementById("finished-overlay");
 const finishedSummary = document.getElementById("finished-summary");
@@ -247,7 +269,7 @@ const RESET_REASON_LABELS = {
 };
 
 /* -------------------------------------------------------------- */
-/* YENI: canli guncelleme bildirimleri (toast)                      */
+/* canli guncelleme bildirimleri (toast)                            */
 /* -------------------------------------------------------------- */
 function showToast(kind, title, detail) {
   const el = document.createElement("div");
@@ -292,6 +314,14 @@ scene.add(grid);
 /* -------------------------------------------------------------- */
 /* Basit "X" ucak ikonu - burun isaretcisi YOK, koni yonu +X'e      */
 /* isaret edecek sekilde duzeltildi.                                 */
+/*                                                                    */
+/* YENI: koni artik govde grubunun (mesh3d) COCUGU DEGIL. Govde,     */
+/* tam roll+pitch+yaw donusu aliyor (gorsel olarak dogru), ama koni  */
+/* ayri bir pivot'a (conePivot3d/conePivot2d) bagli ve SADECE         */
+/* pitch+yaw ile guncelleniyor - roll etkisi hic yok. Ustune bir de  */
+/* quaternion slerp ile yumusatiliyor. Sonuc: koni HER ZAMAN burnun  */
+/* tam onunde, sabit ve titremeden kalir - "savrulma" tamamen         */
+/* engellenmis olur.                                                  */
 /* -------------------------------------------------------------- */
 const ARM_ANGLES_DEG = [45, 135, 225, 315];
 const ARM_LEN = 2.6, ARM_W = 0.35, HUB_R = 0.5;
@@ -325,7 +355,15 @@ function buildAircraftIcon(bodyColorHex) {
   mesh2d.visible = false;
   group.add(mesh2d);
 
-  return { group, mesh3d, mesh2d };
+  // YENI: koni pivotlari - govdeden bagimsiz, sadece burnun yonunu
+  // (pitch+yaw) takip eder.
+  const conePivot3d = new THREE.Group();
+  group.add(conePivot3d);
+  const conePivot2d = new THREE.Group();
+  conePivot2d.visible = false;
+  group.add(conePivot2d);
+
+  return { group, mesh3d, mesh2d, conePivot3d, conePivot2d };
 }
 
 function makeCone3d(colorHex, halfAngleDeg, rangeFt) {
@@ -345,24 +383,26 @@ function makeCone2d(colorHex, halfAngleDeg, rangeFt) {
   const mat = new THREE.MeshBasicMaterial({
     color: colorHex, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false,
   });
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.visible = false;
-  return mesh;
+  // DUZELTME: eskiden burada mesh.visible=false sabitlenmisti ve hicbir
+  // yerde tekrar true yapilmiyordu - 2D modda koni HICBIR ZAMAN
+  // gorunmuyordu. Gorunurluk artik sadece ebeveyn pivot (conePivot2d)
+  // uzerinden, setMode() ile kontrol ediliyor.
+  return new THREE.Mesh(geom, mat);
 }
 
 const trainingIcon = buildAircraftIcon(0x4fd1c5);
 scene.add(trainingIcon.group);
-const trainingCone3d = makeCone3d(0x4fd1c5, 30, 120);
-trainingIcon.mesh3d.add(trainingCone3d);
-const trainingCone2d = makeCone2d(0x4fd1c5, 30, 120);
-trainingIcon.mesh2d.add(trainingCone2d);
+const trainingCone3d = makeCone3d(0x4fd1c5, 20, 45);
+trainingIcon.conePivot3d.add(trainingCone3d);
+const trainingCone2d = makeCone2d(0x4fd1c5, 20, 45);
+trainingIcon.conePivot2d.add(trainingCone2d);
 
 const bestIcon = buildAircraftIcon(0xe0a05a);
 scene.add(bestIcon.group);
-const bestCone3d = makeCone3d(0xe0a05a, 30, 120);
-bestIcon.mesh3d.add(bestCone3d);
-const bestCone2d = makeCone2d(0xe0a05a, 30, 120);
-bestIcon.mesh2d.add(bestCone2d);
+const bestCone3d = makeCone3d(0xe0a05a, 20, 45);
+bestIcon.conePivot3d.add(bestCone3d);
+const bestCone2d = makeCone2d(0xe0a05a, 20, 45);
+bestIcon.conePivot2d.add(bestCone2d);
 
 let conesSized = false;
 function ensureConeSize(f) {
@@ -411,8 +451,12 @@ function setMode(twoD) {
 
   trainingIcon.mesh3d.visible = !twoD;
   trainingIcon.mesh2d.visible = twoD;
+  trainingIcon.conePivot3d.visible = !twoD;
+  trainingIcon.conePivot2d.visible = twoD;
   bestIcon.mesh3d.visible = !twoD;
   bestIcon.mesh2d.visible = twoD;
+  bestIcon.conePivot3d.visible = !twoD;
+  bestIcon.conePivot2d.visible = twoD;
 
   if (twoD) {
     controls.minPolarAngle = 0;
@@ -427,6 +471,21 @@ function setMode(twoD) {
 
 let latestFrame = null;
 let lastMyScore = 0, lastOppScore = 0;
+
+// YENI: koni yonelimi icin yeniden kullanilan gecici nesneler
+// (her karede yeni obje olusturup GC'yi zorlamamak icin).
+const _coneEuler = new THREE.Euler(0, 0, 0, "XYZ");
+const _coneQuat = new THREE.Quaternion();
+const CONE_SMOOTH = 0.35; // 0-1: dusuk deger = daha yumusak/gecikmeli, ama daha az titrek
+
+function applyConeOrientation(conePivot3d, conePivot2d, pitch, yaw) {
+  // Roll KASITLI OLARAK yok sayiliyor - koni govdenin roll donusunden
+  // etkilenmesin, hep burnun onunde sabit kalsin diye.
+  _coneEuler.set(0, pitch, yaw, "XYZ");
+  _coneQuat.setFromEuler(_coneEuler);
+  conePivot3d.quaternion.slerp(_coneQuat, CONE_SMOOTH);
+  conePivot2d.rotation.z = yaw;
+}
 
 function connect() {
   const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -459,10 +518,12 @@ function renderFrame(f) {
   trainingIcon.group.position.set(sn, se, salt);
   trainingIcon.mesh3d.rotation.set(sroll, spitch, syaw, "XYZ");
   trainingIcon.mesh2d.rotation.set(0, 0, syaw);
+  applyConeOrientation(trainingIcon.conePivot3d, trainingIcon.conePivot2d, spitch, syaw);
 
   bestIcon.group.position.set(on, oe, oalt);
   bestIcon.mesh3d.rotation.set(oroll, opitch, oyaw, "XYZ");
   bestIcon.mesh2d.rotation.set(0, 0, oyaw);
+  applyConeOrientation(bestIcon.conePivot3d, bestIcon.conePivot2d, opitch, oyaw);
 
   trailTraining.push(new THREE.Vector3(sn, se, salt));
   if (trailTraining.length > TRAIL_LEN) trailTraining.shift();
@@ -483,6 +544,12 @@ function renderFrame(f) {
   hud.coneOpp.textContent = f.me_in_opp_cone ? "IN CONE ✓" : "—";
   hud.coneOpp.classList.toggle("active", f.me_in_opp_cone);
 
+  // YENI: egitim timestep'i (server, PeriodicSnapshotCallback'in yazdigi
+  // meta.json'dan okuyor ve her karede payload'a ekliyor).
+  timestepValueEl.textContent = (typeof f.training_timesteps === "number")
+    ? f.training_timesteps.toLocaleString("tr-TR")
+    : "–";
+
   cmp.rollT.textContent = fmt(sroll * 180 / Math.PI, 1);
   cmp.rollB.textContent = fmt(oroll * 180 / Math.PI, 1);
   cmp.pitchT.textContent = fmt(spitch * 180 / Math.PI, 1);
@@ -501,6 +568,9 @@ function renderFrame(f) {
   cmp.standoffB.textContent = fmt(-f.opp_standoff_penalty, 3);
   cmp.controlT.textContent = fmt(-f.control_penalty, 3);
   cmp.controlB.textContent = fmt(-f.opp_control_penalty, 3);
+  // YENI: iki drone icin de toplam adim odulu
+  cmp.rewardT.textContent = fmt(f.self_reward, 3);
+  cmp.rewardB.textContent = fmt(f.opp_reward, 3);
 
   scoreTrainingEl.textContent = f.my_score;
   scoreBestEl.textContent = f.opp_score;

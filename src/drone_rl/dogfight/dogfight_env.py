@@ -1,6 +1,14 @@
 """Iki F450 arasinda 'dogfight' gorevi - birbirini kovalayip radar
 konisine alma. TAM 3D fizik.
 
+v6: KRITIK sinir-disi duzeltmesi - yatay sinir kontrolu artik
+    fdm_self'in SABIT spawn noktasina (0,0) degil, iki dronun
+    baslangic orta noktasina (arena merkezi) gore olculuyor. Eskiden
+    fdm_opp spawn'da zaten 150ft'e kadar ofsetli basliyordu, ustune
+    normal bir manevra binince "sinir disi" sayiliyordu - bu gercek
+    kotu ucus degil, olcum hatasiydi. Ayrica sinira yaklasildikca
+    kademeli (soft) bir ceza eklendi; sert kesim tek basina yeterli
+    degildi ve gereksiz ani "crash" sayisini artiriyordu.
 v5: Stage B'de rakip HER reset()'te havuzdan yeniden orneklenir.
 v4: KRITIK konum duzeltmesi - mutlak enlem/boylam (ic/lat-gc-deg,
     ic/long-gc-deg) kullaniliyor. Eskiden "distance-from-start-*"
@@ -16,6 +24,9 @@ v3: info dict'e her iki drone icin kinematik + odul kirilimi eklendi.
   (RL degil), Stage B'de dondurulmus/inference-only bir PPO modeli.
 - reward SADECE fdm_self icin hesaplanir, opp hicbir zaman bu adimda
   ogrenmez (frozen opponent self-play deseni).
+- self_reward/opp_reward (info dict): opp icin hesaplanan deger GERCEK
+  bir egitim sinyali DEGILDIR (opp bu adimda ogrenmiyor) - sadece
+  demo arayuzunde gosterim amacli, simetrik/yaklasik bir odul degeridir.
 """
 
 import math
@@ -141,6 +152,12 @@ class DogfightEnv(gym.Env):
 
         self.standoff_weight = cfg.standoff_weight_start
 
+        # YENI: arena merkezi - reset()'te iki dronun baslangic orta
+        # noktasina sabitlenir. Yatay sinir bu noktaya gore olculur,
+        # fdm_self'in sabit spawn'ina (0,0) gore DEGIL.
+        self._arena_center_n = 0.0
+        self._arena_center_e = 0.0
+
     @property
     def control_dt(self):
         return self.substeps * self.physics_dt
@@ -196,6 +213,11 @@ class DogfightEnv(gym.Env):
 
         dn_target = rng_range * math.cos(math.radians(bearing_deg))
         de_target = rng_range * math.sin(math.radians(bearing_deg))
+
+        # YENI: arena merkezi = iki dronun baslangic orta noktasi.
+        # (self her zaman 0,0'da spawn oluyor; opp dn_target/de_target'ta)
+        self._arena_center_n = dn_target / 2.0
+        self._arena_center_e = de_target / 2.0
 
         self._init_fdm(self.fdm_self, alt_self, heading_self, north_ft=0.0, east_ft=0.0)
         self._init_fdm(self.fdm_opp, alt_opp, heading_opp, north_ft=dn_target, east_ft=de_target)
@@ -293,7 +315,11 @@ class DogfightEnv(gym.Env):
     def _is_out_of_bounds(self, fdm):
         alt = fdm["position/h-agl-ft"]
         n_ft, e_ft, _ = self._position(fdm)
-        horiz = math.hypot(n_ft, e_ft)
+        # DUZELTME: sinir artik arena merkezine (iki dronun baslangic
+        # orta noktasi) gore olculuyor - fdm_self'in sabit spawn'ina
+        # (0,0) gore DEGIL. Eskiden fdm_opp spawn'da bile bu sinira
+        # 60-150ft yakin basliyordu, normal manevrada aninda tetikleniyordu.
+        horiz = math.hypot(n_ft - self._arena_center_n, e_ft - self._arena_center_e)
         yaw_rate = abs(fdm["velocities/r-rad_sec"])
         return (
             alt < self.cfg.crash_min_alt_ft
@@ -331,6 +357,23 @@ class DogfightEnv(gym.Env):
         standoff_raw = ((rng_ft - self.cfg.standoff_target_ft) / self.cfg.standoff_target_ft) ** 2
         standoff_penalty = self.standoff_weight * min(standoff_raw, self.cfg.standoff_penalty_cap)
 
+        # YENI: sinira yaklastikca kademeli (soft) ceza. Sert kesim
+        # (_is_out_of_bounds) hala var, ama bu ekstra terim dronun
+        # sinira YAKLASTIGINI erken adimlarda ogrenmesini saglar -
+        # boylece ani/gereksiz "crash" sayisi azalir.
+        self_n, self_e, _ = self._position(self.fdm_self)
+        opp_n, opp_e, _ = self._position(self.fdm_opp)
+        self_boundary_dist = math.hypot(self_n - self._arena_center_n, self_e - self._arena_center_e)
+        opp_boundary_dist = math.hypot(opp_n - self._arena_center_n, opp_e - self._arena_center_e)
+        soft_edge = self.cfg.max_horizontal_range_ft - self.cfg.boundary_soft_margin_ft
+        soft_margin = max(self.cfg.boundary_soft_margin_ft, 1e-3)
+        self_boundary_penalty = self.cfg.boundary_soft_weight * (
+            min(max(self_boundary_dist - soft_edge, 0.0) / soft_margin, 1.0) ** 2
+        )
+        opp_boundary_penalty = self.cfg.boundary_soft_weight * (
+            min(max(opp_boundary_dist - soft_edge, 0.0) / soft_margin, 1.0) ** 2
+        )
+
         tilt = abs(self.fdm_self["attitude/phi-rad"]) + abs(self.fdm_self["attitude/theta-rad"])
         spin = abs(self.fdm_self["velocities/p-rad_sec"]) + abs(self.fdm_self["velocities/q-rad_sec"])
         yaw_rate_pen = abs(self.fdm_self["velocities/r-rad_sec"])
@@ -363,7 +406,14 @@ class DogfightEnv(gym.Env):
             cone_net -= self.cfg.reward_cone_hold
             self.opp_score += 1
 
-        reward = align_reward - exposure_penalty - standoff_penalty - control_penalty + cone_net
+        reward = (
+            align_reward - exposure_penalty - standoff_penalty - control_penalty
+            + cone_net - self_boundary_penalty
+        )
+        opp_reward = (
+            opp_align_reward - opp_exposure_penalty - standoff_penalty - opp_control_penalty
+            - cone_net - opp_boundary_penalty
+        )
 
         self_oob = self._is_out_of_bounds(self.fdm_self)
         opp_oob = self._is_out_of_bounds(self.fdm_opp)
@@ -374,16 +424,19 @@ class DogfightEnv(gym.Env):
         reset_reason = None
         if collided:
             reward -= self.cfg.crash_penalty
+            opp_reward -= self.cfg.crash_penalty
             crashed = True
             terminated = True
             reset_reason = "collision"
         elif self_oob:
             reward -= self.cfg.crash_penalty
+            opp_reward += self.cfg.opponent_fault_bonus
             crashed = True
             terminated = True
             reset_reason = "self_crash"
         elif opp_oob:
             reward += self.cfg.opponent_fault_bonus
+            opp_reward -= self.cfg.crash_penalty
             terminated = True
             reset_reason = "opponent_crash"
 
@@ -411,11 +464,15 @@ class DogfightEnv(gym.Env):
             "exposure_penalty": exposure_penalty,
             "standoff_penalty": standoff_penalty,
             "control_penalty": control_penalty,
+            "boundary_penalty": self_boundary_penalty,
             "cone_net": cone_net,
             "opp_align_reward": opp_align_reward,
             "opp_exposure_penalty": opp_exposure_penalty,
             "opp_standoff_penalty": standoff_penalty,
             "opp_control_penalty": opp_control_penalty,
+            "opp_boundary_penalty": opp_boundary_penalty,
+            "self_reward": float(reward),
+            "opp_reward": float(opp_reward),
             "self_hdot_fps": float(self.fdm_self["velocities/h-dot-fps"]),
             "opp_hdot_fps": float(self.fdm_opp["velocities/h-dot-fps"]),
             "self_pos": self._position(self.fdm_self),
@@ -433,3 +490,4 @@ class DogfightEnv(gym.Env):
         }
 
         return obs, float(reward), terminated, truncated, info
+

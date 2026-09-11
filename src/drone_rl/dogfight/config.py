@@ -16,8 +16,9 @@ class DogfightEnvConfig:
     yaw_authority: float = 0.45
     control_surface_tau_s: float = 0.08
 
-    cone_half_angle_deg: float = 30.0
-    cone_range_ft: float = 70.0  # v4: 120'den kisaltildi (gorsel + oyun mantigi)
+    # v6: koni kisaltildi (30deg/70ft -> 20deg/45ft) - gorsel + oyun mantigi
+    cone_half_angle_deg: float = 20.0
+    cone_range_ft: float = 45.0
 
     standoff_target_ft: float = 40.0
     standoff_weight_start: float = 0.02
@@ -37,10 +38,22 @@ class DogfightEnvConfig:
     crash_penalty: float = 30.0
     crash_min_alt_ft: float = 5.0
     crash_max_alt_ft: float = 250.0
-    crash_max_tilt_rad: float = 0.7
+    # v6: 0.7 -> 0.9 rad. Eski limit dogfight manevralarinda gereksiz
+    # sikligarr "crash" tetikliyordu; caydiriciligi bozmadan biraz gevsetildi.
+    crash_max_tilt_rad: float = 0.9
     crash_max_yawrate_rps: float = 20.0
-    max_horizontal_range_ft: float = 220.0
+    # v6: 220 -> 300ft. Asil sorun bu limitin kendisinden cok, asagidaki
+    # _is_out_of_bounds icinde YANLIS referans noktasina gore olculmesiydi
+    # (bkz. dogfight_env.py). Referans duzeltilip sinir da biraz genisletildi.
+    max_horizontal_range_ft: float = 300.0
     min_separation_ft: float = 10.0
+
+    # YENI: sinira yaklasildikca kademeli, yumusak bir ceza uygulanir -
+    # aninda "crash" yerine dronun sinirdan uzak durmayi OGRENMESINI
+    # saglar, ama cok kucuk agirlikta oldugu icin pasiflige/kacmaya
+    # itmez (asil odul bilesenleri hala saldirgan ucusu tesvik ediyor).
+    boundary_soft_margin_ft: float = 70.0
+    boundary_soft_weight: float = 0.06
 
     base_altitude_ft: float = 150.0
     altitude_jitter_ft: float = 15.0
@@ -100,3 +113,6 @@ def load_dogfight_config(path: Optional[str]) -> DogfightConfig:
         train=TrainConfig(**raw.get("train", {})),
         promotion=PromotionConfig(**raw.get("promotion", {})),
     )
+
+
+

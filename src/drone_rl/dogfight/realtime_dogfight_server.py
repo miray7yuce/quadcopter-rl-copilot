@@ -14,8 +14,9 @@ app = FastAPI()
 STATE = {
     "html_path": None, "env": None, "training_controller": None,
     "demo_max_steps": None, "live_snapshot_dir": None, "pool_dir": None,
-    "reload_interval_s": 15.0, "_last_training_mtime": None,
+    "reload_interval_s": 2.0, "_last_training_mtime": None,
     "_last_pool_version": None, "_last_event": None,
+    "training_timesteps": None,
 }
 
 
@@ -24,7 +25,29 @@ def index():
     return FileResponse(STATE["html_path"])
 
 
+def _read_training_meta():
+    """Hafif, sadece kucuk bir json okuyan islem - her kontrol dongusunde
+    calistirilabilir (model reload'undan bagimsiz), boylece timestep
+    sayaci arayuzde model yenilenmeden de akici sekilde ilerler."""
+    meta_path = os.path.join(STATE["live_snapshot_dir"], "meta.json")
+    if not os.path.exists(meta_path):
+        return
+    try:
+        with open(meta_path, "r") as f:
+            meta = json.load(f)
+        STATE["training_timesteps"] = meta.get("num_timesteps")
+    except Exception:
+        pass
+
+
 def _check_and_reload_training():
+    """DIKKAT: bu fonksiyon PPO.load/VecNormalize.load gibi AGIR,
+    bloklayan islemler icerir. Asla dogrudan asyncio event loop'unda
+    cagirma - reload_watcher() bunu asyncio.to_thread ile ayri bir
+    thread'de calistirir, boylece websocket akisi (dogfight_loop)
+    donmaz/yavaslamaz."""
+    _read_training_meta()
+
     model_path = os.path.join(STATE["live_snapshot_dir"], "model.zip")
     vecnorm_path = os.path.join(STATE["live_snapshot_dir"], "vecnormalize.pkl")
     if not (os.path.exists(model_path) and os.path.exists(vecnorm_path)):
@@ -49,6 +72,9 @@ def _check_and_reload_training():
 
 
 def _check_and_reload_best():
+    """DIKKAT: bu fonksiyon da bloklayan dosya IO + model yukleme
+    icerebilir - reload_watcher() tarafindan asyncio.to_thread ile
+    ayri thread'de cagrilir."""
     pool = CheckpointPool(STATE["pool_dir"])
     if len(pool) == 0:
         return
@@ -64,12 +90,17 @@ def _check_and_reload_best():
 
 
 async def reload_watcher():
+    """YENI: agir yukleme islemleri artik asyncio.to_thread ile ayri
+    bir thread'de calisiyor - event loop (yani websocket'i besleyen
+    dogfight_loop) bu sirada ASLA bloklanmiyor. Bu sayede kontrol
+    araligini (reload_interval_s) 15s'den 2s'ye indirmek guvenli oldu
+    -> bildirimler gercek zamanliya cok daha yakin, ama arayuz donmuyor."""
     while True:
         await asyncio.sleep(STATE["reload_interval_s"])
         try:
             if STATE["env"] is not None:
-                _check_and_reload_training()
-                _check_and_reload_best()
+                await asyncio.to_thread(_check_and_reload_training)
+                await asyncio.to_thread(_check_and_reload_best)
         except Exception as e:
             print(f"[reload] hata (atlaniyor): {e}")
 
@@ -121,6 +152,9 @@ async def dogfight_loop(websocket: WebSocket):
                 "standoff_penalty": info["standoff_penalty"], "control_penalty": info["control_penalty"],
                 "opp_align_reward": info["opp_align_reward"], "opp_exposure_penalty": info["opp_exposure_penalty"],
                 "opp_standoff_penalty": info["opp_standoff_penalty"], "opp_control_penalty": info["opp_control_penalty"],
+                # YENI: toplam odul (her iki drone icin) ve egitim timestep'i
+                "self_reward": info["self_reward"], "opp_reward": info["opp_reward"],
+                "training_timesteps": STATE["training_timesteps"],
                 "my_score": cumulative_my_score + info["my_score"],
                 "opp_score": cumulative_opp_score + info["opp_score"],
                 "episode_count": episode_count, "last_reset_reason": last_reset_reason,
@@ -152,7 +186,7 @@ class _TrainingSelfController:
 
 
 def start_server(live_snapshot_dir: str, pool_dir: str, config_path: str, html_path: str,
-                  demo_max_steps: int = None, reload_interval_s: float = 15.0, port: int = 8020):
+                  demo_max_steps: int = None, reload_interval_s: float = 2.0, port: int = 8020):
     import threading
     import uvicorn
     from stable_baselines3 import PPO
@@ -189,9 +223,21 @@ def start_server(live_snapshot_dir: str, pool_dir: str, config_path: str, html_p
     STATE["_last_pool_version"] = pool.entries[-1]["version"]
     STATE["_last_event"] = None
 
+    meta_path = os.path.join(live_snapshot_dir, "meta.json")
+    if os.path.exists(meta_path):
+        try:
+            with open(meta_path, "r") as f:
+                STATE["training_timesteps"] = json.load(f).get("num_timesteps")
+        except Exception:
+            STATE["training_timesteps"] = None
+
     thread = threading.Thread(
         target=lambda: uvicorn.run(app, host="0.0.0.0", port=port, log_level="warning"),
         daemon=True,
     )
     thread.start()
     print(f"Dogfight sunucusu baslatildi (port {port}). Her {reload_interval_s}s kontrol edilecek.")
+
+
+
+

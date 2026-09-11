@@ -1,4 +1,5 @@
 import argparse
+import json
 from pathlib import Path
 
 import numpy as np
@@ -53,6 +54,10 @@ class PeriodicSnapshotCallback(BaseCallback):
             self.model.save(str(self.snapshot_dir / "model"))
             if vecnorm is not None:
                 vecnorm.save(str(self.snapshot_dir / "vecnormalize.pkl"))
+            # YENI: gercek zamanli arayuzde egitim timestep'ini
+            # gostermek icin kucuk bir meta dosyasi da yaziliyor.
+            meta = {"num_timesteps": int(self.num_timesteps)}
+            (self.snapshot_dir / "meta.json").write_text(json.dumps(meta))
         return True
 
 

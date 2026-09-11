@@ -113,7 +113,7 @@ def build_parser():
     p_demo.add_argument("--html", type=str, default=None)
     p_demo.add_argument("--port", type=int, default=8020)
     p_demo.add_argument("--max-steps", dest="max_steps", type=int, default=None)
-    p_demo.add_argument("--reload-interval", dest="reload_interval", type=float, default=15.0)
+    p_demo.add_argument("--reload-interval", dest="reload_interval", type=float, default=2.0)
     p_demo.add_argument("--no-browser", action="store_true")
     p_demo.set_defaults(func=cmd_demo)
 
@@ -128,3 +128,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
