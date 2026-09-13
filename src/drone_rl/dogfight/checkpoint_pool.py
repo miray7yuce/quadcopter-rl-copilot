@@ -1,16 +1,24 @@
 """Self-play icin checkpoint havuzu - PFSP-lite.
 
-DUZELTME: Havuz artik KENDI KENDINI DOGRULUYOR. Onceki calisma
-sirasinda (kernel kesintisi, bilgisayar degisimi vb.) bir promotion'in
-dosya kopyalama adimi yarida kalmis olabilir - manifest.json bir
-versiyonu (orn. v2) listeler ama gercek model.zip/vecnormalize.pkl
-dosyalari diskte YOK. Bu, sample()/latest() cagrildiginda
-FileNotFoundError ile egitimi cokertiyordu.
+Korunan davranislar:
+  * Havuz KENDI KENDINI DOGRULAR: manifest'te olup diskte dosyasi
+    eksik olan entry'ler otomatik temizlenir (yarida kalmis bir
+    promotion egitimi cokertmesin diye).
+  * Versiyon numarasi "son entry + 1" (prune sonrasi cakismayi onler).
+  * sample()/latest()/add() manifest'i DISKTEN TAZE okur - egitim
+    surecinin ayri bir CheckpointPool nesnesiyle yaptigi promotion'lari
+    ortamlar hemen gorur (stale opponent problemi).
 
-Simdi: yukleme sirasinda HER entry'nin dosyalarinin GERCEKTEN var olup
-olmadigi kontrol ediliyor - eksik olanlar manifest'ten SESSIZCE
-(sadece bir uyari basarak) CIKARILIYOR ve manifest.json GUNCELLENIYOR.
-Boylece bir daha ayni bozuk versiyona rastlanmiyor.
+v8'de eklenen (T2 - sadelestirilmis):
+  * PFSP-lite ornekleme. Eskiden: %70 en son, %30 eskiler arasinda
+    UNIFORM. Uniform ornekleme, cok eski/zayif politikalarin surekli
+    secilmesine ve egitimin bosa harcanmasina yol aciyordu (bkz.
+    aerospace-12-00265, Bolum 3.1 - "obsolete strategies are more
+    likely to be sampled, potentially degrading RL performance").
+    Simdi eskiler arasinda secim, kayitli win_rate uzerinden softmax
+    agirligiyla yapiliyor: guclu checkpoint'ler daha sik secilir.
+    Tam Elo + SA-Boltzmann meta-solver yerine, ayni etkiyi veren
+    birkac satirlik sade bir surum.
 """
 
 import json
@@ -29,21 +37,24 @@ class CheckpointPool:
         self._load()
         self._prune_missing()
 
+    # ------------------------------------------------------------------
     def _load(self):
         if self.manifest_path.exists():
-            self.entries = json.loads(self.manifest_path.read_text())
+            try:
+                self.entries = json.loads(self.manifest_path.read_text())
+            except json.JSONDecodeError:
+                # baska bir surec tam o anda yaziyor olabilir; eldekini koru
+                self.entries = getattr(self, "entries", [])
         else:
             self.entries = []
 
     def _save(self):
-        self.manifest_path.write_text(json.dumps(self.entries, indent=2))
+        tmp = self.manifest_path.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(self.entries, indent=2))
+        tmp.replace(self.manifest_path)
 
     def _prune_missing(self):
-        """YENI: manifest'te olup diskte dosyalari EKSIK olan entry'leri
-        temizler - kesintiye ugramis bir promotion'dan kalma bozuk
-        kayitlarin egitimi cokertmesini onler."""
-        valid = []
-        removed = []
+        valid, removed = [], []
         for e in self.entries:
             if Path(e["model"]).exists() and Path(e["vecnorm"]).exists():
                 valid.append(e)
@@ -58,21 +69,16 @@ class CheckpointPool:
     def __len__(self):
         return len(self.entries)
 
+    # ------------------------------------------------------------------
     def add(self, model_src: str, vecnorm_src: str, mean_reward: float,
-            win_rate: float, note: str = "") -> int:
-        # YENI: versiyon numarasi artik "son entry'nin numarasi + 1" -
-        # eskiden len(entries)+1 idi, ama bir versiyon prune edilmisse
-        # (silinmisse) bu iki numaranin CAKISMASINA yol acabiliyordu.
+            win_rate: float, note: str = "", obs_dim: Optional[int] = None) -> int:
+        self._load()
         next_version = (self.entries[-1]["version"] + 1) if self.entries else 1
         dst_dir = self.pool_dir / f"v{next_version}"
         dst_dir.mkdir(parents=True, exist_ok=True)
         model_dst = dst_dir / "model.zip"
         vecnorm_dst = dst_dir / "vecnormalize.pkl"
 
-        # YENI: once GECICI bir isimle kopyala, ikisi de TAM bitince
-        # manifest'e ekle - kesinti olursa yarim kalan dosya asla
-        # manifest'e girmez (bir sonraki _prune_missing zaten temizler
-        # ama bunu bastan onlemek daha saglam).
         shutil.copy(model_src, model_dst)
         shutil.copy(vecnorm_src, vecnorm_dst)
 
@@ -84,35 +90,60 @@ class CheckpointPool:
             "win_rate": float(win_rate),
             "note": note,
         }
+        if obs_dim is not None:
+            entry["obs_dim"] = int(obs_dim)
         self.entries.append(entry)
         self._save()
         return next_version
 
     def latest(self) -> Optional[Tuple[str, str]]:
+        self._load()
         if not self.entries:
             return None
         e = self.entries[-1]
         return e["model"], e["vecnorm"]
 
     def latest_mean_reward(self) -> Optional[float]:
+        self._load()
         if not self.entries:
             return None
         return self.entries[-1]["mean_reward"]
 
-    def sample(self, latest_prob: float = 0.7, rng: Optional[np.random.Generator] = None
-               ) -> Optional[Tuple[str, str]]:
+    def latest_version(self) -> Optional[int]:
+        self._load()
+        if not self.entries:
+            return None
+        return self.entries[-1]["version"]
+
+    # ------------------------------------------------------------------
+    def _pfsp_weights(self, entries, temperature: float) -> np.ndarray:
+        """win_rate uzerinden softmax. Dusuk sicaklik = guclu
+        checkpoint'lere daha cok agirlik; yuksek sicaklik = uniform."""
+        wr = np.array([float(e.get("win_rate", 0.5)) for e in entries], dtype=np.float64)
+        t = max(float(temperature), 1e-3)
+        logits = (wr - wr.max()) / t
+        w = np.exp(logits)
+        total = w.sum()
+        if not np.isfinite(total) or total <= 0:
+            return np.full(len(entries), 1.0 / len(entries))
+        return w / total
+
+    def sample(self, latest_prob: float = 0.6,
+               rng: Optional[np.random.Generator] = None,
+               temperature: float = 0.25) -> Optional[Tuple[str, str]]:
+        self._load()
         if not self.entries:
             return None
         rng = rng or np.random.default_rng()
+
         if len(self.entries) == 1 or rng.random() < latest_prob:
             e = self.entries[-1]
         else:
-            idx = int(rng.integers(0, len(self.entries) - 1))
-            e = self.entries[idx]
+            older = self.entries[:-1]
+            probs = self._pfsp_weights(older, temperature)
+            idx = int(rng.choice(len(older), p=probs))
+            e = older[idx]
 
-        # YENI: sample ANINDA da guvenlik kontrolu - manifest.json disinda
-        # (orn. baska bir surecin ayni anda yazdigi) bir bozulma olursa
-        # bile egitim COKMEZ, en guncel/saglam entry'e duser.
         if not (Path(e["model"]).exists() and Path(e["vecnorm"]).exists()):
             print(f"[CheckpointPool] UYARI: v{e['version']} diskte bulunamadi, "
                   f"havuz yeniden dogrulaniyor.")
@@ -125,11 +156,10 @@ class CheckpointPool:
         return e["model"], e["vecnorm"]
 
     def summary(self) -> str:
+        self._load()
         lines = [f"Pool: {self.pool_dir} ({len(self.entries)} versiyon)"]
         for e in self.entries:
             lines.append(f"  v{e['version']}: mean_reward={e['mean_reward']:.2f} "
-                          f"win_rate={e['win_rate']:.2f} note={e['note']}")
+                         f"win_rate={e['win_rate']:.2f} obs_dim={e.get('obs_dim', '?')} "
+                         f"note={e['note']}")
         return "\n".join(lines)
-
-
-

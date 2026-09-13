@@ -6,5 +6,21 @@
     "mean_reward": -29.506097806780257,
     "win_rate": 0.1,
     "note": "stage-a seed (scripted opponent'e karsi)"
+  },
+  {
+    "version": 2,
+    "model": "/content/repo/runs/dogfight_pool/v2/model.zip",
+    "vecnorm": "/content/repo/runs/dogfight_pool/v2/vecnormalize.pkl",
+    "mean_reward": -20.064217962015434,
+    "win_rate": 0.0,
+    "note": "stage-a seed"
+  },
+  {
+    "version": 3,
+    "model": "/content/repo/runs/dogfight_pool/v3/model.zip",
+    "vecnorm": "/content/repo/runs/dogfight_pool/v3/vecnormalize.pkl",
+    "mean_reward": -37.04756164454071,
+    "win_rate": 0.0,
+    "note": "stage-a seed"
   }
 ]

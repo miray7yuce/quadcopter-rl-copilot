@@ -1,67 +1,109 @@
+# Stage B: havuzdan orneklenen dondurulmus PPO rakiplerine karsi self-play.
+# v8 - standoff_* ve reward_align_* parametreleri KALDIRILDI.
 env:
   episode_seconds: 45.0
   physics_hz: 240
   control_hz: 20
+
   hover_throttle: 0.420
   throttle_range: 0.25
   roll_authority: 0.6
   pitch_authority: 0.6
   yaw_authority: 0.45
   control_surface_tau_s: 0.08
-  cone_half_angle_deg: 20.0
-  cone_range_ft: 45.0
-  standoff_target_ft: 40.0
-  standoff_weight_start: 0.05
-  standoff_weight_end: 0.09
-  standoff_ramp_steps: 300000
-  standoff_penalty_cap: 2.0
-  reward_align_weight: 0.20
-  reward_exposure_weight: 0.15
-  reward_cone_hold: 0.08
-  reward_tilt_weight: 0.03
-  reward_spin_weight: 0.06
-  reward_yawrate_weight: 0.04
-  reward_jerk_weight: 0.05
-  opponent_fault_bonus: 5.0
-  crash_penalty: 30.0
-  crash_min_alt_ft: 5.0
-  crash_max_alt_ft: 250.0
-  crash_max_tilt_rad: 0.9
-  crash_max_yawrate_rps: 20.0
-  max_horizontal_range_ft: 300.0
-  min_separation_ft: 10.0
-  boundary_soft_margin_ft: 70.0
-  boundary_soft_weight: 0.06
+  # `python main.py calibrate` ciktisina gore ayarlayin (+1.0 veya -1.0)
+  forward_pitch_sign: 1.0
+
+  velocity_norm_fps: 30.0
+  range_norm_ft: 100.0
+  closing_norm_fps: 20.0
+  dz_norm_ft: 50.0
+  engage_axis_blend_fps: 8.0
+
+  cone_half_angle_deg: 25.0
+  cone_range_ft: 60.0
+
+  reward_track_weight: 0.50
+  reward_threat_weight: 0.35
+  track_sigma_rad: 0.80
+
+  reward_dist_weight: 0.15
+  dist_ref_ft: 150.0
+  reward_close_weight: 0.12
+  closing_ref_fps: 15.0
+  too_close_ft: 25.0
+  reward_too_close_weight: 0.30
+
+  reward_cone_hold: 0.15
+
+  reward_tilt_weight: 0.02
+  reward_spin_weight: 0.03
+  reward_yawrate_weight: 0.02
+  reward_jerk_weight: 0.03
+
+  hp_initial: 3.0
+  hp_damage_rate: 1.0
+  win_bonus: 50.0
+  timeout_hp_bonus: 15.0
+
+  crash_penalty: 25.0
+  opponent_fault_bonus: 10.0
+  crash_min_alt_ft: 8.0
+  crash_max_alt_ft: 300.0
+  crash_max_tilt_rad: 1.40
+  tilt_soft_rad: 0.60
+  tilt_soft_weight: 0.25
+  yawrate_soft_rps: 4.0
+  yawrate_soft_weight: 0.10
+  max_horizontal_range_ft: 400.0
+  boundary_soft_margin_ft: 120.0
+  boundary_soft_weight: 0.25
+  min_separation_ft: 8.0
+
+  shaped_weight_start: 1.00
+  shaped_weight_end: 0.45
+  shaped_ramp_steps: 600000
+  curriculum_ramp_steps: 1
+
   base_altitude_ft: 150.0
-  altitude_jitter_ft: 15.0
-  spawn_range_min_ft: 60.0
-  spawn_range_max_ft: 150.0
-  opponent_latest_prob: 0.7
+  altitude_jitter_ft: 25.0
+  spawn_range_min_ft: 80.0
+  spawn_range_max_ft: 220.0
+  spawn_speed_max_fps: 18.0
+  spawn_attitude_jitter_rad: 0.12
+
+  opponent_latest_prob: 0.60
+  opponent_pfsp_temp: 0.25
+  opponent_deterministic: false
+
 ppo:
   policy: MlpPolicy
-  n_steps: 2048
+  n_steps: 1024
   batch_size: 256
   n_epochs: 10
-  gamma: 0.99
+  gamma: 0.995
   gae_lambda: 0.95
   clip_range: 0.2
   learning_rate: 0.0003
-  ent_coef: 0.0
-  net_arch_pi: [128, 128]
-  net_arch_vf: [128, 128]
+  lr_final_frac: 0.1
+  ent_coef: 0.005
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  target_kl: 0.05
+  clip_reward: 10.0
+  net_arch_pi: [256, 256]
+  net_arch_vf: [256, 256]
   activation_fn: tanh
+
 train:
-  timesteps: 1000000
-  n_envs: 4
+  timesteps: 2000000
+  n_envs: 6
+  vec: auto
+  seed: 1
+
 promotion:
   eval_freq: 30000
-  n_eval_episodes: 30
+  n_eval_episodes: 20
   win_rate_threshold: 0.55
-  mean_reward_improve_pct: 8.0
-  consecutive_passes_required: 3
-
-
-
-
-
-
+  mean_reward_improve_pct: 5.0
+  consecutive_passes_required: 2

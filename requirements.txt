@@ -1,8 +1,9 @@
 jsbsim
 torch
-stable-baselines3
+stable-baselines3>=2.0
 gymnasium
 fastapi
 uvicorn
 pyyaml
 numpy
+tensorboard
