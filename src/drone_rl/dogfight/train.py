@@ -161,13 +161,41 @@ class PeriodicSnapshotCallback(BaseCallback):
         return True
 
 
+_OPPONENT_FAULT_REASONS = (
+    "opponent_down", "opponent_ground", "opponent_ceiling",
+    "opponent_tumble", "opponent_boundary",
+)
+_SELF_FAULT_REASONS = (
+    "self_down", "self_ground", "self_ceiling", "self_tumble", "self_boundary",
+)
+
+
 def _episode_won(info) -> bool:
-    """v8: kazanma artik koni adim sayisiyla degil, HP ile belirlenir."""
-    if info.get("reset_reason") == "opponent_down":
+    """v8.1 DUZELTME: eskiden SADECE reset_reason=='opponent_down' acik
+    galibiyet sayiliyordu; rakip kendi hatasiyla (tumble/boundary/ground/
+    ceiling - yani sana hic kilit/hasar vermeden) duserse HICBIR dala
+    girmiyor, en sonda hp_opp < hp_self karsilastirmasina dusuyordu.
+    Ama boyle bir bolumde IKI TARAFIN DA HP'si hala baslangic degerinde
+    (3.0 == 3.0) olabilir - '<' False cikip bu acik ustunluk GALIBIYET
+    SAYILMIYORDU. Oysa ortamin odul fonksiyonu bunu zaten
+    opponent_fault_bonus ile SENIN lehine puanliyordu (bkz.
+    dogfight_env.py step()) - yani egitim sinyali ile degerlendirme
+    metrigi CELISIYORDU. Bu, mean_reward surekli iyilesirken win_rate'in
+    gurultulu/dusuk kalmasinin (ve promotion'un tikanmasinin) ana
+    nedenlerinden biriydi.
+
+    Simdi: rakibin HERHANGI bir kendi-hatasi (opponent_* reset_reason)
+    ile bitmesi DOGRUDAN galibiyet sayilir - carpisma (collision) ve
+    karsilikli dusme (mutual_down) haric, HP karsilastirmasina hic
+    gerek kalmadan."""
+    reason = info.get("reset_reason")
+    if reason in _OPPONENT_FAULT_REASONS:
         return True
-    if info.get("reset_reason") in ("self_down", "self_ground", "self_ceiling",
-                                    "self_tumble", "self_boundary"):
+    if reason in _SELF_FAULT_REASONS:
         return False
+    if reason in ("collision", "mutual_down"):
+        return False
+    # timeout ya da beklenmeyen bir sebep: HP farkina bak
     return float(info.get("hp_opp", 0.0)) < float(info.get("hp_self", 0.0))
 
 
@@ -324,6 +352,11 @@ def main():
     ap.add_argument("--snapshot-freq", type=int, default=10000)
     ap.add_argument("--seed-pool", action="store_true")
     ap.add_argument("--from", dest="from_run", type=str)
+    # YENI: --resume - runs/<out>/live_snapshot/{model.zip,vecnormalize.pkl}
+    # mevcutsa egitim SIFIRDAN degil, oradan devam eder. Colab runtime
+    # kopmalarinda ilerlemenin kaybolmamasi icin eklendi.
+    ap.add_argument("--resume", action="store_true",
+                    help="live_snapshot'ta kayitli model/vecnormalize varsa oradan devam et")
     args = ap.parse_args()
 
     if args.seed_pool:
@@ -340,23 +373,50 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
+    live_dir = out / "live_snapshot"
+    resume_model_path = live_dir / "model.zip"
+    resume_vecnorm_path = live_dir / "vecnormalize.pkl"
+    do_resume = bool(args.resume and resume_model_path.exists() and resume_vecnorm_path.exists())
+    if args.resume and not do_resume:
+        print(f"[resume] --resume verildi ama '{live_dir}' altinda kayitli bir "
+             f"snapshot bulunamadi (model.zip/vecnormalize.pkl) - SIFIRDAN baslaniyor.")
+
     venv = make_dogfight_training_vec_env(
         cfg.env, n_envs=n_envs, stage=args.stage, pool_dir=args.pool,
         training=True, norm_reward=True, clip_reward=cfg.ppo.clip_reward,
         vec=vec, seed=seed,
+        vecnormalize_path=str(resume_vecnorm_path) if do_resume else None,
     )
 
     policy_kwargs = build_policy_kwargs(cfg.ppo)
-    model = PPO(
-        cfg.ppo.policy, venv,
-        n_steps=cfg.ppo.n_steps, batch_size=cfg.ppo.batch_size, n_epochs=cfg.ppo.n_epochs,
-        gamma=cfg.ppo.gamma, gae_lambda=cfg.ppo.gae_lambda, clip_range=cfg.ppo.clip_range,
-        learning_rate=linear_schedule(cfg.ppo.learning_rate, cfg.ppo.lr_final_frac),
-        ent_coef=cfg.ppo.ent_coef, vf_coef=cfg.ppo.vf_coef,
-        max_grad_norm=cfg.ppo.max_grad_norm, target_kl=cfg.ppo.target_kl,
-        policy_kwargs=policy_kwargs, verbose=1, device="cpu", seed=seed,
-        tensorboard_log=str(out / "tb"),
-    )
+
+    if do_resume:
+        # DIKKAT: policy_kwargs / mimari buradan gecilmiyor - PPO.load
+        # kaydedilmis modelin KENDI mimarisini ve agirliklarini geri
+        # yukler. Sadece cevre (env) YENI (guncel kod/odul duzeltmeleri
+        # ile) baglaniyor - boylece TRAIN.PY'DA yapilan bir duzeltme
+        # (orn. _episode_won mantigi ya da odul fonksiyonu) agirliklari
+        # SIFIRLAMADAN devreye girer.
+        model = PPO.load(str(resume_model_path), env=venv, device="cpu")
+        already_done = int(model.num_timesteps)
+        remaining = max(timesteps - already_done, 0)
+        print(f"[resume] {resume_model_path} yuklendi.")
+        print(f"[resume] su ana kadar tamamlanan adim : {already_done}")
+        print(f"[resume] yaml'daki hedef adim          : {timesteps}")
+        print(f"[resume] bu calistirmada kalan adim    : {remaining}")
+    else:
+        model = PPO(
+            cfg.ppo.policy, venv,
+            n_steps=cfg.ppo.n_steps, batch_size=cfg.ppo.batch_size, n_epochs=cfg.ppo.n_epochs,
+            gamma=cfg.ppo.gamma, gae_lambda=cfg.ppo.gae_lambda, clip_range=cfg.ppo.clip_range,
+            learning_rate=linear_schedule(cfg.ppo.learning_rate, cfg.ppo.lr_final_frac),
+            ent_coef=cfg.ppo.ent_coef, vf_coef=cfg.ppo.vf_coef,
+            max_grad_norm=cfg.ppo.max_grad_norm, target_kl=cfg.ppo.target_kl,
+            policy_kwargs=policy_kwargs, verbose=1, device="cpu", seed=seed,
+            tensorboard_log=str(out / "tb"),
+        )
+        already_done = 0
+        remaining = timesteps
 
     ckpt_cb = CheckpointCallback(save_freq=max(20_000 // n_envs, 1),
                                  save_path=str(out / "ckpt"), name_prefix="ppo")
@@ -371,13 +431,29 @@ def main():
         pool = CheckpointPool(args.pool)
         if len(pool) == 0:
             raise ValueError("Havuz bos - once --seed-pool calistirin")
-        callbacks.append(PromotionCallback(pool, cfg.env, cfg.promotion, out))
+        promo_cb = PromotionCallback(pool, cfg.env, cfg.promotion, out)
+        if do_resume:
+            # YENI: resume aninda _next_eval'i mevcut ilerlemeye gore
+            # HIZALA - yoksa (varsayilan _next_eval=eval_freq oldugu
+            # icin) num_timesteps zaten cok ilerideyken ilk birkac
+            # _on_step cagrisinda ART ARDA, GEREKSIZ COK SAYIDA
+            # degerlendirme (her biri n_eval_episodes bolum!) tetiklenir.
+            promo_cb._next_eval = (
+                (already_done // cfg.promotion.eval_freq) + 1
+            ) * cfg.promotion.eval_freq
+            print(f"[resume] promotion degerlendirmesi bir sonraki "
+                 f"adim={promo_cb._next_eval}'de tetiklenecek.")
+        callbacks.append(promo_cb)
 
-    model.learn(total_timesteps=timesteps, callback=callbacks)
+    if remaining > 0:
+        model.learn(total_timesteps=remaining, reset_num_timesteps=False, callback=callbacks)
+    else:
+        print(f"[resume] zaten hedef adim sayisina ({timesteps}) ulasilmis, "
+             f"egitim atlaniyor.")
 
     model.save(out / "model_final")
     venv.save(str(out / "vecnormalize.pkl"))
-    print(f"Egitim tamamlandi: {out}")
+    print(f"Egitim tamamlandi: {out} (toplam num_timesteps={model.num_timesteps})")
 
 
 if __name__ == "__main__":

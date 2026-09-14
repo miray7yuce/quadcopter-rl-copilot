@@ -7,5 +7,14 @@
     "win_rate": 0.0,
     "note": "stage-a seed",
     "obs_dim": 30
+  },
+  {
+    "version": 2,
+    "model": "/content/repo/runs/dogfight_pool/v2/model.zip",
+    "vecnorm": "/content/repo/runs/dogfight_pool/v2/vecnormalize.pkl",
+    "mean_reward": -31.28911192209059,
+    "win_rate": 0.2,
+    "note": "stage-a seed",
+    "obs_dim": 30
   }
 ]

@@ -103,7 +103,14 @@ def make_dogfight_env(env_cfg, stage: str = "a", pool_dir: str = None,
 def make_dogfight_training_vec_env(env_cfg, n_envs: int, stage: str, pool_dir: str,
                                    training: bool, norm_reward: bool,
                                    clip_obs: float = 10.0, clip_reward: float = 10.0,
-                                   vec: str = "auto", seed=None):
+                                   vec: str = "auto", seed=None,
+                                   vecnormalize_path: str = None):
+    """DUZELTME (resume destegi): vecnormalize_path verilirse, YENI bir
+    VecNormalize olusturmak yerine diskteki kaydedilmis normalizasyon
+    istatistikleri (mean/var vb.) YUKLENIR. Bu olmadan resume edilen bir
+    egitim, sifirdan sifirlanmis (yanlis olcekli) bir gozlem
+    normalizasyonuyla devam eder - bu da modelin ogrendigi politikayla
+    UYUMSUZ girdi dagilimina yol acar (fiilen egitim bozulur)."""
     def _make(rank):
         def _init():
             env = make_dogfight_env(env_cfg, stage=stage, pool_dir=pool_dir)
@@ -126,6 +133,13 @@ def make_dogfight_training_vec_env(env_cfg, n_envs: int, stage: str, pool_dir: s
     else:
         venv = DummyVecEnv(fns)
 
-    venv = VecNormalize(venv, norm_obs=True, norm_reward=norm_reward,
-                        clip_obs=clip_obs, clip_reward=clip_reward, training=training)
+    if vecnormalize_path:
+        venv = VecNormalize.load(vecnormalize_path, venv)
+        venv.training = training
+        venv.norm_reward = norm_reward
+        venv.clip_obs = clip_obs
+        venv.clip_reward = clip_reward
+    else:
+        venv = VecNormalize(venv, norm_obs=True, norm_reward=norm_reward,
+                            clip_obs=clip_obs, clip_reward=clip_reward, training=training)
     return venv

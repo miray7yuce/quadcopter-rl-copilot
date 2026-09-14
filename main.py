@@ -24,6 +24,8 @@ def _common_train_argv(args, base):
         argv += ["--vec", args.vec]
     if getattr(args, "seed", None) is not None:
         argv += ["--seed", str(args.seed)]
+    if getattr(args, "resume", False):
+        argv += ["--resume"]
     argv += ["--snapshot-freq", str(args.snapshot_freq)]
     return argv
 
@@ -111,6 +113,8 @@ def build_parser():
         p.add_argument("--vec", type=str, default=None,
                        choices=["auto", "dummy", "subproc"])
         p.add_argument("--seed", type=int, default=None)
+        p.add_argument("--resume", action="store_true",
+                       help="live_snapshot'ta kayitli model/vecnormalize varsa oradan devam et")
         p.add_argument("--snapshot-freq", type=int, default=10000)
 
     p_a = sub.add_parser("train-a")
