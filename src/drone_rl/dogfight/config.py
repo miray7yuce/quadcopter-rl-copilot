@@ -111,7 +111,9 @@ class DogfightEnvConfig:
     # ------------------------------------------------------------------
     crash_penalty: float = 25.0
     opponent_fault_bonus: float = 10.0
-    crash_min_alt_ft: float = 8.0
+    # DUZELTME (yer carpmasi sorunu): eskiden 8 ft idi - sert tabanla
+    # arasinda neredeyse hic tepki payi yoktu. 20 ft'e cikarildi.
+    crash_min_alt_ft: float = 20.0
     crash_max_alt_ft: float = 300.0
     crash_max_tilt_rad: float = 1.40   # ~80 deg: gercekten kurtarilamaz
     tilt_soft_rad: float = 0.60        # bu acinin uzerinde kademeli ceza
@@ -122,6 +124,23 @@ class DogfightEnvConfig:
     boundary_soft_margin_ft: float = 120.0
     boundary_soft_weight: float = 0.25
     min_separation_ft: float = 8.0
+
+    # YENI: irtifa tabani/tavani icin de tilt/yawrate/boundary'deki gibi
+    # KADEMELI ceza. Eskiden bu SADECE sert sinirdi (crash_min_alt_ft/
+    # crash_max_alt_ft) - ajan yere yaklastigini hic 'hissetmeden' aniden
+    # carpiyordu, cunku hicbir erken uyari sinyali yoktu (diger 3 guvenlik
+    # terimi icin vardi, bu bir eksiklikti). Taban icin marj daha genis
+    # tutuldu cunku yere carpma cok daha sik/tehlikeli.
+    alt_floor_soft_margin_ft: float = 60.0
+    alt_floor_soft_weight: float = 0.35
+    alt_ceiling_soft_margin_ft: float = 40.0
+    alt_ceiling_soft_weight: float = 0.15
+
+    # YENI: hizli inis (yuksek negatif dikey hiz) dogrudan cezalandirilir -
+    # ozellikle rakip asagidayken 'menzili kapatma' odulu dalisi tesvik
+    # ediyordu; bu terim dalis HIZINI irtifadan bagimsiz olarak sinirlar.
+    descent_rate_soft_fps: float = 12.0
+    descent_rate_soft_weight: float = 0.12
 
     # ------------------------------------------------------------------
     # Shaped odul sonumlemesi + mufredat ilerlemesi
@@ -231,3 +250,7 @@ def load_dogfight_config(path: Optional[str]) -> DogfightConfig:
         train=TrainConfig(**raw.get("train", {})),
         promotion=PromotionConfig(**raw.get("promotion", {})),
     )
+
+
+
+

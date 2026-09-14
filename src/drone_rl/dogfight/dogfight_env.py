@@ -757,7 +757,30 @@ class DogfightEnv(gym.Env):
         bnd_excess = max(self._boundary_dist(fdm) - soft_edge, 0.0)
         bnd_pen = cfg.boundary_soft_weight * min(bnd_excess / margin, 1.0) ** 2
 
-        return tilt_pen + yaw_pen + bnd_pen
+        # YENI: irtifa tabani - tilt/yaw/boundary ile AYNI kademeli desen,
+        # eskiden eksikti. Taban esiginin UZERINDE kalan mesafe azaldikca
+        # (crash_min_alt_ft'e yaklastikca) ceza kareselce artar.
+        alt = fdm["position/h-agl-ft"]
+        floor_soft_edge = cfg.crash_min_alt_ft + cfg.alt_floor_soft_margin_ft
+        floor_margin = max(cfg.alt_floor_soft_margin_ft, 1e-3)
+        floor_excess = max(floor_soft_edge - alt, 0.0)
+        floor_pen = cfg.alt_floor_soft_weight * min(floor_excess / floor_margin, 1.0) ** 2
+
+        ceil_soft_edge = cfg.crash_max_alt_ft - cfg.alt_ceiling_soft_margin_ft
+        ceil_margin = max(cfg.alt_ceiling_soft_margin_ft, 1e-3)
+        ceil_excess = max(alt - ceil_soft_edge, 0.0)
+        ceil_pen = cfg.alt_ceiling_soft_weight * min(ceil_excess / ceil_margin, 1.0) ** 2
+
+        # YENI: dalis HIZI dogrudan cezalandirilir - irtifadan bagimsiz,
+        # erken bir uyari. 'closing' odulu rakip asagidayken dalisi
+        # tesvik ediyordu; bu terim asiri hizli inisi caydirir (yatay
+        # kovalamaya dokunmaz, sadece dikey hizi sinirlar).
+        hdot = fdm["velocities/h-dot-fps"]
+        descent_excess = max(-hdot - cfg.descent_rate_soft_fps, 0.0)
+        descent_pen = cfg.descent_rate_soft_weight * min(
+            descent_excess / max(cfg.descent_rate_soft_fps, 1e-3), 1.0) ** 2
+
+        return tilt_pen + yaw_pen + bnd_pen + floor_pen + ceil_pen + descent_pen
 
     # ------------------------------------------------------------------
     # Step
@@ -971,3 +994,5 @@ class DogfightEnv(gym.Env):
         }
 
         return obs, float(reward), terminated, truncated, info
+
+

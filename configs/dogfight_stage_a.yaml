@@ -48,7 +48,7 @@ env:
 
   crash_penalty: 25.0
   opponent_fault_bonus: 10.0
-  crash_min_alt_ft: 8.0
+  crash_min_alt_ft: 20.0
   crash_max_alt_ft: 300.0
   crash_max_tilt_rad: 1.40
   tilt_soft_rad: 0.60
@@ -59,6 +59,16 @@ env:
   boundary_soft_margin_ft: 120.0
   boundary_soft_weight: 0.25
   min_separation_ft: 8.0
+
+  # YENI: irtifa tabani/tavani icin kademeli ceza (yer carpmasi sorunu icin)
+  alt_floor_soft_margin_ft: 60.0
+  alt_floor_soft_weight: 0.35
+  alt_ceiling_soft_margin_ft: 40.0
+  alt_ceiling_soft_weight: 0.15
+
+  # YENI: asiri hizli inisi dogrudan cezalandirir
+  descent_rate_soft_fps: 12.0
+  descent_rate_soft_weight: 0.12
 
   shaped_weight_start: 1.00
   shaped_weight_end: 0.55
@@ -107,3 +117,4 @@ promotion:
   win_rate_threshold: 0.55
   mean_reward_improve_pct: 5.0
   consecutive_passes_required: 2
+
