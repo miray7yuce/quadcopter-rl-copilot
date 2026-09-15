@@ -4,37 +4,7 @@ See the migration guide at https://gymnasium.farama.org/introduction/migration_g
 Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
 Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
 See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
-Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
-See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
+[CheckpointPool] UYARI: diskte dosyasi eksik oldugu icin manifest'ten cikarilan versiyonlar: [2]
 
 
      JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
@@ -59,43 +29,6 @@ Failed to tie property fcs/accelz/malfunction/fail_low to object methods
 Failed to tie property fcs/accelz/malfunction/fail_high to object methods
 Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
 Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
-Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
-See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
-Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
-Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
-See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
-Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
-See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
 Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
 Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
 Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
@@ -131,6 +64,9 @@ Failed to tie property fcs/temp_c/randomseed to object methods
 Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
 Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
 See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
 
 
      JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
@@ -143,34 +79,6 @@ JSBSim startup beginning ...
 Current version needed is: 2.0
          You have version: 3.0
 [39m
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
 Failed to tie property fcs/accelx/malfunction/fail_low to object methods
 Failed to tie property fcs/accelx/malfunction/fail_high to object methods
 Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
@@ -190,13 +98,6 @@ Failed to tie property fcs/temp_c/randomseed to object methods
 
 
      JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-
-
-                 [JSBSim-ML vJSBSim Flight Dynamics Model v2.01.2.4 Feb  7 2026 11:12:49]
-
-JSBSim startup beginning ...
-
-
             [JSBSim-ML v2.0]
 
 JSBSim startup beginning ...
@@ -206,6 +107,29 @@ JSBSim startup beginning ...
 Current version needed is: 2.0
          You have version: 3.0
 [39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
 
 [31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
 Current version needed is: 2.0
@@ -227,6 +151,18 @@ Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
 Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
 Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
 Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
 Failed to tie property fcs/accelx/malfunction/fail_low to object methods
 Failed to tie property fcs/accelx/malfunction/fail_high to object methods
 Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
@@ -243,6 +179,71 @@ Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
 Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
 Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
 Failed to tie property fcs/temp_c/randomseed to object methods
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
 
 
      JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
@@ -356,1238 +357,2643 @@ Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
 Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
 Failed to tie property fcs/temp_c/randomseed to object methods
 [resume] /content/repo/runs/dogfight_stage_b/live_snapshot/model.zip yuklendi.
-[resume] su ana kadar tamamlanan adim : 529788
+[resume] su ana kadar tamamlanan adim : 659736
 [resume] yaml'daki hedef adim          : 2000000
-[resume] bu calistirmada kalan adim    : 1470212
-[resume] promotion degerlendirmesi bir sonraki adim=540000'de tetiklenecek.
+[resume] bu calistirmada kalan adim    : 1340264
+[resume] promotion degerlendirmesi bir sonraki adim=660000'de tetiklenecek.
 Logging to /content/repo/runs/dogfight_stage_b/tb/PPO_0
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=660000 win_rate=0.85 mean_reward=-7.26 (baseline=-39.3185010259585, improve=+81.5%) pass=True (1/2)
 -----------------------------------
 | curriculum/          |          |
 |    progress          | 1        |
-|    shaped_weight     | 0.509    |
+|    shaped_weight     | 0.45     |
 | dogfight/            |          |
-|    ata_deg_mean      | 85.3     |
-|    closing_fps_mean  | -3.07    |
-|    exposed_rate      | 0.00618  |
-|    hp_opp_end        | 2.83     |
-|    hp_self_end       | 2.98     |
-|    lock_rate         | 0.0215   |
-|    opp_fault_rate    | 0.00342  |
-|    range_ft_mean     | 123      |
-|    self_fault_rate   | 0.000814 |
+|    ata_deg_mean      | 83.3     |
+|    closing_fps_mean  | 4.9      |
+|    exposed_rate      | 0.00765  |
+|    hp_opp_end        | 2.94     |
+|    hp_self_end       | 2.96     |
+|    lock_rate         | 0.00765  |
+|    opp_fault_rate    | 0.00391  |
+|    range_ft_mean     | 103      |
+|    self_fault_rate   | 0.000651 |
+| promotion/           |          |
+|    mean_reward       | -7.26    |
+|    win_rate          | 0.85     |
 | reset_reason/        |          |
-|    opponent_boundary | 0.0769   |
-|    opponent_ground   | 0.5      |
-|    opponent_tumble   | 0.231    |
-|    self_boundary     | 0.0769   |
-|    self_ground       | 0.0769   |
-|    self_tumble       | 0.0385   |
+|    opponent_boundary | 0.107    |
+|    opponent_ground   | 0.286    |
+|    opponent_tumble   | 0.464    |
+|    self_boundary     | 0.0714   |
+|    self_ground       | 0.0357   |
+|    self_tumble       | 0.0357   |
 | rollout/             |          |
-|    ep_len_mean       | 209      |
-|    ep_rew_mean       | -27.5    |
+|    ep_len_mean       | 217      |
+|    ep_rew_mean       | -18.1    |
 | time/                |          |
-|    fps               | 190      |
+|    fps               | 137      |
 |    iterations        | 1        |
-|    time_elapsed      | 32       |
-|    total_timesteps   | 535932   |
+|    time_elapsed      | 44       |
+|    total_timesteps   | 665880   |
 -----------------------------------
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-[promotion] step=540000 win_rate=0.50 mean_reward=-36.34 (baseline=-17.364395242089778, improve=-109.3%) pass=False (0/2)
 -----------------------------------------
 | curriculum/             |             |
 |    progress             | 1           |
-|    shaped_weight        | 0.503       |
+|    shaped_weight        | 0.45        |
 | dogfight/               |             |
-|    ata_deg_mean         | 90.3        |
-|    closing_fps_mean     | -7.91       |
-|    exposed_rate         | 0.00456     |
+|    ata_deg_mean         | 85.2        |
+|    closing_fps_mean     | 5.77        |
+|    exposed_rate         | 0.00521     |
 |    hp_opp_end           | 2.95        |
-|    hp_self_end          | 2.94        |
-|    lock_rate            | 0.00993     |
-|    opp_fault_rate       | 0.00277     |
-|    range_ft_mean        | 143         |
-|    self_fault_rate      | 0.000977    |
-| promotion/              |             |
-|    mean_reward          | -36.3       |
-|    win_rate             | 0.5         |
-| reset_reason/           |             |
-|    opponent_boundary    | 0.217       |
-|    opponent_ground      | 0.391       |
-|    opponent_tumble      | 0.13        |
-|    self_boundary        | 0.13        |
-|    self_ground          | 0.087       |
-|    self_tumble          | 0.0435      |
-| rollout/                |             |
-|    ep_len_mean          | 220         |
-|    ep_rew_mean          | -28.3       |
-| time/                   |             |
-|    fps                  | 151         |
-|    iterations           | 2           |
-|    time_elapsed         | 80          |
-|    total_timesteps      | 542076      |
-| train/                  |             |
-|    approx_kl            | 0.018531686 |
-|    clip_fraction        | 0.196       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.64       |
-|    explained_variance   | 0.556       |
-|    learning_rate        | 0.000228    |
-|    loss                 | -0.0835     |
-|    n_updates            | 870         |
-|    policy_gradient_loss | -0.0345     |
-|    std                  | 0.772       |
-|    value_loss           | 0.0264      |
------------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.498       |
-| dogfight/               |             |
-|    ata_deg_mean         | 83.9        |
-|    closing_fps_mean     | -5.08       |
-|    exposed_rate         | 0.00993     |
-|    hp_opp_end           | 2.95        |
-|    hp_self_end          | 2.94        |
-|    lock_rate            | 0.0057      |
-|    opp_fault_rate       | 0.00326     |
-|    range_ft_mean        | 149         |
-|    self_fault_rate      | 0.0013      |
-| reset_reason/           |             |
-|    collision            | 0.0345      |
-|    opponent_boundary    | 0.241       |
-|    opponent_ground      | 0.172       |
-|    opponent_tumble      | 0.276       |
-|    self_boundary        | 0.069       |
-|    self_ground          | 0.138       |
-|    self_tumble          | 0.069       |
-| rollout/                |             |
-|    ep_len_mean          | 223         |
-|    ep_rew_mean          | -28.7       |
-| time/                   |             |
-|    fps                  | 166         |
-|    iterations           | 3           |
-|    time_elapsed         | 110         |
-|    total_timesteps      | 548220      |
-| train/                  |             |
-|    approx_kl            | 0.019885922 |
-|    clip_fraction        | 0.192       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.64       |
-|    explained_variance   | 0.775       |
-|    learning_rate        | 0.000227    |
-|    loss                 | -0.083      |
-|    n_updates            | 880         |
-|    policy_gradient_loss | -0.0383     |
-|    std                  | 0.772       |
-|    value_loss           | 0.0218      |
------------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.492       |
-| dogfight/               |             |
-|    ata_deg_mean         | 77.1        |
-|    closing_fps_mean     | -4.17       |
-|    exposed_rate         | 0.00586     |
-|    hp_opp_end           | 2.89        |
 |    hp_self_end          | 2.96        |
-|    lock_rate            | 0.0177      |
-|    opp_fault_rate       | 0.00326     |
-|    range_ft_mean        | 142         |
-|    self_fault_rate      | 0.00146     |
+|    lock_rate            | 0.00781     |
+|    opp_fault_rate       | 0.00439     |
+|    range_ft_mean        | 107         |
+|    self_fault_rate      | 0.000651    |
 | reset_reason/           |             |
-|    collision            | 0.0357      |
-|    opponent_boundary    | 0.286       |
-|    opponent_ground      | 0.214       |
-|    opponent_tumble      | 0.143       |
-|    self_boundary        | 0.0357      |
-|    self_ceiling         | 0.0357      |
-|    self_ground          | 0.143       |
-|    self_tumble          | 0.107       |
+|    collision            | 0.0323      |
+|    opponent_boundary    | 0.129       |
+|    opponent_ground      | 0.161       |
+|    opponent_tumble      | 0.548       |
+|    self_boundary        | 0.129       |
 | rollout/                |             |
-|    ep_len_mean          | 226         |
-|    ep_rew_mean          | -29         |
+|    ep_len_mean          | 208         |
+|    ep_rew_mean          | -14.7       |
 | time/                   |             |
-|    fps                  | 175         |
-|    iterations           | 4           |
-|    time_elapsed         | 140         |
-|    total_timesteps      | 554364      |
+|    fps                  | 147         |
+|    iterations           | 2           |
+|    time_elapsed         | 83          |
+|    total_timesteps      | 672024      |
 | train/                  |             |
-|    approx_kl            | 0.018908055 |
-|    clip_fraction        | 0.194       |
+|    approx_kl            | 0.021086948 |
+|    clip_fraction        | 0.206       |
 |    clip_range           | 0.2         |
-|    entropy_loss         | -4.63       |
-|    explained_variance   | 0.716       |
-|    learning_rate        | 0.000226    |
-|    loss                 | -0.0742     |
-|    n_updates            | 890         |
-|    policy_gradient_loss | -0.0366     |
-|    std                  | 0.768       |
-|    value_loss           | 0.0204      |
+|    entropy_loss         | -4.34       |
+|    explained_variance   | 0.763       |
+|    learning_rate        | 0.00021     |
+|    loss                 | -0.072      |
+|    n_updates            | 1080        |
+|    policy_gradient_loss | -0.0396     |
+|    std                  | 0.714       |
+|    value_loss           | 0.0226      |
 -----------------------------------------
 -----------------------------------------
 | curriculum/             |             |
 |    progress             | 1           |
-|    shaped_weight        | 0.487       |
+|    shaped_weight        | 0.45        |
 | dogfight/               |             |
-|    ata_deg_mean         | 81.3        |
-|    closing_fps_mean     | -10.1       |
-|    exposed_rate         | 0.00798     |
-|    hp_opp_end           | 2.82        |
-|    hp_self_end          | 2.94        |
-|    lock_rate            | 0.0239      |
-|    opp_fault_rate       | 0.00309     |
-|    range_ft_mean        | 154         |
-|    self_fault_rate      | 0.00163     |
-| reset_reason/           |             |
-|    collision            | 0.0345      |
-|    opponent_boundary    | 0.241       |
-|    opponent_ground      | 0.172       |
-|    opponent_tumble      | 0.207       |
-|    self_boundary        | 0.103       |
-|    self_ground          | 0.207       |
-|    self_tumble          | 0.0345      |
-| rollout/                |             |
-|    ep_len_mean          | 227         |
-|    ep_rew_mean          | -31.1       |
-| time/                   |             |
-|    fps                  | 175         |
-|    iterations           | 5           |
-|    time_elapsed         | 174         |
-|    total_timesteps      | 560508      |
-| train/                  |             |
-|    approx_kl            | 0.021449335 |
-|    clip_fraction        | 0.202       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.63       |
-|    explained_variance   | 0.659       |
-|    learning_rate        | 0.000225    |
-|    loss                 | -0.0739     |
-|    n_updates            | 900         |
-|    policy_gradient_loss | -0.0371     |
-|    std                  | 0.773       |
-|    value_loss           | 0.0238      |
------------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.481       |
-| dogfight/               |             |
-|    ata_deg_mean         | 84          |
-|    closing_fps_mean     | -8.28       |
-|    exposed_rate         | 0.00895     |
-|    hp_opp_end           | 2.94        |
+|    ata_deg_mean         | 85          |
+|    closing_fps_mean     | 3.99        |
+|    exposed_rate         | 0.00977     |
+|    hp_opp_end           | 2.9         |
 |    hp_self_end          | 2.95        |
-|    lock_rate            | 0.0101      |
-|    opp_fault_rate       | 0.00342     |
-|    range_ft_mean        | 151         |
+|    lock_rate            | 0.0148      |
+|    opp_fault_rate       | 0.00309     |
+|    range_ft_mean        | 110         |
 |    self_fault_rate      | 0.00114     |
 | reset_reason/           |             |
-|    collision            | 0.0345      |
-|    opponent_boundary    | 0.276       |
-|    opponent_ground      | 0.172       |
-|    opponent_tumble      | 0.276       |
-|    self_boundary        | 0.0345      |
-|    self_ground          | 0.138       |
-|    self_tumble          | 0.069       |
-| rollout/                |             |
-|    ep_len_mean          | 217         |
-|    ep_rew_mean          | -31.1       |
-| time/                   |             |
-|    fps                  | 174         |
-|    iterations           | 6           |
-|    time_elapsed         | 211         |
-|    total_timesteps      | 566652      |
-| train/                  |             |
-|    approx_kl            | 0.020970583 |
-|    clip_fraction        | 0.201       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.63       |
-|    explained_variance   | 0.751       |
-|    learning_rate        | 0.000224    |
-|    loss                 | -0.0703     |
-|    n_updates            | 910         |
-|    policy_gradient_loss | -0.0379     |
-|    std                  | 0.771       |
-|    value_loss           | 0.0202      |
------------------------------------------
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-[promotion] step=570000 win_rate=0.75 mean_reward=-39.34 (baseline=-17.364395242089778, improve=-126.6%) pass=False (0/2)
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.476       |
-| dogfight/               |             |
-|    ata_deg_mean         | 82.7        |
-|    closing_fps_mean     | -7.32       |
-|    exposed_rate         | 0.00505     |
-|    hp_opp_end           | 2.94        |
-|    hp_self_end          | 2.95        |
-|    lock_rate            | 0.00977     |
-|    opp_fault_rate       | 0.00309     |
-|    range_ft_mean        | 152         |
-|    self_fault_rate      | 0.0013      |
-| promotion/              |             |
-|    mean_reward          | -39.3       |
-|    win_rate             | 0.75        |
-| reset_reason/           |             |
-|    collision            | 0.0714      |
-|    opponent_boundary    | 0.214       |
-|    opponent_ceiling     | 0.0357      |
-|    opponent_ground      | 0.179       |
-|    opponent_tumble      | 0.214       |
-|    self_boundary        | 0.143       |
-|    self_ground          | 0.107       |
-|    self_tumble          | 0.0357      |
-| rollout/                |             |
-|    ep_len_mean          | 218         |
-|    ep_rew_mean          | -29.4       |
-| time/                   |             |
-|    fps                  | 161         |
-|    iterations           | 7           |
-|    time_elapsed         | 266         |
-|    total_timesteps      | 572796      |
-| train/                  |             |
-|    approx_kl            | 0.019223906 |
-|    clip_fraction        | 0.194       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.61       |
-|    explained_variance   | 0.73        |
-|    learning_rate        | 0.000224    |
-|    loss                 | -0.0764     |
-|    n_updates            | 920         |
-|    policy_gradient_loss | -0.0354     |
-|    std                  | 0.764       |
-|    value_loss           | 0.0264      |
------------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.47        |
-| dogfight/               |             |
-|    ata_deg_mean         | 83.1        |
-|    closing_fps_mean     | -8.84       |
-|    exposed_rate         | 0.0119      |
-|    hp_opp_end           | 2.91        |
-|    hp_self_end          | 2.95        |
-|    lock_rate            | 0.012       |
-|    opp_fault_rate       | 0.00309     |
-|    range_ft_mean        | 140         |
-|    self_fault_rate      | 0.00114     |
-| reset_reason/           |             |
-|    collision            | 0.0741      |
-|    opponent_boundary    | 0.333       |
-|    opponent_ground      | 0.185       |
-|    opponent_tumble      | 0.148       |
-|    self_boundary        | 0.0741      |
-|    self_ground          | 0.111       |
-|    self_tumble          | 0.0741      |
-| rollout/                |             |
-|    ep_len_mean          | 213         |
-|    ep_rew_mean          | -29.3       |
-| time/                   |             |
-|    fps                  | 162         |
-|    iterations           | 8           |
-|    time_elapsed         | 302         |
-|    total_timesteps      | 578940      |
-| train/                  |             |
-|    approx_kl            | 0.020398572 |
-|    clip_fraction        | 0.202       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.59       |
-|    explained_variance   | 0.812       |
-|    learning_rate        | 0.000223    |
-|    loss                 | -0.0849     |
-|    n_updates            | 930         |
-|    policy_gradient_loss | -0.0366     |
-|    std                  | 0.763       |
-|    value_loss           | 0.0189      |
------------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.464       |
-| dogfight/               |             |
-|    ata_deg_mean         | 81.7        |
-|    closing_fps_mean     | -3.23       |
-|    exposed_rate         | 0.00635     |
-|    hp_opp_end           | 2.92        |
-|    hp_self_end          | 2.94        |
-|    lock_rate            | 0.0107      |
-|    opp_fault_rate       | 0.00277     |
-|    range_ft_mean        | 131         |
-|    self_fault_rate      | 0.00163     |
-| reset_reason/           |             |
-|    collision            | 0.069       |
+|    collision            | 0.103       |
 |    opponent_boundary    | 0.172       |
-|    opponent_ceiling     | 0.0345      |
-|    opponent_ground      | 0.207       |
-|    opponent_tumble      | 0.172       |
-|    self_boundary        | 0.103       |
-|    self_ground          | 0.138       |
-|    self_tumble          | 0.103       |
+|    opponent_ground      | 0.276       |
+|    opponent_tumble      | 0.207       |
+|    self_boundary        | 0.138       |
+|    self_ground          | 0.103       |
 | rollout/                |             |
-|    ep_len_mean          | 214         |
-|    ep_rew_mean          | -29         |
+|    ep_len_mean          | 207         |
+|    ep_rew_mean          | -16.3       |
 | time/                   |             |
-|    fps                  | 162         |
-|    iterations           | 9           |
-|    time_elapsed         | 339         |
-|    total_timesteps      | 585084      |
+|    fps                  | 155         |
+|    iterations           | 3           |
+|    time_elapsed         | 118         |
+|    total_timesteps      | 678168      |
 | train/                  |             |
-|    approx_kl            | 0.020109853 |
-|    clip_fraction        | 0.195       |
+|    approx_kl            | 0.021551134 |
+|    clip_fraction        | 0.211       |
 |    clip_range           | 0.2         |
-|    entropy_loss         | -4.58       |
-|    explained_variance   | 0.699       |
-|    learning_rate        | 0.000222    |
-|    loss                 | -0.0708     |
-|    n_updates            | 940         |
-|    policy_gradient_loss | -0.0347     |
-|    std                  | 0.76        |
-|    value_loss           | 0.0289      |
+|    entropy_loss         | -4.32       |
+|    explained_variance   | 0.645       |
+|    learning_rate        | 0.000209    |
+|    loss                 | -0.0799     |
+|    n_updates            | 1090        |
+|    policy_gradient_loss | -0.0394     |
+|    std                  | 0.713       |
+|    value_loss           | 0.024       |
 -----------------------------------------
-----------------------------------------
-| curriculum/             |            |
-|    progress             | 1          |
-|    shaped_weight        | 0.458      |
-| dogfight/               |            |
-|    ata_deg_mean         | 85.2       |
-|    closing_fps_mean     | -10.7      |
-|    exposed_rate         | 0.00537    |
-|    hp_opp_end           | 2.96       |
-|    hp_self_end          | 2.93       |
-|    lock_rate            | 0.0096     |
-|    opp_fault_rate       | 0.00293    |
-|    range_ft_mean        | 144        |
-|    self_fault_rate      | 0.00146    |
-| reset_reason/           |            |
-|    opponent_boundary    | 0.231      |
-|    opponent_ceiling     | 0.0385     |
-|    opponent_ground      | 0.154      |
-|    opponent_tumble      | 0.231      |
-|    self_boundary        | 0.154      |
-|    self_ground          | 0.0769     |
-|    self_tumble          | 0.115      |
-| rollout/                |            |
-|    ep_len_mean          | 222        |
-|    ep_rew_mean          | -30.4      |
-| time/                   |            |
-|    fps                  | 162        |
-|    iterations           | 10         |
-|    time_elapsed         | 377        |
-|    total_timesteps      | 591228     |
-| train/                  |            |
-|    approx_kl            | 0.01978991 |
-|    clip_fraction        | 0.195      |
-|    clip_range           | 0.2        |
-|    entropy_loss         | -4.57      |
-|    explained_variance   | 0.728      |
-|    learning_rate        | 0.000221   |
-|    loss                 | -0.0649    |
-|    n_updates            | 950        |
-|    policy_gradient_loss | -0.0372    |
-|    std                  | 0.758      |
-|    value_loss           | 0.0252     |
-----------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.453       |
-| dogfight/               |             |
-|    ata_deg_mean         | 81.7        |
-|    closing_fps_mean     | -7.79       |
-|    exposed_rate         | 0.0083      |
-|    hp_opp_end           | 2.95        |
-|    hp_self_end          | 2.94        |
-|    lock_rate            | 0.00309     |
-|    opp_fault_rate       | 0.00326     |
-|    range_ft_mean        | 153         |
-|    self_fault_rate      | 0.0013      |
-| reset_reason/           |             |
-|    opponent_boundary    | 0.214       |
-|    opponent_ground      | 0.357       |
-|    opponent_tumble      | 0.143       |
-|    self_boundary        | 0.214       |
-|    self_ground          | 0.0357      |
-|    self_tumble          | 0.0357      |
-| rollout/                |             |
-|    ep_len_mean          | 223         |
-|    ep_rew_mean          | -30         |
-| time/                   |             |
-|    fps                  | 163         |
-|    iterations           | 11          |
-|    time_elapsed         | 413         |
-|    total_timesteps      | 597372      |
-| train/                  |             |
-|    approx_kl            | 0.018641116 |
-|    clip_fraction        | 0.196       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.57       |
-|    explained_variance   | 0.779       |
-|    learning_rate        | 0.00022     |
-|    loss                 | -0.0848     |
-|    n_updates            | 960         |
-|    policy_gradient_loss | -0.0369     |
-|    std                  | 0.76        |
-|    value_loss           | 0.0222      |
------------------------------------------
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-[promotion] step=600000 win_rate=0.45 mean_reward=-45.94 (baseline=-17.364395242089778, improve=-164.6%) pass=False (0/2)
 -----------------------------------------
 | curriculum/             |             |
 |    progress             | 1           |
 |    shaped_weight        | 0.45        |
 | dogfight/               |             |
-|    ata_deg_mean         | 88          |
-|    closing_fps_mean     | -7.35       |
-|    exposed_rate         | 0.0158      |
-|    hp_opp_end           | 2.96        |
-|    hp_self_end          | 2.89        |
-|    lock_rate            | 0.00586     |
-|    opp_fault_rate       | 0.0026      |
-|    range_ft_mean        | 136         |
-|    self_fault_rate      | 0.00163     |
+|    ata_deg_mean         | 89.7        |
+|    closing_fps_mean     | 5.98        |
+|    exposed_rate         | 0.0194      |
+|    hp_opp_end           | 2.94        |
+|    hp_self_end          | 2.88        |
+|    lock_rate            | 0.00993     |
+|    opp_fault_rate       | 0.00439     |
+|    range_ft_mean        | 101         |
+|    self_fault_rate      | 0.000814    |
+| reset_reason/           |             |
+|    collision            | 0.0312      |
+|    opponent_boundary    | 0.0625      |
+|    opponent_ground      | 0.25        |
+|    opponent_tumble      | 0.5         |
+|    self_boundary        | 0.0625      |
+|    self_ground          | 0.0938      |
+| rollout/                |             |
+|    ep_len_mean          | 199         |
+|    ep_rew_mean          | -12.6       |
+| time/                   |             |
+|    fps                  | 158         |
+|    iterations           | 4           |
+|    time_elapsed         | 155         |
+|    total_timesteps      | 684312      |
+| train/                  |             |
+|    approx_kl            | 0.022405477 |
+|    clip_fraction        | 0.209       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.31       |
+|    explained_variance   | 0.427       |
+|    learning_rate        | 0.000208    |
+|    loss                 | -0.0895     |
+|    n_updates            | 1100        |
+|    policy_gradient_loss | -0.0412     |
+|    std                  | 0.712       |
+|    value_loss           | 0.0333      |
+-----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=690000 win_rate=0.70 mean_reward=-16.02 (baseline=-39.3185010259585, improve=+59.2%) pass=True (2/2)
+[promotion] YENI VERSIYON: v2 havuza eklendi!
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 83.4        |
+|    closing_fps_mean     | 5.43        |
+|    exposed_rate         | 0.0169      |
+|    hp_opp_end           | 2.93        |
+|    hp_self_end          | 2.93        |
+|    lock_rate            | 0.0096      |
+|    opp_fault_rate       | 0.00439     |
+|    range_ft_mean        | 100         |
+|    self_fault_rate      | 0.000651    |
 | promotion/              |             |
-|    mean_reward          | -45.9       |
-|    win_rate             | 0.45        |
+|    mean_reward          | -16         |
+|    win_rate             | 0.7         |
 | reset_reason/           |             |
-|    collision            | 0.037       |
-|    opponent_boundary    | 0.148       |
-|    opponent_ceiling     | 0.037       |
-|    opponent_ground      | 0.259       |
-|    opponent_tumble      | 0.148       |
-|    self_boundary        | 0.111       |
-|    self_ground          | 0.111       |
-|    self_tumble          | 0.148       |
+|    collision            | 0.0882      |
+|    opponent_boundary    | 0.0588      |
+|    opponent_ground      | 0.294       |
+|    opponent_tumble      | 0.441       |
+|    self_boundary        | 0.0588      |
+|    self_ground          | 0.0588      |
 | rollout/                |             |
-|    ep_len_mean          | 226         |
-|    ep_rew_mean          | -29.5       |
+|    ep_len_mean          | 191         |
+|    ep_rew_mean          | -12.1       |
 | time/                   |             |
-|    fps                  | 157         |
-|    iterations           | 12          |
-|    time_elapsed         | 468         |
-|    total_timesteps      | 603516      |
+|    fps                  | 146         |
+|    iterations           | 5           |
+|    time_elapsed         | 210         |
+|    total_timesteps      | 690456      |
 | train/                  |             |
-|    approx_kl            | 0.019203242 |
-|    clip_fraction        | 0.202       |
+|    approx_kl            | 0.020901516 |
+|    clip_fraction        | 0.21        |
 |    clip_range           | 0.2         |
-|    entropy_loss         | -4.55       |
-|    explained_variance   | 0.732       |
-|    learning_rate        | 0.000219    |
-|    loss                 | -0.0758     |
-|    n_updates            | 970         |
-|    policy_gradient_loss | -0.0355     |
-|    std                  | 0.753       |
-|    value_loss           | 0.0244      |
------------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.45        |
-| dogfight/               |             |
-|    ata_deg_mean         | 83.8        |
-|    closing_fps_mean     | -7.05       |
-|    exposed_rate         | 0.0171      |
-|    hp_opp_end           | 2.95        |
-|    hp_self_end          | 2.89        |
-|    lock_rate            | 0.00765     |
-|    opp_fault_rate       | 0.00342     |
-|    range_ft_mean        | 142         |
-|    self_fault_rate      | 0.000977    |
-| reset_reason/           |             |
-|    collision            | 0.069       |
-|    opponent_boundary    | 0.276       |
-|    opponent_ceiling     | 0.0345      |
-|    opponent_ground      | 0.241       |
-|    opponent_tumble      | 0.172       |
-|    self_boundary        | 0.0345      |
-|    self_ground          | 0.069       |
-|    self_tumble          | 0.103       |
-| rollout/                |             |
-|    ep_len_mean          | 224         |
-|    ep_rew_mean          | -28         |
-| time/                   |             |
-|    fps                  | 159         |
-|    iterations           | 13          |
-|    time_elapsed         | 499         |
-|    total_timesteps      | 609660      |
-| train/                  |             |
-|    approx_kl            | 0.021906257 |
-|    clip_fraction        | 0.2         |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.54       |
-|    explained_variance   | 0.718       |
-|    learning_rate        | 0.000219    |
-|    loss                 | -0.0703     |
-|    n_updates            | 980         |
-|    policy_gradient_loss | -0.0377     |
-|    std                  | 0.752       |
-|    value_loss           | 0.0259      |
+|    entropy_loss         | -4.3        |
+|    explained_variance   | 0.595       |
+|    learning_rate        | 0.000208    |
+|    loss                 | -0.0738     |
+|    n_updates            | 1110        |
+|    policy_gradient_loss | -0.0385     |
+|    std                  | 0.707       |
+|    value_loss           | 0.0321      |
 -----------------------------------------
 ----------------------------------------
 | curriculum/             |            |
 |    progress             | 1          |
 |    shaped_weight        | 0.45       |
 | dogfight/               |            |
-|    ata_deg_mean         | 85.6       |
-|    closing_fps_mean     | -7.11      |
-|    exposed_rate         | 0.0142     |
-|    hp_opp_end           | 2.94       |
-|    hp_self_end          | 2.9        |
-|    lock_rate            | 0.0083     |
-|    opp_fault_rate       | 0.00407    |
-|    range_ft_mean        | 155        |
-|    self_fault_rate      | 0.000326   |
+|    ata_deg_mean         | 93.6       |
+|    closing_fps_mean     | -0.332     |
+|    exposed_rate         | 0.00814    |
+|    hp_opp_end           | 2.98       |
+|    hp_self_end          | 2.91       |
+|    lock_rate            | 0.00342    |
+|    opp_fault_rate       | 0.00212    |
+|    range_ft_mean        | 120        |
+|    self_fault_rate      | 0.00212    |
 | reset_reason/           |            |
-|    collision            | 0.0357     |
-|    opponent_boundary    | 0.286      |
-|    opponent_ground      | 0.25       |
-|    opponent_tumble      | 0.357      |
-|    self_ground          | 0.0714     |
+|    collision            | 0.037      |
+|    opponent_boundary    | 0.037      |
+|    opponent_ground      | 0.111      |
+|    opponent_tumble      | 0.333      |
+|    self_boundary        | 0.222      |
+|    self_ceiling         | 0.037      |
+|    self_ground          | 0.185      |
+|    self_tumble          | 0.037      |
 | rollout/                |            |
-|    ep_len_mean          | 221        |
-|    ep_rew_mean          | -25.7      |
+|    ep_len_mean          | 201        |
+|    ep_rew_mean          | -17.2      |
 | time/                   |            |
-|    fps                  | 161        |
-|    iterations           | 14         |
-|    time_elapsed         | 534        |
-|    total_timesteps      | 615804     |
+|    fps                  | 150        |
+|    iterations           | 6          |
+|    time_elapsed         | 245        |
+|    total_timesteps      | 696600     |
 | train/                  |            |
-|    approx_kl            | 0.01910229 |
-|    clip_fraction        | 0.195      |
+|    approx_kl            | 0.02278022 |
+|    clip_fraction        | 0.211      |
 |    clip_range           | 0.2        |
-|    entropy_loss         | -4.53      |
-|    explained_variance   | 0.815      |
-|    learning_rate        | 0.000218   |
-|    loss                 | -0.0944    |
-|    n_updates            | 990        |
-|    policy_gradient_loss | -0.0376    |
-|    std                  | 0.75       |
-|    value_loss           | 0.0231     |
+|    entropy_loss         | -4.29      |
+|    explained_variance   | 0.566      |
+|    learning_rate        | 0.000207   |
+|    loss                 | -0.0696    |
+|    n_updates            | 1120       |
+|    policy_gradient_loss | -0.0382    |
+|    std                  | 0.708      |
+|    value_loss           | 0.0262     |
 ----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 86.3        |
+|    closing_fps_mean     | 3.61        |
+|    exposed_rate         | 0.0233      |
+|    hp_opp_end           | 2.98        |
+|    hp_self_end          | 2.81        |
+|    lock_rate            | 0.00456     |
+|    opp_fault_rate       | 0.00277     |
+|    range_ft_mean        | 117         |
+|    self_fault_rate      | 0.000977    |
+| reset_reason/           |             |
+|    collision            | 0.0417      |
+|    opponent_boundary    | 0.292       |
+|    opponent_ceiling     | 0.0417      |
+|    opponent_ground      | 0.25        |
+|    opponent_tumble      | 0.125       |
+|    self_boundary        | 0.125       |
+|    self_ground          | 0.0417      |
+|    self_tumble          | 0.0833      |
+| rollout/                |             |
+|    ep_len_mean          | 212         |
+|    ep_rew_mean          | -17.8       |
+| time/                   |             |
+|    fps                  | 152         |
+|    iterations           | 7           |
+|    time_elapsed         | 282         |
+|    total_timesteps      | 702744      |
+| train/                  |             |
+|    approx_kl            | 0.021989292 |
+|    clip_fraction        | 0.216       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.3        |
+|    explained_variance   | 0.735       |
+|    learning_rate        | 0.000206    |
+|    loss                 | -0.0785     |
+|    n_updates            | 1130        |
+|    policy_gradient_loss | -0.0404     |
+|    std                  | 0.711       |
+|    value_loss           | 0.0206      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 88.3        |
+|    closing_fps_mean     | -0.95       |
+|    exposed_rate         | 0.00667     |
+|    hp_opp_end           | 2.95        |
+|    hp_self_end          | 2.93        |
+|    lock_rate            | 0.0026      |
+|    opp_fault_rate       | 0.00228     |
+|    range_ft_mean        | 136         |
+|    self_fault_rate      | 0.000814    |
+| reset_reason/           |             |
+|    opponent_boundary    | 0.316       |
+|    opponent_ground      | 0.158       |
+|    opponent_tumble      | 0.263       |
+|    self_boundary        | 0.105       |
+|    self_ground          | 0.105       |
+|    self_tumble          | 0.0526      |
+| rollout/                |             |
+|    ep_len_mean          | 230         |
+|    ep_rew_mean          | -21.6       |
+| time/                   |             |
+|    fps                  | 155         |
+|    iterations           | 8           |
+|    time_elapsed         | 316         |
+|    total_timesteps      | 708888      |
+| train/                  |             |
+|    approx_kl            | 0.021193033 |
+|    clip_fraction        | 0.214       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.29       |
+|    explained_variance   | 0.656       |
+|    learning_rate        | 0.000205    |
+|    loss                 | -0.0788     |
+|    n_updates            | 1140        |
+|    policy_gradient_loss | -0.0408     |
+|    std                  | 0.705       |
+|    value_loss           | 0.0287      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 82.3        |
+|    closing_fps_mean     | -0.571      |
+|    exposed_rate         | 0.00342     |
+|    hp_opp_end           | 2.92        |
+|    hp_self_end          | 2.96        |
+|    lock_rate            | 0.0104      |
+|    opp_fault_rate       | 0.00212     |
+|    range_ft_mean        | 125         |
+|    self_fault_rate      | 0.00163     |
+| reset_reason/           |             |
+|    collision            | 0.0417      |
+|    opponent_boundary    | 0.0417      |
+|    opponent_ground      | 0.333       |
+|    opponent_tumble      | 0.167       |
+|    self_boundary        | 0.167       |
+|    self_ground          | 0.125       |
+|    self_tumble          | 0.125       |
+| rollout/                |             |
+|    ep_len_mean          | 255         |
+|    ep_rew_mean          | -28.5       |
+| time/                   |             |
+|    fps                  | 155         |
+|    iterations           | 9           |
+|    time_elapsed         | 355         |
+|    total_timesteps      | 715032      |
+| train/                  |             |
+|    approx_kl            | 0.022794789 |
+|    clip_fraction        | 0.221       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.26       |
+|    explained_variance   | 0.671       |
+|    learning_rate        | 0.000204    |
+|    loss                 | -0.0778     |
+|    n_updates            | 1150        |
+|    policy_gradient_loss | -0.0432     |
+|    std                  | 0.702       |
+|    value_loss           | 0.0215      |
+-----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=720000 win_rate=0.70 mean_reward=-40.43 (baseline=-16.023038866255806, improve=-152.3%) pass=False (0/2)
+---------------------------------------
+| curriculum/             |           |
+|    progress             | 1         |
+|    shaped_weight        | 0.45      |
+| dogfight/               |           |
+|    ata_deg_mean         | 87.5      |
+|    closing_fps_mean     | 0.0762    |
+|    exposed_rate         | 0.0109    |
+|    hp_opp_end           | 2.95      |
+|    hp_self_end          | 2.92      |
+|    lock_rate            | 0.00602   |
+|    opp_fault_rate       | 0.00212   |
+|    range_ft_mean        | 126       |
+|    self_fault_rate      | 0.00179   |
+| promotion/              |           |
+|    mean_reward          | -40.4     |
+|    win_rate             | 0.7       |
+| reset_reason/           |           |
+|    opponent_boundary    | 0.125     |
+|    opponent_ground      | 0.292     |
+|    opponent_tumble      | 0.125     |
+|    self_boundary        | 0.208     |
+|    self_ground          | 0.208     |
+|    self_tumble          | 0.0417    |
+| rollout/                |           |
+|    ep_len_mean          | 263       |
+|    ep_rew_mean          | -30.4     |
+| time/                   |           |
+|    fps                  | 147       |
+|    iterations           | 10        |
+|    time_elapsed         | 415       |
+|    total_timesteps      | 721176    |
+| train/                  |           |
+|    approx_kl            | 0.0213939 |
+|    clip_fraction        | 0.208     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -4.24     |
+|    explained_variance   | 0.809     |
+|    learning_rate        | 0.000203  |
+|    loss                 | -0.0885   |
+|    n_updates            | 1160      |
+|    policy_gradient_loss | -0.0415   |
+|    std                  | 0.699     |
+|    value_loss           | 0.0206    |
+---------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 90.8        |
+|    closing_fps_mean     | 2.96        |
+|    exposed_rate         | 0.00667     |
+|    hp_opp_end           | 2.94        |
+|    hp_self_end          | 2.95        |
+|    lock_rate            | 0.00944     |
+|    opp_fault_rate       | 0.0026      |
+|    range_ft_mean        | 106         |
+|    self_fault_rate      | 0.00146     |
+| reset_reason/           |             |
+|    opponent_boundary    | 0.28        |
+|    opponent_ground      | 0.2         |
+|    opponent_tumble      | 0.16        |
+|    self_boundary        | 0.12        |
+|    self_ground          | 0.2         |
+|    self_tumble          | 0.04        |
+| rollout/                |             |
+|    ep_len_mean          | 272         |
+|    ep_rew_mean          | -31.2       |
+| time/                   |             |
+|    fps                  | 149         |
+|    iterations           | 11          |
+|    time_elapsed         | 451         |
+|    total_timesteps      | 727320      |
+| train/                  |             |
+|    approx_kl            | 0.022024913 |
+|    clip_fraction        | 0.216       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.24       |
+|    explained_variance   | 0.815       |
+|    learning_rate        | 0.000203    |
+|    loss                 | -0.0869     |
+|    n_updates            | 1170        |
+|    policy_gradient_loss | -0.0419     |
+|    std                  | 0.699       |
+|    value_loss           | 0.022       |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 88.4        |
+|    closing_fps_mean     | 2.19        |
+|    exposed_rate         | 0.00798     |
+|    hp_opp_end           | 2.92        |
+|    hp_self_end          | 2.94        |
+|    lock_rate            | 0.00863     |
+|    opp_fault_rate       | 0.00195     |
+|    range_ft_mean        | 123         |
+|    self_fault_rate      | 0.00146     |
+| reset_reason/           |             |
+|    collision            | 0.125       |
+|    opponent_boundary    | 0.25        |
+|    opponent_ceiling     | 0.0417      |
+|    opponent_ground      | 0.0833      |
+|    opponent_tumble      | 0.125       |
+|    self_boundary        | 0.167       |
+|    self_ground          | 0.167       |
+|    self_tumble          | 0.0417      |
+| rollout/                |             |
+|    ep_len_mean          | 259         |
+|    ep_rew_mean          | -30.8       |
+| time/                   |             |
+|    fps                  | 151         |
+|    iterations           | 12          |
+|    time_elapsed         | 486         |
+|    total_timesteps      | 733464      |
+| train/                  |             |
+|    approx_kl            | 0.021480434 |
+|    clip_fraction        | 0.225       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.23       |
+|    explained_variance   | 0.772       |
+|    learning_rate        | 0.000202    |
+|    loss                 | -0.0784     |
+|    n_updates            | 1180        |
+|    policy_gradient_loss | -0.0407     |
+|    std                  | 0.695       |
+|    value_loss           | 0.0287      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 75.2        |
+|    closing_fps_mean     | 2.46        |
+|    exposed_rate         | 0.00472     |
+|    hp_opp_end           | 2.95        |
+|    hp_self_end          | 2.95        |
+|    lock_rate            | 0.00586     |
+|    opp_fault_rate       | 0.00293     |
+|    range_ft_mean        | 108         |
+|    self_fault_rate      | 0.000814    |
+| reset_reason/           |             |
+|    collision            | 0.08        |
+|    opponent_boundary    | 0.28        |
+|    opponent_ground      | 0.28        |
+|    opponent_tumble      | 0.16        |
+|    self_boundary        | 0.12        |
+|    self_ground          | 0.04        |
+|    self_tumble          | 0.04        |
+| rollout/                |             |
+|    ep_len_mean          | 252         |
+|    ep_rew_mean          | -26.9       |
+| time/                   |             |
+|    fps                  | 152         |
+|    iterations           | 13          |
+|    time_elapsed         | 523         |
+|    total_timesteps      | 739608      |
+| train/                  |             |
+|    approx_kl            | 0.020270208 |
+|    clip_fraction        | 0.203       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.21       |
+|    explained_variance   | 0.81        |
+|    learning_rate        | 0.000201    |
+|    loss                 | -0.0802     |
+|    n_updates            | 1190        |
+|    policy_gradient_loss | -0.0425     |
+|    std                  | 0.693       |
+|    value_loss           | 0.0229      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 83          |
+|    closing_fps_mean     | -2.06       |
+|    exposed_rate         | 0.00358     |
+|    hp_opp_end           | 2.87        |
+|    hp_self_end          | 2.99        |
+|    lock_rate            | 0.0148      |
+|    opp_fault_rate       | 0.00244     |
+|    range_ft_mean        | 143         |
+|    self_fault_rate      | 0.00114     |
+| reset_reason/           |             |
+|    opponent_boundary    | 0.381       |
+|    opponent_ground      | 0.0952      |
+|    opponent_tumble      | 0.19        |
+|    self_boundary        | 0.238       |
+|    self_ground          | 0.0952      |
+| rollout/                |             |
+|    ep_len_mean          | 259         |
+|    ep_rew_mean          | -28.7       |
+| time/                   |             |
+|    fps                  | 153         |
+|    iterations           | 14          |
+|    time_elapsed         | 559         |
+|    total_timesteps      | 745752      |
+| train/                  |             |
+|    approx_kl            | 0.026531318 |
+|    clip_fraction        | 0.226       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.19       |
+|    explained_variance   | 0.755       |
+|    learning_rate        | 0.0002      |
+|    loss                 | -0.0858     |
+|    n_updates            | 1200        |
+|    policy_gradient_loss | -0.0419     |
+|    std                  | 0.688       |
+|    value_loss           | 0.0281      |
+-----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=750000 win_rate=0.70 mean_reward=-43.85 (baseline=-16.023038866255806, improve=-173.7%) pass=False (0/2)
+----------------------------------------
+| curriculum/             |            |
+|    progress             | 1          |
+|    shaped_weight        | 0.45       |
+| dogfight/               |            |
+|    ata_deg_mean         | 89.8       |
+|    closing_fps_mean     | 0.82       |
+|    exposed_rate         | 0.00846    |
+|    hp_opp_end           | 2.96       |
+|    hp_self_end          | 2.94       |
+|    lock_rate            | 0.00586    |
+|    opp_fault_rate       | 0.00195    |
+|    range_ft_mean        | 126        |
+|    self_fault_rate      | 0.00179    |
+| promotion/              |            |
+|    mean_reward          | -43.9      |
+|    win_rate             | 0.7        |
+| reset_reason/           |            |
+|    collision            | 0.0417     |
+|    opponent_boundary    | 0.208      |
+|    opponent_ground      | 0.208      |
+|    opponent_tumble      | 0.0833     |
+|    self_boundary        | 0.333      |
+|    self_ground          | 0.125      |
+| rollout/                |            |
+|    ep_len_mean          | 259        |
+|    ep_rew_mean          | -28.6      |
+| time/                   |            |
+|    fps                  | 147        |
+|    iterations           | 15         |
+|    time_elapsed         | 625        |
+|    total_timesteps      | 751896     |
+| train/                  |            |
+|    approx_kl            | 0.02157914 |
+|    clip_fraction        | 0.204      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.17      |
+|    explained_variance   | 0.807      |
+|    learning_rate        | 0.000199   |
+|    loss                 | -0.0681    |
+|    n_updates            | 1210       |
+|    policy_gradient_loss | -0.0403    |
+|    std                  | 0.687      |
+|    value_loss           | 0.0235     |
+----------------------------------------
+----------------------------------------
+| curriculum/             |            |
+|    progress             | 1          |
+|    shaped_weight        | 0.45       |
+| dogfight/               |            |
+|    ata_deg_mean         | 86         |
+|    closing_fps_mean     | 0.87       |
+|    exposed_rate         | 0.00586    |
+|    hp_opp_end           | 2.9        |
+|    hp_self_end          | 2.94       |
+|    lock_rate            | 0.0104     |
+|    opp_fault_rate       | 0.00293    |
+|    range_ft_mean        | 114        |
+|    self_fault_rate      | 0.00114    |
+| reset_reason/           |            |
+|    collision            | 0.04       |
+|    opponent_boundary    | 0.2        |
+|    opponent_ground      | 0.28       |
+|    opponent_tumble      | 0.2        |
+|    self_boundary        | 0.16       |
+|    self_ground          | 0.12       |
+| rollout/                |            |
+|    ep_len_mean          | 260        |
+|    ep_rew_mean          | -27.7      |
+| time/                   |            |
+|    fps                  | 147        |
+|    iterations           | 16         |
+|    time_elapsed         | 668        |
+|    total_timesteps      | 758040     |
+| train/                  |            |
+|    approx_kl            | 0.02181149 |
+|    clip_fraction        | 0.203      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.17      |
+|    explained_variance   | 0.833      |
+|    learning_rate        | 0.000198   |
+|    loss                 | -0.0953    |
+|    n_updates            | 1220       |
+|    policy_gradient_loss | -0.039     |
+|    std                  | 0.688      |
+|    value_loss           | 0.0254     |
+----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 83.5        |
+|    closing_fps_mean     | 1.66        |
+|    exposed_rate         | 0.0184      |
+|    hp_opp_end           | 2.92        |
+|    hp_self_end          | 2.86        |
+|    lock_rate            | 0.0116      |
+|    opp_fault_rate       | 0.00244     |
+|    range_ft_mean        | 115         |
+|    self_fault_rate      | 0.00179     |
+| reset_reason/           |             |
+|    opponent_boundary    | 0.2         |
+|    opponent_ground      | 0.32        |
+|    opponent_tumble      | 0.04        |
+|    self_boundary        | 0.28        |
+|    self_ground          | 0.08        |
+|    self_tumble          | 0.08        |
+| rollout/                |             |
+|    ep_len_mean          | 261         |
+|    ep_rew_mean          | -29.3       |
+| time/                   |             |
+|    fps                  | 147         |
+|    iterations           | 17          |
+|    time_elapsed         | 706         |
+|    total_timesteps      | 764184      |
+| train/                  |             |
+|    approx_kl            | 0.022110665 |
+|    clip_fraction        | 0.212       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.15       |
+|    explained_variance   | 0.769       |
+|    learning_rate        | 0.000198    |
+|    loss                 | -0.079      |
+|    n_updates            | 1230        |
+|    policy_gradient_loss | -0.0403     |
+|    std                  | 0.682       |
+|    value_loss           | 0.032       |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 90.2        |
+|    closing_fps_mean     | 1.27        |
+|    exposed_rate         | 0.00537     |
+|    hp_opp_end           | 2.95        |
+|    hp_self_end          | 2.96        |
+|    lock_rate            | 0.00553     |
+|    opp_fault_rate       | 0.00277     |
+|    range_ft_mean        | 115         |
+|    self_fault_rate      | 0.00179     |
+| reset_reason/           |             |
+|    collision            | 0.0345      |
+|    opponent_boundary    | 0.172       |
+|    opponent_ground      | 0.276       |
+|    opponent_tumble      | 0.138       |
+|    self_boundary        | 0.276       |
+|    self_ceiling         | 0.0345      |
+|    self_ground          | 0.069       |
+| rollout/                |             |
+|    ep_len_mean          | 241         |
+|    ep_rew_mean          | -27.3       |
+| time/                   |             |
+|    fps                  | 148         |
+|    iterations           | 18          |
+|    time_elapsed         | 745         |
+|    total_timesteps      | 770328      |
+| train/                  |             |
+|    approx_kl            | 0.023801647 |
+|    clip_fraction        | 0.227       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.14       |
+|    explained_variance   | 0.776       |
+|    learning_rate        | 0.000197    |
+|    loss                 | -0.0793     |
+|    n_updates            | 1240        |
+|    policy_gradient_loss | -0.0424     |
+|    std                  | 0.682       |
+|    value_loss           | 0.026       |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 81.6        |
+|    closing_fps_mean     | 3.37        |
+|    exposed_rate         | 0.00293     |
+|    hp_opp_end           | 2.93        |
+|    hp_self_end          | 2.98        |
+|    lock_rate            | 0.0096      |
+|    opp_fault_rate       | 0.00326     |
+|    range_ft_mean        | 113         |
+|    self_fault_rate      | 0.00114     |
+| reset_reason/           |             |
+|    collision            | 0.0357      |
+|    opponent_boundary    | 0.214       |
+|    opponent_ceiling     | 0.0357      |
+|    opponent_ground      | 0.0714      |
+|    opponent_tumble      | 0.393       |
+|    self_boundary        | 0.107       |
+|    self_ground          | 0.143       |
+| rollout/                |             |
+|    ep_len_mean          | 233         |
+|    ep_rew_mean          | -24.8       |
+| time/                   |             |
+|    fps                  | 148         |
+|    iterations           | 19          |
+|    time_elapsed         | 784         |
+|    total_timesteps      | 776472      |
+| train/                  |             |
+|    approx_kl            | 0.021392547 |
+|    clip_fraction        | 0.206       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.13       |
+|    explained_variance   | 0.704       |
+|    learning_rate        | 0.000196    |
+|    loss                 | -0.071      |
+|    n_updates            | 1250        |
+|    policy_gradient_loss | -0.0391     |
+|    std                  | 0.681       |
+|    value_loss           | 0.0297      |
+-----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=780000 win_rate=0.70 mean_reward=-38.61 (baseline=-16.023038866255806, improve=-140.9%) pass=False (0/2)
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 83.9        |
+|    closing_fps_mean     | 1.1         |
+|    exposed_rate         | 0.007       |
+|    hp_opp_end           | 2.99        |
+|    hp_self_end          | 2.95        |
+|    lock_rate            | 0.00163     |
+|    opp_fault_rate       | 0.00277     |
+|    range_ft_mean        | 121         |
+|    self_fault_rate      | 0.00146     |
+| promotion/              |             |
+|    mean_reward          | -38.6       |
+|    win_rate             | 0.7         |
+| reset_reason/           |             |
+|    collision            | 0.0385      |
+|    opponent_boundary    | 0.154       |
+|    opponent_ground      | 0.231       |
+|    opponent_tumble      | 0.231       |
+|    self_boundary        | 0.154       |
+|    self_ground          | 0.192       |
+| rollout/                |             |
+|    ep_len_mean          | 224         |
+|    ep_rew_mean          | -23.2       |
+| time/                   |             |
+|    fps                  | 145         |
+|    iterations           | 20          |
+|    time_elapsed         | 846         |
+|    total_timesteps      | 782616      |
+| train/                  |             |
+|    approx_kl            | 0.021780988 |
+|    clip_fraction        | 0.216       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.12       |
+|    explained_variance   | 0.687       |
+|    learning_rate        | 0.000195    |
+|    loss                 | -0.0868     |
+|    n_updates            | 1260        |
+|    policy_gradient_loss | -0.0408     |
+|    std                  | 0.677       |
+|    value_loss           | 0.0356      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 84.4        |
+|    closing_fps_mean     | 3.2         |
+|    exposed_rate         | 0.0129      |
+|    hp_opp_end           | 2.97        |
+|    hp_self_end          | 2.9         |
+|    lock_rate            | 0.00309     |
+|    opp_fault_rate       | 0.00309     |
+|    range_ft_mean        | 114         |
+|    self_fault_rate      | 0.000814    |
+| reset_reason/           |             |
+|    collision            | 0.04        |
+|    opponent_boundary    | 0.24        |
+|    opponent_ground      | 0.36        |
+|    opponent_tumble      | 0.16        |
+|    self_boundary        | 0.16        |
+|    self_ground          | 0.04        |
+| rollout/                |             |
+|    ep_len_mean          | 227         |
+|    ep_rew_mean          | -22.9       |
+| time/                   |             |
+|    fps                  | 145         |
+|    iterations           | 21          |
+|    time_elapsed         | 887         |
+|    total_timesteps      | 788760      |
+| train/                  |             |
+|    approx_kl            | 0.022693252 |
+|    clip_fraction        | 0.215       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.1        |
+|    explained_variance   | 0.685       |
+|    learning_rate        | 0.000194    |
+|    loss                 | -0.0774     |
+|    n_updates            | 1270        |
+|    policy_gradient_loss | -0.0413     |
+|    std                  | 0.674       |
+|    value_loss           | 0.0281      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 83          |
+|    closing_fps_mean     | 1.92        |
+|    exposed_rate         | 0.00977     |
+|    hp_opp_end           | 2.98        |
+|    hp_self_end          | 2.93        |
+|    lock_rate            | 0.0026      |
+|    opp_fault_rate       | 0.00212     |
+|    range_ft_mean        | 121         |
+|    self_fault_rate      | 0.00228     |
+| reset_reason/           |             |
+|    opponent_boundary    | 0.111       |
+|    opponent_ground      | 0.222       |
+|    opponent_tumble      | 0.148       |
+|    self_boundary        | 0.111       |
+|    self_ground          | 0.333       |
+|    self_tumble          | 0.0741      |
+| rollout/                |             |
+|    ep_len_mean          | 231         |
+|    ep_rew_mean          | -24.7       |
+| time/                   |             |
+|    fps                  | 146         |
+|    iterations           | 22          |
+|    time_elapsed         | 925         |
+|    total_timesteps      | 794904      |
+| train/                  |             |
+|    approx_kl            | 0.024169741 |
+|    clip_fraction        | 0.23        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.08       |
+|    explained_variance   | 0.679       |
+|    learning_rate        | 0.000194    |
+|    loss                 | -0.0829     |
+|    n_updates            | 1280        |
+|    policy_gradient_loss | -0.0434     |
+|    std                  | 0.67        |
+|    value_loss           | 0.0283      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 90.1        |
+|    closing_fps_mean     | 1.04        |
+|    exposed_rate         | 0.0125      |
+|    hp_opp_end           | 2.96        |
+|    hp_self_end          | 2.88        |
+|    lock_rate            | 0.00537     |
+|    opp_fault_rate       | 0.00195     |
+|    range_ft_mean        | 114         |
+|    self_fault_rate      | 0.00195     |
+| reset_reason/           |             |
+|    collision            | 0.0417      |
+|    opponent_boundary    | 0.125       |
+|    opponent_ground      | 0.167       |
+|    opponent_tumble      | 0.167       |
+|    self_boundary        | 0.208       |
+|    self_ground          | 0.167       |
+|    self_tumble          | 0.125       |
+| rollout/                |             |
+|    ep_len_mean          | 235         |
+|    ep_rew_mean          | -27.3       |
+| time/                   |             |
+|    fps                  | 146         |
+|    iterations           | 23          |
+|    time_elapsed         | 962         |
+|    total_timesteps      | 801048      |
+| train/                  |             |
+|    approx_kl            | 0.023009086 |
+|    clip_fraction        | 0.225       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.07       |
+|    explained_variance   | 0.689       |
+|    learning_rate        | 0.000193    |
+|    loss                 | -0.0715     |
+|    n_updates            | 1290        |
+|    policy_gradient_loss | -0.0399     |
+|    std                  | 0.67        |
+|    value_loss           | 0.031       |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 90.8        |
+|    closing_fps_mean     | 1.25        |
+|    exposed_rate         | 0.0119      |
+|    hp_opp_end           | 2.94        |
+|    hp_self_end          | 2.93        |
+|    lock_rate            | 0.00814     |
+|    opp_fault_rate       | 0.00228     |
+|    range_ft_mean        | 123         |
+|    self_fault_rate      | 0.00195     |
+| reset_reason/           |             |
+|    collision            | 0.037       |
+|    opponent_ceiling     | 0.037       |
+|    opponent_ground      | 0.148       |
+|    opponent_tumble      | 0.333       |
+|    self_boundary        | 0.296       |
+|    self_ceiling         | 0.037       |
+|    self_ground          | 0.111       |
+| rollout/                |             |
+|    ep_len_mean          | 240         |
+|    ep_rew_mean          | -29         |
+| time/                   |             |
+|    fps                  | 147         |
+|    iterations           | 24          |
+|    time_elapsed         | 1001        |
+|    total_timesteps      | 807192      |
+| train/                  |             |
+|    approx_kl            | 0.023034856 |
+|    clip_fraction        | 0.226       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.06       |
+|    explained_variance   | 0.567       |
+|    learning_rate        | 0.000192    |
+|    loss                 | -0.0805     |
+|    n_updates            | 1300        |
+|    policy_gradient_loss | -0.0403     |
+|    std                  | 0.667       |
+|    value_loss           | 0.0319      |
+-----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=810000 win_rate=0.70 mean_reward=-31.66 (baseline=-16.023038866255806, improve=-97.6%) pass=False (0/2)
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 85.5        |
+|    closing_fps_mean     | 3.27        |
+|    exposed_rate         | 0.0145      |
+|    hp_opp_end           | 2.94        |
+|    hp_self_end          | 2.89        |
+|    lock_rate            | 0.0096      |
+|    opp_fault_rate       | 0.00309     |
+|    range_ft_mean        | 114         |
+|    self_fault_rate      | 0.000977    |
+| promotion/              |             |
+|    mean_reward          | -31.7       |
+|    win_rate             | 0.7         |
+| reset_reason/           |             |
+|    collision            | 0.107       |
+|    opponent_boundary    | 0.179       |
+|    opponent_ceiling     | 0.0357      |
+|    opponent_ground      | 0.179       |
+|    opponent_tumble      | 0.286       |
+|    self_boundary        | 0.107       |
+|    self_ground          | 0.107       |
+| rollout/                |             |
+|    ep_len_mean          | 229         |
+|    ep_rew_mean          | -27.7       |
+| time/                   |             |
+|    fps                  | 144         |
+|    iterations           | 25          |
+|    time_elapsed         | 1063        |
+|    total_timesteps      | 813336      |
+| train/                  |             |
+|    approx_kl            | 0.022922881 |
+|    clip_fraction        | 0.215       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.04       |
+|    explained_variance   | 0.677       |
+|    learning_rate        | 0.000191    |
+|    loss                 | -0.0923     |
+|    n_updates            | 1310        |
+|    policy_gradient_loss | -0.0422     |
+|    std                  | 0.664       |
+|    value_loss           | 0.0287      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 87          |
+|    closing_fps_mean     | 1.4         |
+|    exposed_rate         | 0.0133      |
+|    hp_opp_end           | 2.91        |
+|    hp_self_end          | 2.89        |
+|    lock_rate            | 0.0106      |
+|    opp_fault_rate       | 0.0026      |
+|    range_ft_mean        | 119         |
+|    self_fault_rate      | 0.00146     |
+| reset_reason/           |             |
+|    collision            | 0.04        |
+|    opponent_boundary    | 0.2         |
+|    opponent_ceiling     | 0.04        |
+|    opponent_ground      | 0.16        |
+|    opponent_tumble      | 0.2         |
+|    self_boundary        | 0.24        |
+|    self_ground          | 0.08        |
+|    self_tumble          | 0.04        |
+| rollout/                |             |
+|    ep_len_mean          | 238         |
+|    ep_rew_mean          | -27.6       |
+| time/                   |             |
+|    fps                  | 142         |
+|    iterations           | 26          |
+|    time_elapsed         | 1117        |
+|    total_timesteps      | 819480      |
+| train/                  |             |
+|    approx_kl            | 0.021949595 |
+|    clip_fraction        | 0.213       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.04       |
+|    explained_variance   | 0.655       |
+|    learning_rate        | 0.00019     |
+|    loss                 | -0.078      |
+|    n_updates            | 1320        |
+|    policy_gradient_loss | -0.0401     |
+|    std                  | 0.666       |
+|    value_loss           | 0.0375      |
+-----------------------------------------
+----------------------------------------
+| curriculum/             |            |
+|    progress             | 1          |
+|    shaped_weight        | 0.45       |
+| dogfight/               |            |
+|    ata_deg_mean         | 80.3       |
+|    closing_fps_mean     | 4.47       |
+|    exposed_rate         | 0.00391    |
+|    hp_opp_end           | 2.91       |
+|    hp_self_end          | 2.96       |
+|    lock_rate            | 0.00944    |
+|    opp_fault_rate       | 0.00293    |
+|    range_ft_mean        | 120        |
+|    self_fault_rate      | 0.000488   |
+| reset_reason/           |            |
+|    collision            | 0.087      |
+|    opponent_boundary    | 0.348      |
+|    opponent_ground      | 0.217      |
+|    opponent_tumble      | 0.217      |
+|    self_boundary        | 0.0435     |
+|    self_ceiling         | 0.0435     |
+|    self_ground          | 0.0435     |
+| rollout/                |            |
+|    ep_len_mean          | 242        |
+|    ep_rew_mean          | -23.6      |
+| time/                   |            |
+|    fps                  | 143        |
+|    iterations           | 27         |
+|    time_elapsed         | 1154       |
+|    total_timesteps      | 825624     |
+| train/                  |            |
+|    approx_kl            | 0.02078215 |
+|    clip_fraction        | 0.202      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.04      |
+|    explained_variance   | 0.778      |
+|    learning_rate        | 0.000189   |
+|    loss                 | -0.0889    |
+|    n_updates            | 1330       |
+|    policy_gradient_loss | -0.0424    |
+|    std                  | 0.665      |
+|    value_loss           | 0.0219     |
+----------------------------------------
+----------------------------------------
+| curriculum/             |            |
+|    progress             | 1          |
+|    shaped_weight        | 0.45       |
+| dogfight/               |            |
+|    ata_deg_mean         | 79.5       |
+|    closing_fps_mean     | 2.95       |
+|    exposed_rate         | 0.00749    |
+|    hp_opp_end           | 2.89       |
+|    hp_self_end          | 2.95       |
+|    lock_rate            | 0.0161     |
+|    opp_fault_rate       | 0.00228    |
+|    range_ft_mean        | 104        |
+|    self_fault_rate      | 0.00146    |
+| reset_reason/           |            |
+|    collision            | 0.08       |
+|    opponent_boundary    | 0.2        |
+|    opponent_ground      | 0.2        |
+|    opponent_tumble      | 0.16       |
+|    self_boundary        | 0.12       |
+|    self_ground          | 0.16       |
+|    self_tumble          | 0.08       |
+| rollout/                |            |
+|    ep_len_mean          | 235        |
+|    ep_rew_mean          | -21.4      |
+| time/                   |            |
+|    fps                  | 144        |
+|    iterations           | 28         |
+|    time_elapsed         | 1192       |
+|    total_timesteps      | 831768     |
+| train/                  |            |
+|    approx_kl            | 0.02272933 |
+|    clip_fraction        | 0.219      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.02      |
+|    explained_variance   | 0.653      |
+|    learning_rate        | 0.000189   |
+|    loss                 | -0.0773    |
+|    n_updates            | 1340       |
+|    policy_gradient_loss | -0.0418    |
+|    std                  | 0.66       |
+|    value_loss           | 0.0283     |
+----------------------------------------
+----------------------------------------
+| curriculum/             |            |
+|    progress             | 1          |
+|    shaped_weight        | 0.45       |
+| dogfight/               |            |
+|    ata_deg_mean         | 83.2       |
+|    closing_fps_mean     | 0.862      |
+|    exposed_rate         | 0.00293    |
+|    hp_opp_end           | 2.92       |
+|    hp_self_end          | 2.97       |
+|    lock_rate            | 0.00602    |
+|    opp_fault_rate       | 0.00244    |
+|    range_ft_mean        | 126        |
+|    self_fault_rate      | 0.00114    |
+| reset_reason/           |            |
+|    collision            | 0.087      |
+|    opponent_boundary    | 0.391      |
+|    opponent_ground      | 0.0435     |
+|    opponent_tumble      | 0.174      |
+|    self_boundary        | 0.261      |
+|    self_ground          | 0.0435     |
+| rollout/                |            |
+|    ep_len_mean          | 254        |
+|    ep_rew_mean          | -24.4      |
+| time/                   |            |
+|    fps                  | 144        |
+|    iterations           | 29         |
+|    time_elapsed         | 1233       |
+|    total_timesteps      | 837912     |
+| train/                  |            |
+|    approx_kl            | 0.02289901 |
+|    clip_fraction        | 0.211      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.01      |
+|    explained_variance   | 0.686      |
+|    learning_rate        | 0.000188   |
+|    loss                 | -0.0736    |
+|    n_updates            | 1350       |
+|    policy_gradient_loss | -0.0409    |
+|    std                  | 0.66       |
+|    value_loss           | 0.0295     |
+----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=840000 win_rate=0.45 mean_reward=-54.91 (baseline=-16.023038866255806, improve=-242.7%) pass=False (0/2)
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 82.7        |
+|    closing_fps_mean     | 0.145       |
+|    exposed_rate         | 0.00765     |
+|    hp_opp_end           | 2.9         |
+|    hp_self_end          | 2.94        |
+|    lock_rate            | 0.0116      |
+|    opp_fault_rate       | 0.00179     |
+|    range_ft_mean        | 132         |
+|    self_fault_rate      | 0.00163     |
+| promotion/              |             |
+|    mean_reward          | -54.9       |
+|    win_rate             | 0.45        |
+| reset_reason/           |             |
+|    collision            | 0.13        |
+|    opponent_boundary    | 0.261       |
+|    opponent_ground      | 0.0435      |
+|    opponent_tumble      | 0.13        |
+|    self_boundary        | 0.13        |
+|    self_ceiling         | 0.0435      |
+|    self_ground          | 0.13        |
+|    self_tumble          | 0.13        |
+| rollout/                |             |
+|    ep_len_mean          | 262         |
+|    ep_rew_mean          | -28.7       |
+| time/                   |             |
+|    fps                  | 141         |
+|    iterations           | 30          |
+|    time_elapsed         | 1305        |
+|    total_timesteps      | 844056      |
+| train/                  |             |
+|    approx_kl            | 0.025529971 |
+|    clip_fraction        | 0.23        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.01       |
+|    explained_variance   | 0.729       |
+|    learning_rate        | 0.000187    |
+|    loss                 | -0.094      |
+|    n_updates            | 1360        |
+|    policy_gradient_loss | -0.0448     |
+|    std                  | 0.662       |
+|    value_loss           | 0.0226      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 88.9        |
+|    closing_fps_mean     | 2.65        |
+|    exposed_rate         | 0.00944     |
+|    hp_opp_end           | 2.97        |
+|    hp_self_end          | 2.93        |
+|    lock_rate            | 0.007       |
+|    opp_fault_rate       | 0.00309     |
+|    range_ft_mean        | 109         |
+|    self_fault_rate      | 0.000977    |
+| reset_reason/           |             |
+|    collision            | 0.0741      |
+|    opponent_boundary    | 0.185       |
+|    opponent_ground      | 0.222       |
+|    opponent_tumble      | 0.296       |
+|    self_boundary        | 0.148       |
+|    self_ceiling         | 0.037       |
+|    self_ground          | 0.037       |
+| rollout/                |             |
+|    ep_len_mean          | 252         |
+|    ep_rew_mean          | -28.3       |
+| time/                   |             |
+|    fps                  | 142         |
+|    iterations           | 31          |
+|    time_elapsed         | 1340        |
+|    total_timesteps      | 850200      |
+| train/                  |             |
+|    approx_kl            | 0.024174184 |
+|    clip_fraction        | 0.218       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4          |
+|    explained_variance   | 0.754       |
+|    learning_rate        | 0.000186    |
+|    loss                 | -0.0853     |
+|    n_updates            | 1370        |
+|    policy_gradient_loss | -0.0436     |
+|    std                  | 0.657       |
+|    value_loss           | 0.0267      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 81.8        |
+|    closing_fps_mean     | 2.38        |
+|    exposed_rate         | 0.0116      |
+|    hp_opp_end           | 2.87        |
+|    hp_self_end          | 2.96        |
+|    lock_rate            | 0.0143      |
+|    opp_fault_rate       | 0.00228     |
+|    range_ft_mean        | 112         |
+|    self_fault_rate      | 0.00163     |
+| reset_reason/           |             |
+|    collision            | 0.143       |
+|    opponent_boundary    | 0.0357      |
+|    opponent_ground      | 0.357       |
+|    opponent_tumble      | 0.107       |
+|    self_boundary        | 0.179       |
+|    self_ground          | 0.179       |
+| rollout/                |             |
+|    ep_len_mean          | 246         |
+|    ep_rew_mean          | -29.4       |
+| time/                   |             |
+|    fps                  | 142         |
+|    iterations           | 32          |
+|    time_elapsed         | 1377        |
+|    total_timesteps      | 856344      |
+| train/                  |             |
+|    approx_kl            | 0.023336917 |
+|    clip_fraction        | 0.217       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.99       |
+|    explained_variance   | 0.649       |
+|    learning_rate        | 0.000185    |
+|    loss                 | -0.081      |
+|    n_updates            | 1380        |
+|    policy_gradient_loss | -0.0429     |
+|    std                  | 0.655       |
+|    value_loss           | 0.0304      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 84          |
+|    closing_fps_mean     | 2.98        |
+|    exposed_rate         | 0.00537     |
+|    hp_opp_end           | 2.97        |
+|    hp_self_end          | 2.92        |
+|    lock_rate            | 0.00374     |
+|    opp_fault_rate       | 0.00277     |
+|    range_ft_mean        | 120         |
+|    self_fault_rate      | 0.00163     |
+| reset_reason/           |             |
+|    opponent_boundary    | 0.148       |
+|    opponent_ground      | 0.296       |
+|    opponent_tumble      | 0.185       |
+|    self_boundary        | 0.296       |
+|    self_ceiling         | 0.037       |
+|    self_tumble          | 0.037       |
+| rollout/                |             |
+|    ep_len_mean          | 236         |
+|    ep_rew_mean          | -26.8       |
+| time/                   |             |
+|    fps                  | 143         |
+|    iterations           | 33          |
+|    time_elapsed         | 1411        |
+|    total_timesteps      | 862488      |
+| train/                  |             |
+|    approx_kl            | 0.021868074 |
+|    clip_fraction        | 0.215       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.97       |
+|    explained_variance   | 0.72        |
+|    learning_rate        | 0.000184    |
+|    loss                 | -0.0729     |
+|    n_updates            | 1390        |
+|    policy_gradient_loss | -0.0425     |
+|    std                  | 0.653       |
+|    value_loss           | 0.0331      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 83.6        |
+|    closing_fps_mean     | 1.58        |
+|    exposed_rate         | 0.00602     |
+|    hp_opp_end           | 2.89        |
+|    hp_self_end          | 2.98        |
+|    lock_rate            | 0.013       |
+|    opp_fault_rate       | 0.00195     |
+|    range_ft_mean        | 108         |
+|    self_fault_rate      | 0.00163     |
+| reset_reason/           |             |
+|    collision            | 0.087       |
+|    opponent_boundary    | 0.0435      |
+|    opponent_ground      | 0.261       |
+|    opponent_tumble      | 0.174       |
+|    self_boundary        | 0.217       |
+|    self_ground          | 0.217       |
+| rollout/                |             |
+|    ep_len_mean          | 234         |
+|    ep_rew_mean          | -25         |
+| time/                   |             |
+|    fps                  | 144         |
+|    iterations           | 34          |
+|    time_elapsed         | 1449        |
+|    total_timesteps      | 868632      |
+| train/                  |             |
+|    approx_kl            | 0.022636836 |
+|    clip_fraction        | 0.209       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.95       |
+|    explained_variance   | 0.637       |
+|    learning_rate        | 0.000184    |
+|    loss                 | -0.0798     |
+|    n_updates            | 1400        |
+|    policy_gradient_loss | -0.0417     |
+|    std                  | 0.649       |
+|    value_loss           | 0.0283      |
+-----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=870000 win_rate=0.40 mean_reward=-49.37 (baseline=-16.023038866255806, improve=-208.1%) pass=False (0/2)
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 81.1        |
+|    closing_fps_mean     | 3.51        |
+|    exposed_rate         | 0.012       |
+|    hp_opp_end           | 3           |
+|    hp_self_end          | 2.89        |
+|    lock_rate            | 0           |
+|    opp_fault_rate       | 0.00309     |
+|    range_ft_mean        | 113         |
+|    self_fault_rate      | 0.000977    |
+| promotion/              |             |
+|    mean_reward          | -49.4       |
+|    win_rate             | 0.4         |
+| reset_reason/           |             |
+|    collision            | 0.143       |
+|    opponent_boundary    | 0.214       |
+|    opponent_ground      | 0.179       |
+|    opponent_tumble      | 0.25        |
+|    self_boundary        | 0.0714      |
+|    self_ground          | 0.107       |
+|    self_tumble          | 0.0357      |
+| rollout/                |             |
+|    ep_len_mean          | 232         |
+|    ep_rew_mean          | -24.1       |
+| time/                   |             |
+|    fps                  | 142         |
+|    iterations           | 35          |
+|    time_elapsed         | 1506        |
+|    total_timesteps      | 874776      |
+| train/                  |             |
+|    approx_kl            | 0.025382558 |
+|    clip_fraction        | 0.235       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.93       |
+|    explained_variance   | 0.767       |
+|    learning_rate        | 0.000183    |
+|    loss                 | -0.0838     |
+|    n_updates            | 1410        |
+|    policy_gradient_loss | -0.046      |
+|    std                  | 0.647       |
+|    value_loss           | 0.0279      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 84.9        |
+|    closing_fps_mean     | 2.44        |
+|    exposed_rate         | 0.0143      |
+|    hp_opp_end           | 2.94        |
+|    hp_self_end          | 2.89        |
+|    lock_rate            | 0.00846     |
+|    opp_fault_rate       | 0.00326     |
+|    range_ft_mean        | 107         |
+|    self_fault_rate      | 0.00114     |
+| reset_reason/           |             |
+|    opponent_boundary    | 0.185       |
+|    opponent_ground      | 0.222       |
+|    opponent_tumble      | 0.333       |
+|    self_boundary        | 0.185       |
+|    self_ceiling         | 0.037       |
+|    self_ground          | 0.037       |
+| rollout/                |             |
+|    ep_len_mean          | 235         |
+|    ep_rew_mean          | -22.6       |
+| time/                   |             |
+|    fps                  | 143         |
+|    iterations           | 36          |
+|    time_elapsed         | 1543        |
+|    total_timesteps      | 880920      |
+| train/                  |             |
+|    approx_kl            | 0.021878472 |
+|    clip_fraction        | 0.205       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.91       |
+|    explained_variance   | 0.632       |
+|    learning_rate        | 0.000182    |
+|    loss                 | -0.0758     |
+|    n_updates            | 1420        |
+|    policy_gradient_loss | -0.0377     |
+|    std                  | 0.643       |
+|    value_loss           | 0.0333      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 80.6        |
+|    closing_fps_mean     | -0.0685     |
+|    exposed_rate         | 0.00602     |
+|    hp_opp_end           | 2.87        |
+|    hp_self_end          | 2.96        |
+|    lock_rate            | 0.0146      |
+|    opp_fault_rate       | 0.0026      |
+|    range_ft_mean        | 116         |
+|    self_fault_rate      | 0.0013      |
+| reset_reason/           |             |
+|    collision            | 0.04        |
+|    opponent_boundary    | 0.2         |
+|    opponent_ground      | 0.24        |
+|    opponent_tumble      | 0.2         |
+|    self_boundary        | 0.24        |
+|    self_ground          | 0.08        |
+| rollout/                |             |
+|    ep_len_mean          | 236         |
+|    ep_rew_mean          | -22.8       |
+| time/                   |             |
+|    fps                  | 143         |
+|    iterations           | 37          |
+|    time_elapsed         | 1581        |
+|    total_timesteps      | 887064      |
+| train/                  |             |
+|    approx_kl            | 0.022309603 |
+|    clip_fraction        | 0.216       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.89       |
+|    explained_variance   | 0.752       |
+|    learning_rate        | 0.000181    |
+|    loss                 | -0.0765     |
+|    n_updates            | 1430        |
+|    policy_gradient_loss | -0.0434     |
+|    std                  | 0.639       |
+|    value_loss           | 0.0277      |
+-----------------------------------------
+----------------------------------------
+| curriculum/             |            |
+|    progress             | 1          |
+|    shaped_weight        | 0.45       |
+| dogfight/               |            |
+|    ata_deg_mean         | 80.5       |
+|    closing_fps_mean     | 0.735      |
+|    exposed_rate         | 0.015      |
+|    hp_opp_end           | 2.88       |
+|    hp_self_end          | 2.89       |
+|    lock_rate            | 0.0184     |
+|    opp_fault_rate       | 0.00293    |
+|    range_ft_mean        | 115        |
+|    self_fault_rate      | 0.00146    |
+| reset_reason/           |            |
+|    collision            | 0.1        |
+|    opponent_boundary    | 0.233      |
+|    opponent_ground      | 0.167      |
+|    opponent_tumble      | 0.2        |
+|    self_boundary        | 0.133      |
+|    self_ground          | 0.133      |
+|    self_tumble          | 0.0333     |
+| rollout/                |            |
+|    ep_len_mean          | 230        |
+|    ep_rew_mean          | -21.2      |
+| time/                   |            |
+|    fps                  | 144        |
+|    iterations           | 38         |
+|    time_elapsed         | 1616       |
+|    total_timesteps      | 893208     |
+| train/                  |            |
+|    approx_kl            | 0.02458336 |
+|    clip_fraction        | 0.215      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.87      |
+|    explained_variance   | 0.727      |
+|    learning_rate        | 0.00018    |
+|    loss                 | -0.0748    |
+|    n_updates            | 1440       |
+|    policy_gradient_loss | -0.0419    |
+|    std                  | 0.637      |
+|    value_loss           | 0.0253     |
+----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 83.4        |
+|    closing_fps_mean     | 2.02        |
+|    exposed_rate         | 0.00586     |
+|    hp_opp_end           | 2.72        |
+|    hp_self_end          | 2.96        |
+|    lock_rate            | 0.0308      |
+|    opp_fault_rate       | 0.00195     |
+|    range_ft_mean        | 122         |
+|    self_fault_rate      | 0.00114     |
+| reset_reason/           |             |
+|    collision            | 0.136       |
+|    opponent_boundary    | 0.0909      |
+|    opponent_ceiling     | 0.0455      |
+|    opponent_ground      | 0.0455      |
+|    opponent_tumble      | 0.364       |
+|    self_boundary        | 0.273       |
+|    self_tumble          | 0.0455      |
+| rollout/                |             |
+|    ep_len_mean          | 237         |
+|    ep_rew_mean          | -22.6       |
+| time/                   |             |
+|    fps                  | 144         |
+|    iterations           | 39          |
+|    time_elapsed         | 1654        |
+|    total_timesteps      | 899352      |
+| train/                  |             |
+|    approx_kl            | 0.024765072 |
+|    clip_fraction        | 0.222       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.86       |
+|    explained_variance   | 0.67        |
+|    learning_rate        | 0.000179    |
+|    loss                 | -0.0832     |
+|    n_updates            | 1450        |
+|    policy_gradient_loss | -0.0423     |
+|    std                  | 0.634       |
+|    value_loss           | 0.0342      |
+-----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=900000 win_rate=0.65 mean_reward=-39.40 (baseline=-16.023038866255806, improve=-145.9%) pass=False (0/2)
 -----------------------------------------
 | curriculum/             |             |
 |    progress             | 1           |
 |    shaped_weight        | 0.45        |
 | dogfight/               |             |
 |    ata_deg_mean         | 82.2        |
-|    closing_fps_mean     | -5.27       |
-|    exposed_rate         | 0.00407     |
-|    hp_opp_end           | 2.94        |
-|    hp_self_end          | 2.98        |
-|    lock_rate            | 0.00944     |
-|    opp_fault_rate       | 0.00358     |
-|    range_ft_mean        | 134         |
-|    self_fault_rate      | 0.00114     |
-| reset_reason/           |             |
-|    collision            | 0.0333      |
-|    opponent_boundary    | 0.167       |
-|    opponent_ceiling     | 0.0333      |
-|    opponent_ground      | 0.333       |
-|    opponent_tumble      | 0.2         |
-|    self_boundary        | 0.133       |
-|    self_ground          | 0.1         |
-| rollout/                |             |
-|    ep_len_mean          | 216         |
-|    ep_rew_mean          | -22.8       |
-| time/                   |             |
-|    fps                  | 161         |
-|    iterations           | 15          |
-|    time_elapsed         | 570         |
-|    total_timesteps      | 621948      |
-| train/                  |             |
-|    approx_kl            | 0.021346608 |
-|    clip_fraction        | 0.212       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.5        |
-|    explained_variance   | 0.851       |
-|    learning_rate        | 0.000217    |
-|    loss                 | -0.0792     |
-|    n_updates            | 1000        |
-|    policy_gradient_loss | -0.0394     |
-|    std                  | 0.744       |
-|    value_loss           | 0.0188      |
------------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.45        |
-| dogfight/               |             |
-|    ata_deg_mean         | 79.5        |
-|    closing_fps_mean     | -0.751      |
-|    exposed_rate         | 0.00911     |
-|    hp_opp_end           | 2.91        |
-|    hp_self_end          | 2.92        |
-|    lock_rate            | 0.0112      |
-|    opp_fault_rate       | 0.00293     |
-|    range_ft_mean        | 130         |
-|    self_fault_rate      | 0.00114     |
-| reset_reason/           |             |
-|    collision            | 0.107       |
-|    opponent_boundary    | 0.25        |
-|    opponent_ground      | 0.214       |
-|    opponent_tumble      | 0.179       |
-|    self_boundary        | 0.143       |
-|    self_ground          | 0.0357      |
-|    self_tumble          | 0.0714      |
-| rollout/                |             |
-|    ep_len_mean          | 217         |
-|    ep_rew_mean          | -21.9       |
-| time/                   |             |
-|    fps                  | 160         |
-|    iterations           | 16          |
-|    time_elapsed         | 613         |
-|    total_timesteps      | 628092      |
-| train/                  |             |
-|    approx_kl            | 0.021877766 |
-|    clip_fraction        | 0.199       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.48       |
-|    explained_variance   | 0.77        |
-|    learning_rate        | 0.000216    |
-|    loss                 | -0.079      |
-|    n_updates            | 1010        |
-|    policy_gradient_loss | -0.0362     |
-|    std                  | 0.74        |
-|    value_loss           | 0.021       |
------------------------------------------
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-[promotion] step=630000 win_rate=0.45 mean_reward=-41.43 (baseline=-17.364395242089778, improve=-138.6%) pass=False (0/2)
-----------------------------------------
-| curriculum/             |            |
-|    progress             | 1          |
-|    shaped_weight        | 0.45       |
-| dogfight/               |            |
-|    ata_deg_mean         | 85.1       |
-|    closing_fps_mean     | -1.8       |
-|    exposed_rate         | 0.0129     |
-|    hp_opp_end           | 2.9        |
-|    hp_self_end          | 2.92       |
-|    lock_rate            | 0.0153     |
-|    opp_fault_rate       | 0.00374    |
-|    range_ft_mean        | 123        |
-|    self_fault_rate      | 0.000977   |
-| promotion/              |            |
-|    mean_reward          | -41.4      |
-|    win_rate             | 0.45       |
-| reset_reason/           |            |
-|    collision            | 0.0333     |
-|    opponent_boundary    | 0.267      |
-|    opponent_ground      | 0.267      |
-|    opponent_tumble      | 0.233      |
-|    self_boundary        | 0.0667     |
-|    self_ceiling         | 0.0333     |
-|    self_tumble          | 0.1        |
-| rollout/                |            |
-|    ep_len_mean          | 215        |
-|    ep_rew_mean          | -21.5      |
-| time/                   |            |
-|    fps                  | 156        |
-|    iterations           | 17         |
-|    time_elapsed         | 669        |
-|    total_timesteps      | 634236     |
-| train/                  |            |
-|    approx_kl            | 0.02070965 |
-|    clip_fraction        | 0.211      |
-|    clip_range           | 0.2        |
-|    entropy_loss         | -4.45      |
-|    explained_variance   | 0.77       |
-|    learning_rate        | 0.000215   |
-|    loss                 | -0.0821    |
-|    n_updates            | 1020       |
-|    policy_gradient_loss | -0.0379    |
-|    std                  | 0.736      |
-|    value_loss           | 0.0194     |
-----------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.45        |
-| dogfight/               |             |
-|    ata_deg_mean         | 78.8        |
-|    closing_fps_mean     | -7.18       |
-|    exposed_rate         | 0.00798     |
-|    hp_opp_end           | 2.87        |
-|    hp_self_end          | 2.94        |
-|    lock_rate            | 0.0189      |
-|    opp_fault_rate       | 0.00358     |
-|    range_ft_mean        | 140         |
-|    self_fault_rate      | 0.000814    |
-| reset_reason/           |             |
-|    opponent_boundary    | 0.296       |
-|    opponent_ground      | 0.185       |
-|    opponent_tumble      | 0.333       |
-|    self_boundary        | 0.148       |
-|    self_ground          | 0.037       |
-| rollout/                |             |
-|    ep_len_mean          | 214         |
-|    ep_rew_mean          | -21.6       |
-| time/                   |             |
-|    fps                  | 156         |
-|    iterations           | 18          |
-|    time_elapsed         | 705         |
-|    total_timesteps      | 640380      |
-| train/                  |             |
-|    approx_kl            | 0.021324955 |
-|    clip_fraction        | 0.205       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.43       |
-|    explained_variance   | 0.688       |
-|    learning_rate        | 0.000214    |
-|    loss                 | -0.0945     |
-|    n_updates            | 1030        |
-|    policy_gradient_loss | -0.0385     |
-|    std                  | 0.732       |
-|    value_loss           | 0.0218      |
------------------------------------------
-----------------------------------------
-| curriculum/             |            |
-|    progress             | 1          |
-|    shaped_weight        | 0.45       |
-| dogfight/               |            |
-|    ata_deg_mean         | 85.4       |
-|    closing_fps_mean     | -4.63      |
-|    exposed_rate         | 0.00732    |
-|    hp_opp_end           | 2.92       |
-|    hp_self_end          | 2.95       |
-|    lock_rate            | 0.00879    |
-|    opp_fault_rate       | 0.00358    |
-|    range_ft_mean        | 133        |
-|    self_fault_rate      | 0.000488   |
-| reset_reason/           |            |
-|    opponent_boundary    | 0.32       |
-|    opponent_ground      | 0.32       |
-|    opponent_tumble      | 0.24       |
-|    self_boundary        | 0.08       |
-|    self_ground          | 0.04       |
-| rollout/                |            |
-|    ep_len_mean          | 223        |
-|    ep_rew_mean          | -19.9      |
-| time/                   |            |
-|    fps                  | 156        |
-|    iterations           | 19         |
-|    time_elapsed         | 743        |
-|    total_timesteps      | 646524     |
-| train/                  |            |
-|    approx_kl            | 0.02040212 |
-|    clip_fraction        | 0.196      |
-|    clip_range           | 0.2        |
-|    entropy_loss         | -4.41      |
-|    explained_variance   | 0.743      |
-|    learning_rate        | 0.000214   |
-|    loss                 | -0.0648    |
-|    n_updates            | 1040       |
-|    policy_gradient_loss | -0.038     |
-|    std                  | 0.729      |
-|    value_loss           | 0.0232     |
-----------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.45        |
-| dogfight/               |             |
-|    ata_deg_mean         | 74.2        |
-|    closing_fps_mean     | -2.51       |
-|    exposed_rate         | 0.00456     |
-|    hp_opp_end           | 2.9         |
-|    hp_self_end          | 2.98        |
-|    lock_rate            | 0.0168      |
-|    opp_fault_rate       | 0.00391     |
-|    range_ft_mean        | 132         |
-|    self_fault_rate      | 0.000814    |
-| reset_reason/           |             |
-|    collision            | 0.0345      |
-|    opponent_boundary    | 0.276       |
-|    opponent_ground      | 0.31        |
-|    opponent_tumble      | 0.207       |
-|    self_boundary        | 0.069       |
-|    self_ceiling         | 0.0345      |
-|    self_ground          | 0.069       |
-| rollout/                |             |
-|    ep_len_mean          | 220         |
-|    ep_rew_mean          | -19.7       |
-| time/                   |             |
-|    fps                  | 157         |
-|    iterations           | 20          |
-|    time_elapsed         | 780         |
-|    total_timesteps      | 652668      |
-| train/                  |             |
-|    approx_kl            | 0.020936796 |
-|    clip_fraction        | 0.22        |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.39       |
-|    explained_variance   | 0.844       |
-|    learning_rate        | 0.000213    |
-|    loss                 | -0.0806     |
-|    n_updates            | 1050        |
-|    policy_gradient_loss | -0.0424     |
-|    std                  | 0.725       |
-|    value_loss           | 0.0178      |
------------------------------------------
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.45        |
-| dogfight/               |             |
-|    ata_deg_mean         | 76          |
-|    closing_fps_mean     | -6.13       |
-|    exposed_rate         | 0.0026      |
-|    hp_opp_end           | 2.9         |
-|    hp_self_end          | 2.97        |
-|    lock_rate            | 0.0122      |
-|    opp_fault_rate       | 0.00309     |
-|    range_ft_mean        | 139         |
-|    self_fault_rate      | 0.00114     |
-| reset_reason/           |             |
-|    opponent_boundary    | 0.231       |
-|    opponent_ground      | 0.346       |
-|    opponent_tumble      | 0.154       |
-|    self_boundary        | 0.192       |
-|    self_ground          | 0.0385      |
-|    self_tumble          | 0.0385      |
-| rollout/                |             |
-|    ep_len_mean          | 226         |
-|    ep_rew_mean          | -21.5       |
-| time/                   |             |
-|    fps                  | 158         |
-|    iterations           | 21          |
-|    time_elapsed         | 815         |
-|    total_timesteps      | 658812      |
-| train/                  |             |
-|    approx_kl            | 0.020922815 |
-|    clip_fraction        | 0.197       |
-|    clip_range           | 0.2         |
-|    entropy_loss         | -4.38       |
-|    explained_variance   | 0.835       |
-|    learning_rate        | 0.000212    |
-|    loss                 | -0.074      |
-|    n_updates            | 1060        |
-|    policy_gradient_loss | -0.0372     |
-|    std                  | 0.723       |
-|    value_loss           | 0.0192      |
------------------------------------------
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-
-
-     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
-            [JSBSim-ML v2.0]
-
-JSBSim startup beginning ...
-
-
-[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
-Current version needed is: 2.0
-         You have version: 3.0
-[39m
-Failed to tie property fcs/accelx/malfunction/fail_low to object methods
-Failed to tie property fcs/accelx/malfunction/fail_high to object methods
-Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelx/randomseed to object methods
-Failed to tie property fcs/accely/malfunction/fail_low to object methods
-Failed to tie property fcs/accely/malfunction/fail_high to object methods
-Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accely/randomseed to object methods
-Failed to tie property fcs/accelz/malfunction/fail_low to object methods
-Failed to tie property fcs/accelz/malfunction/fail_high to object methods
-Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
-Failed to tie property fcs/accelz/randomseed to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
-Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
-Failed to tie property fcs/temp_c/randomseed to object methods
-[promotion] step=660000 win_rate=0.60 mean_reward=-46.01 (baseline=-17.364395242089778, improve=-165.0%) pass=False (0/2)
------------------------------------------
-| curriculum/             |             |
-|    progress             | 1           |
-|    shaped_weight        | 0.45        |
-| dogfight/               |             |
-|    ata_deg_mean         | 78.6        |
-|    closing_fps_mean     | -0.47       |
-|    exposed_rate         | 0.0106      |
-|    hp_opp_end           | 2.88        |
-|    hp_self_end          | 2.93        |
-|    lock_rate            | 0.0164      |
-|    opp_fault_rate       | 0.00391     |
-|    range_ft_mean        | 129         |
+|    closing_fps_mean     | 2.77        |
+|    exposed_rate         | 0.0103      |
+|    hp_opp_end           | 2.95        |
+|    hp_self_end          | 2.9         |
+|    lock_rate            | 0.0057      |
+|    opp_fault_rate       | 0.00277     |
+|    range_ft_mean        | 119         |
 |    self_fault_rate      | 0.000814    |
 | promotion/              |             |
-|    mean_reward          | -46         |
-|    win_rate             | 0.6         |
+|    mean_reward          | -39.4       |
+|    win_rate             | 0.65        |
 | reset_reason/           |             |
-|    collision            | 0.0938      |
-|    opponent_boundary    | 0.125       |
-|    opponent_ceiling     | 0.0312      |
-|    opponent_ground      | 0.375       |
-|    opponent_tumble      | 0.219       |
-|    self_boundary        | 0.0938      |
-|    self_ground          | 0.0312      |
-|    self_tumble          | 0.0312      |
+|    collision            | 0.0833      |
+|    opponent_boundary    | 0.25        |
+|    opponent_ground      | 0.292       |
+|    opponent_tumble      | 0.167       |
+|    self_boundary        | 0.0833      |
+|    self_ground          | 0.125       |
 | rollout/                |             |
-|    ep_len_mean          | 219         |
-|    ep_rew_mean          | -21         |
+|    ep_len_mean          | 246         |
+|    ep_rew_mean          | -24         |
 | time/                   |             |
-|    fps                  | 155         |
-|    iterations           | 22          |
-|    time_elapsed         | 871         |
-|    total_timesteps      | 664956      |
+|    fps                  | 143         |
+|    iterations           | 40          |
+|    time_elapsed         | 1714        |
+|    total_timesteps      | 905496      |
 | train/                  |             |
-|    approx_kl            | 0.023407811 |
+|    approx_kl            | 0.024371067 |
+|    clip_fraction        | 0.222       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.84       |
+|    explained_variance   | 0.671       |
+|    learning_rate        | 0.000179    |
+|    loss                 | -0.0882     |
+|    n_updates            | 1460        |
+|    policy_gradient_loss | -0.0446     |
+|    std                  | 0.632       |
+|    value_loss           | 0.0247      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 83.5        |
+|    closing_fps_mean     | 0.382       |
+|    exposed_rate         | 0.00977     |
+|    hp_opp_end           | 2.88        |
+|    hp_self_end          | 2.93        |
+|    lock_rate            | 0.0132      |
+|    opp_fault_rate       | 0.00212     |
+|    range_ft_mean        | 112         |
+|    self_fault_rate      | 0.00146     |
+| reset_reason/           |             |
+|    collision            | 0.0833      |
+|    opponent_boundary    | 0.208       |
+|    opponent_ground      | 0.125       |
+|    opponent_tumble      | 0.208       |
+|    self_boundary        | 0.25        |
+|    self_ceiling         | 0.0417      |
+|    self_tumble          | 0.0833      |
+| rollout/                |             |
+|    ep_len_mean          | 248         |
+|    ep_rew_mean          | -25.3       |
+| time/                   |             |
+|    fps                  | 143         |
+|    iterations           | 41          |
+|    time_elapsed         | 1750        |
+|    total_timesteps      | 911640      |
+| train/                  |             |
+|    approx_kl            | 0.023860514 |
+|    clip_fraction        | 0.218       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.82       |
+|    explained_variance   | 0.633       |
+|    learning_rate        | 0.000178    |
+|    loss                 | -0.0768     |
+|    n_updates            | 1470        |
+|    policy_gradient_loss | -0.0392     |
+|    std                  | 0.629       |
+|    value_loss           | 0.0322      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 79.3        |
+|    closing_fps_mean     | 3.4         |
+|    exposed_rate         | 0.00732     |
+|    hp_opp_end           | 2.97        |
+|    hp_self_end          | 2.96        |
+|    lock_rate            | 0.00618     |
+|    opp_fault_rate       | 0.0026      |
+|    range_ft_mean        | 118         |
+|    self_fault_rate      | 0.0013      |
+| reset_reason/           |             |
+|    collision            | 0.111       |
+|    opponent_boundary    | 0.259       |
+|    opponent_ground      | 0.111       |
+|    opponent_tumble      | 0.222       |
+|    self_boundary        | 0.0741      |
+|    self_ceiling         | 0.037       |
+|    self_ground          | 0.148       |
+|    self_tumble          | 0.037       |
+| rollout/                |             |
+|    ep_len_mean          | 248         |
+|    ep_rew_mean          | -25.3       |
+| time/                   |             |
+|    fps                  | 144         |
+|    iterations           | 42          |
+|    time_elapsed         | 1785        |
+|    total_timesteps      | 917784      |
+| train/                  |             |
+|    approx_kl            | 0.024042835 |
 |    clip_fraction        | 0.22        |
 |    clip_range           | 0.2         |
-|    entropy_loss         | -4.37       |
-|    explained_variance   | 0.775       |
-|    learning_rate        | 0.000211    |
-|    loss                 | -0.0753     |
-|    n_updates            | 1070        |
-|    policy_gradient_loss | -0.0376     |
-|    std                  | 0.72        |
-|    value_loss           | 0.017       |
+|    entropy_loss         | -3.81       |
+|    explained_variance   | 0.667       |
+|    learning_rate        | 0.000177    |
+|    loss                 | -0.0802     |
+|    n_updates            | 1480        |
+|    policy_gradient_loss | -0.0466     |
+|    std                  | 0.627       |
+|    value_loss           | 0.0264      |
 -----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 88.6        |
+|    closing_fps_mean     | 3.39        |
+|    exposed_rate         | 0.0143      |
+|    hp_opp_end           | 2.9         |
+|    hp_self_end          | 2.88        |
+|    lock_rate            | 0.0112      |
+|    opp_fault_rate       | 0.00244     |
+|    range_ft_mean        | 116         |
+|    self_fault_rate      | 0.0013      |
+| reset_reason/           |             |
+|    collision            | 0.115       |
+|    opponent_boundary    | 0.154       |
+|    opponent_ground      | 0.231       |
+|    opponent_tumble      | 0.192       |
+|    self_boundary        | 0.231       |
+|    self_ceiling         | 0.0385      |
+|    self_tumble          | 0.0385      |
+| rollout/                |             |
+|    ep_len_mean          | 243         |
+|    ep_rew_mean          | -25.1       |
+| time/                   |             |
+|    fps                  | 144         |
+|    iterations           | 43          |
+|    time_elapsed         | 1823        |
+|    total_timesteps      | 923928      |
+| train/                  |             |
+|    approx_kl            | 0.024085268 |
+|    clip_fraction        | 0.227       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.79       |
+|    explained_variance   | 0.715       |
+|    learning_rate        | 0.000176    |
+|    loss                 | -0.0884     |
+|    n_updates            | 1490        |
+|    policy_gradient_loss | -0.0441     |
+|    std                  | 0.624       |
+|    value_loss           | 0.0284      |
+-----------------------------------------
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+
+
+     JSBSim Flight Dynamics Model v1.2.4 Feb  7 2026 11:12:49
+            [JSBSim-ML v2.0]
+
+JSBSim startup beginning ...
+
+
+[31mYOU HAVE AN INCOMPATIBLE CFG FILE FOR THIS AIRCRAFT. RESULTS WILL BE UNPREDICTABLE !!
+Current version needed is: 2.0
+         You have version: 3.0
+[39m
+Failed to tie property fcs/accelx/malfunction/fail_low to object methods
+Failed to tie property fcs/accelx/malfunction/fail_high to object methods
+Failed to tie property fcs/accelx/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelx/randomseed to object methods
+Failed to tie property fcs/accely/malfunction/fail_low to object methods
+Failed to tie property fcs/accely/malfunction/fail_high to object methods
+Failed to tie property fcs/accely/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accely/randomseed to object methods
+Failed to tie property fcs/accelz/malfunction/fail_low to object methods
+Failed to tie property fcs/accelz/malfunction/fail_high to object methods
+Failed to tie property fcs/accelz/malfunction/fail_stuck to object methods
+Failed to tie property fcs/accelz/randomseed to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_low to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_high to object methods
+Failed to tie property fcs/temp_c/malfunction/fail_stuck to object methods
+Failed to tie property fcs/temp_c/randomseed to object methods
+[promotion] step=930000 win_rate=0.85 mean_reward=-30.88 (baseline=-16.023038866255806, improve=-92.7%) pass=False (0/2)
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 81.2        |
+|    closing_fps_mean     | 1.18        |
+|    exposed_rate         | 0.012       |
+|    hp_opp_end           | 2.9         |
+|    hp_self_end          | 2.89        |
+|    lock_rate            | 0.0133      |
+|    opp_fault_rate       | 0.00228     |
+|    range_ft_mean        | 110         |
+|    self_fault_rate      | 0.0013      |
+| promotion/              |             |
+|    mean_reward          | -30.9       |
+|    win_rate             | 0.85        |
+| reset_reason/           |             |
+|    collision            | 0.16        |
+|    opponent_boundary    | 0.12        |
+|    opponent_ground      | 0.32        |
+|    opponent_tumble      | 0.08        |
+|    self_boundary        | 0.16        |
+|    self_ceiling         | 0.08        |
+|    self_ground          | 0.08        |
+| rollout/                |             |
+|    ep_len_mean          | 240         |
+|    ep_rew_mean          | -26.6       |
+| time/                   |             |
+|    fps                  | 143         |
+|    iterations           | 44          |
+|    time_elapsed         | 1882        |
+|    total_timesteps      | 930072      |
+| train/                  |             |
+|    approx_kl            | 0.024463391 |
+|    clip_fraction        | 0.233       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.78       |
+|    explained_variance   | 0.759       |
+|    learning_rate        | 0.000175    |
+|    loss                 | -0.087      |
+|    n_updates            | 1500        |
+|    policy_gradient_loss | -0.0439     |
+|    std                  | 0.621       |
+|    value_loss           | 0.0265      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 85.2        |
+|    closing_fps_mean     | 2.32        |
+|    exposed_rate         | 0.0213      |
+|    hp_opp_end           | 2.85        |
+|    hp_self_end          | 2.87        |
+|    lock_rate            | 0.0203      |
+|    opp_fault_rate       | 0.00309     |
+|    range_ft_mean        | 111         |
+|    self_fault_rate      | 0.00114     |
+| reset_reason/           |             |
+|    collision            | 0.037       |
+|    opponent_boundary    | 0.259       |
+|    opponent_ground      | 0.185       |
+|    opponent_tumble      | 0.259       |
+|    self_boundary        | 0.148       |
+|    self_ceiling         | 0.037       |
+|    self_ground          | 0.037       |
+|    self_tumble          | 0.037       |
+| rollout/                |             |
+|    ep_len_mean          | 240         |
+|    ep_rew_mean          | -25.2       |
+| time/                   |             |
+|    fps                  | 144         |
+|    iterations           | 45          |
+|    time_elapsed         | 1918        |
+|    total_timesteps      | 936216      |
+| train/                  |             |
+|    approx_kl            | 0.026298253 |
+|    clip_fraction        | 0.236       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.76       |
+|    explained_variance   | 0.69        |
+|    learning_rate        | 0.000174    |
+|    loss                 | -0.0968     |
+|    n_updates            | 1510        |
+|    policy_gradient_loss | -0.0468     |
+|    std                  | 0.618       |
+|    value_loss           | 0.0254      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 80.4        |
+|    closing_fps_mean     | 1.16        |
+|    exposed_rate         | 0.0106      |
+|    hp_opp_end           | 2.89        |
+|    hp_self_end          | 2.88        |
+|    lock_rate            | 0.0146      |
+|    opp_fault_rate       | 0.00228     |
+|    range_ft_mean        | 111         |
+|    self_fault_rate      | 0.00146     |
+| reset_reason/           |             |
+|    collision            | 0.0417      |
+|    opponent_boundary    | 0.125       |
+|    opponent_ground      | 0.167       |
+|    opponent_tumble      | 0.292       |
+|    self_boundary        | 0.25        |
+|    self_ground          | 0.0833      |
+|    self_tumble          | 0.0417      |
+| rollout/                |             |
+|    ep_len_mean          | 241         |
+|    ep_rew_mean          | -24.8       |
+| time/                   |             |
+|    fps                  | 144         |
+|    iterations           | 46          |
+|    time_elapsed         | 1961        |
+|    total_timesteps      | 942360      |
+| train/                  |             |
+|    approx_kl            | 0.025609324 |
+|    clip_fraction        | 0.24        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.74       |
+|    explained_variance   | 0.784       |
+|    learning_rate        | 0.000174    |
+|    loss                 | -0.0769     |
+|    n_updates            | 1520        |
+|    policy_gradient_loss | -0.0476     |
+|    std                  | 0.616       |
+|    value_loss           | 0.0294      |
+-----------------------------------------
+-----------------------------------------
+| curriculum/             |             |
+|    progress             | 1           |
+|    shaped_weight        | 0.45        |
+| dogfight/               |             |
+|    ata_deg_mean         | 78.5        |
+|    closing_fps_mean     | 4.59        |
+|    exposed_rate         | 0.00781     |
+|    hp_opp_end           | 2.89        |
+|    hp_self_end          | 2.95        |
+|    lock_rate            | 0.013       |
+|    opp_fault_rate       | 0.00293     |
+|    range_ft_mean        | 117         |
+|    self_fault_rate      | 0.000814    |
+| reset_reason/           |             |
+|    collision            | 0.115       |
+|    opponent_boundary    | 0.192       |
+|    opponent_ground      | 0.346       |
+|    opponent_tumble      | 0.154       |
+|    self_boundary        | 0.0769      |
+|    self_ceiling         | 0.0385      |
+|    self_ground          | 0.0769      |
+| rollout/                |             |
+|    ep_len_mean          | 243         |
+|    ep_rew_mean          | -23.1       |
+| time/                   |             |
+|    fps                  | 143         |
+|    iterations           | 47          |
+|    time_elapsed         | 2012        |
+|    total_timesteps      | 948504      |
+| train/                  |             |
+|    approx_kl            | 0.022407852 |
+|    clip_fraction        | 0.214       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.73       |
+|    explained_variance   | 0.803       |
+|    learning_rate        | 0.000173    |
+|    loss                 | -0.0957     |
+|    n_updates            | 1530        |
+|    policy_gradient_loss | -0.0457     |
+|    std                  | 0.615       |
+|    value_loss           | 0.0247      |
+-----------------------------------------
+----------------------------------------
+| curriculum/             |            |
+|    progress             | 1          |
+|    shaped_weight        | 0.45       |
+| dogfight/               |            |
+|    ata_deg_mean         | 79.3       |
+|    closing_fps_mean     | 2.85       |
+|    exposed_rate         | 0.0101     |
+|    hp_opp_end           | 2.95       |
+|    hp_self_end          | 2.92       |
+|    lock_rate            | 0.00781    |
+|    opp_fault_rate       | 0.00277    |
+|    range_ft_mean        | 102        |
+|    self_fault_rate      | 0.00114    |
+| reset_reason/           |            |
+|    opponent_boundary    | 0.375      |
+|    opponent_ground      | 0.125      |
+|    opponent_tumble      | 0.208      |
+|    self_boundary        | 0.125      |
+|    self_ground          | 0.0833     |
+|    self_tumble          | 0.0833     |
+| rollout/                |            |
+|    ep_len_mean          | 247        |
+|    ep_rew_mean          | -21.1      |
+| time/                   |            |
+|    fps                  | 143        |
+|    iterations           | 48         |
+|    time_elapsed         | 2048       |
+|    total_timesteps      | 954648     |
+| train/                  |            |
+|    approx_kl            | 0.02406525 |
+|    clip_fraction        | 0.216      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.71      |
+|    explained_variance   | 0.638      |
+|    learning_rate        | 0.000172   |
+|    loss                 | -0.0931    |
+|    n_updates            | 1540       |
+|    policy_gradient_loss | -0.0444    |
+|    std                  | 0.612      |
+|    value_loss           | 0.0218     |
+----------------------------------------

@@ -73,6 +73,7 @@ env:
   extreme_altitude_min_ft: -100.0
   extreme_altitude_max_ft: 2000.0
   extreme_boundary_ft: 2000.0
+  extreme_speed_fps: 500.0
 
   # YENI: irtifa tabani/tavani icin kademeli ceza (yer carpmasi sorunu icin)
   alt_floor_soft_margin_ft: 60.0
@@ -131,5 +132,14 @@ promotion:
   win_rate_threshold: 0.55
   mean_reward_improve_pct: 5.0
   consecutive_passes_required: 2
+
+
+
+
+
+
+
+
+
 
 

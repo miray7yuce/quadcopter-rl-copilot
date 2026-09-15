@@ -866,11 +866,20 @@ class DogfightEnv(gym.Env):
         o eski, siki sinirlar (80 derece egim, 20-300ft irtifa) artik
         SADECE terminate_on_fault=True iken sonlandiriyor. Bu fonksiyon
         COK daha gevsek esikler kullanir (~143 derece egim, -100/+2000ft
-        irtifa, 2000ft sinir) - amac 'dengesizligi cezalandirmak' degil,
-        JSBSim'in fizik motoru GERCEKTEN sayisal olarak KIRILMADAN once
-        (NaN/Inf uretmeden once) bir sinir koymak. _is_finite_state zaten
-        NaN olustuktan SONRA yakaliyordu; bu fonksiyon bir onceki adimda,
-        NaN olusmadan ONCE devreye girmeyi hedefler."""
+        irtifa, 2000ft sinir, 500fps hiz) - amac 'dengesizligi
+        cezalandirmak' degil, JSBSim'in fizik motoru GERCEKTEN sayisal
+        olarak KIRILMADAN once (NaN/Inf uretmeden once) bir sinir koymak.
+        _is_finite_state zaten NaN olustuktan SONRA yakaliyordu; bu
+        fonksiyon bir onceki adimda, NaN olusmadan ONCE devreye girmeyi
+        hedefler.
+
+        DUZELTME (gercek gozlemlenmis bir vaka): eskiden bu fonksiyon
+        SADECE irtifa/egim/sinir kontrol ediyordu, HIZI HIC kontrol
+        etmiyordu. ACMI kaydinda, BEST'in fiziksel olarak imkansiz
+        hizlarla (~1000+ m/s) yaklasik 1.75 saniye boyunca kare-kareye
+        kaotik savruldugu, ama irtifa/egim/sinirin TESADUFEN esiklerin
+        icinde kaldigi icin HICBIR guvenlik aginin bunu yakalamadigi
+        goruldu. Hiz kontrolu bu bosluk icin eklendi."""
         alt = fdm["position/h-agl-ft"]
         if alt < self.cfg.extreme_altitude_min_ft or alt > self.cfg.extreme_altitude_max_ft:
             return True
@@ -878,6 +887,9 @@ class DogfightEnv(gym.Env):
         if abs(phi) > self.cfg.extreme_tilt_rad or abs(theta) > self.cfg.extreme_tilt_rad:
             return True
         if self._boundary_dist(fdm) > self.cfg.extreme_boundary_ft:
+            return True
+        speed = _norm3(fdm["velocities/u-fps"], fdm["velocities/v-fps"], fdm["velocities/w-fps"])
+        if speed > self.cfg.extreme_speed_fps:
             return True
         return False
 
@@ -1195,6 +1207,8 @@ class DogfightEnv(gym.Env):
         }
 
         return obs, float(reward), terminated, truncated, info
+
+
 
 
 

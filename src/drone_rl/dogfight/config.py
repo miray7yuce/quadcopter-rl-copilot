@@ -136,6 +136,16 @@ class DogfightEnvConfig:
     extreme_altitude_min_ft: float = -100.0
     extreme_altitude_max_ft: float = 2000.0
     extreme_boundary_ft: float = 2000.0
+    # YENI: hiz buyuklugu icin de 'felaket' esigi. Once _is_catastrophic
+    # SADECE irtifa/egim/sinir kontrol ediyordu - hizi HIC kontrol
+    # etmiyordu. Gozlemlenen gercek bir vakada JSBSim'in fizik motoru
+    # NaN'a duşmeden once kisa bir sure (~1-2s) fiziksel olarak imkansiz
+    # hizlarla (saniyede yuzlerce/binlerce metre) kare-kareye kaotik
+    # savruluyordu - irtifa/egim/sinir tesadufen esiklerin icinde
+    # kaldigi icin bu HICBIR guvenlik agi tarafindan yakalanmiyordu.
+    # 500 fps (~340 mph) kucuk bir quadrotor icin zaten cok comert bir
+    # ust sinir - gercek ucusta asla buraya yaklasilmaz.
+    extreme_speed_fps: float = 500.0
 
     min_separation_ft: float = 8.0
 
