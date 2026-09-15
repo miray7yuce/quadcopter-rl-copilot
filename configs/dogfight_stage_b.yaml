@@ -29,7 +29,7 @@ env:
 
   reward_dist_weight: 0.15
   dist_ref_ft: 150.0
-  reward_close_weight: 0.12
+  reward_close_weight: 0.30
   closing_ref_fps: 15.0
   too_close_ft: 25.0
   reward_too_close_weight: 0.30
@@ -59,6 +59,19 @@ env:
   boundary_soft_margin_ft: 120.0
   boundary_soft_weight: 0.25
   min_separation_ft: 8.0
+
+  # YENI (mentor istegi): egim/irtifa/sinir ihlalleri artik episode'u
+  # SONLANDIRMIYOR, sadece cezalandiriliyor. Carpisma ve HP=0 (kazanma/
+  # kaybetme) bu ayardan BAGIMSIZ, her zaman episode'u bitirir.
+  terminate_on_fault: true
+
+  # YENI: terminate_on_fault=False olsa BILE HER ZAMAN sonlandiran,
+  # cok gevsek bir emniyet freni - JSBSim'in fizik motoru gercekten
+  # sayisal olarak kirilmadan (NaN/Inf) once devreye girer.
+  extreme_tilt_rad: 2.5
+  extreme_altitude_min_ft: -100.0
+  extreme_altitude_max_ft: 2000.0
+  extreme_boundary_ft: 2000.0
 
   # YENI: irtifa tabani/tavani icin kademeli ceza (yer carpmasi sorunu icin)
   alt_floor_soft_margin_ft: 60.0
@@ -117,4 +130,7 @@ promotion:
   win_rate_threshold: 0.55
   mean_reward_improve_pct: 5.0
   consecutive_passes_required: 2
+
+
+
 

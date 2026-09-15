@@ -1,4 +1,3 @@
-
 """Iki drone'un (TRAINING, BEST) ucusunu Tacview'un RESMI "Real-life CSV"
 formatinda kaydeder - onceki export_acmi.py'den FARKLI: o Tacview'un
 KENDI native ACMI formatini uretiyordu, bu ise Tacview'un DUZ CSV
@@ -136,6 +135,8 @@ def _build_eval_env(config_path, live_snapshot_dir, pool_dir):
     env = DogfightEnv(cfg.env, opponent_controller=opp_controller)
     env.set_shaped_weight(cfg.env.shaped_weight_end)
     env.set_curriculum_progress(1.0)
+    # YENI: sadece bu kayit ortami icin - egitim config'i etkilenmez.
+    env.set_terminate_on_fault(False)
 
     training_ctrl = _TrainingController(model_path, vecnorm_path)
     return env, training_ctrl, pool.latest_version()

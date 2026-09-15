@@ -1,5 +1,3 @@
-
-
 """Iki drone'un (TRAINING = egitim modeli, BEST = havuzdaki en guncel
 dondurulmus rakip) ucusunu Tacview'un KENDI formatinda (.acmi, metin
 tabanli ACMI 2.1) kaydeder - dogrudan Tacview'a surukleyip 3B tekrar
@@ -110,7 +108,7 @@ class _TrainingController:
         return action[0]
 
 
-def _build_eval_env(config_path, live_snapshot_dir, pool_dir):
+def _build_eval_env(config_path, live_snapshot_dir, pool_dir, min_duration_s: float):
     cfg = load_dogfight_config(config_path)
 
     live_dir = Path(live_snapshot_dir)
@@ -130,6 +128,22 @@ def _build_eval_env(config_path, live_snapshot_dir, pool_dir):
     env = DogfightEnv(cfg.env, opponent_controller=opp_controller)
     env.set_shaped_weight(cfg.env.shaped_weight_end)
     env.set_curriculum_progress(1.0)
+    # YENI: EGITIM config'ine (yaml) DOKUNMADAN, sadece BU kayit ortami
+    # icin dengesizlik/egim/irtifa/sinir ihlalleri artik bolumu
+    # sonlandirmiyor - mentorun istedigi 'kesintisiz uzun ucus kaydi'
+    # tam olarak bu. Egitim guvenli/standart sinirlariyla (yaml'daki
+    # terminate_on_fault: true) devam ediyor, TAMAMEN ETKILENMEDI.
+    # Collision/HP=0/sayisal-sapma/felaket esikleri HALA aktif - yani
+    # JSBSim gercekten kirilirsa kayit o bolumu bitirip devam eder,
+    # cokme olmaz.
+    env.set_terminate_on_fault(False)
+    # YENI (KRITIK): bolum suresi, kayit hedefinden (min_duration_s)
+    # DAHA UZUN yapiliyor - boylece 60s'lik bir kayit, egitimdeki 45s'lik
+    # bolum sinirindan dolayi 2 parcaya BOLUNUP art arda 'birlestirilmis'
+    # (reset'li/isinlanmali) olmuyor; TEK, KESINTISIZ bir bolumun tamami
+    # kaydediliyor. +10s pay, hedefe TAM ulasilirken bolumun tam o anda
+    # bitmemesini garanti eder.
+    env.set_max_episode_seconds(min_duration_s + 10.0)
 
     training_ctrl = _TrainingController(model_path, vecnorm_path)
     return env, training_ctrl, pool.latest_version()
@@ -151,7 +165,7 @@ def write_continuous_acmi(path: Path, env, training_ctrl,
     ref_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     lines = [
         "FileType=text/acmi/tacview",
-        "FileVersion=2.1",
+        "FileVersion=2.2",
         f"0,ReferenceTime={ref_time}",
     ]
 
@@ -230,11 +244,13 @@ def main():
     print(f"live-snapshot  : {live_snapshot_dir}")
     print(f"pool           : {pool_dir}")
 
-    env, training_ctrl, pool_version = _build_eval_env(config_path, live_snapshot_dir, pool_dir)
+    env, training_ctrl, pool_version = _build_eval_env(
+        config_path, live_snapshot_dir, pool_dir, min_duration_s=args.min_duration_s)
 
     print(f"BEST (havuz)   : v{pool_version}")
-    print(f"{args.recordings} kayit uretiliyor, her biri en az "
-         f"{args.min_duration_s:.0f}s (gerekirse bolumler otomatik birlestirilecek)...")
+    print(f"{args.recordings} kayit uretiliyor, her biri EN AZ {args.min_duration_s:.0f}s "
+         f"SUREKLI/KESINTISIZ tek bir bolum olarak (bolum suresi bu kayit icin "
+         f"{args.min_duration_s + 10:.0f}s'ye ayarlandi, egitim etkilenmedi)...")
 
     for rec in range(1, args.recordings + 1):
         out_path = EXPORT_DIR / f"dogfight_recording_{rec}.acmi"
@@ -248,4 +264,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 

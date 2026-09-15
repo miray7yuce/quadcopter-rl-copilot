@@ -78,7 +78,7 @@ class DogfightEnvConfig:
     # ------------------------------------------------------------------
     reward_dist_weight: float = 0.15
     dist_ref_ft: float = 150.0
-    reward_close_weight: float = 0.12
+    reward_close_weight: float = 0.30
     closing_ref_fps: float = 15.0
     too_close_ft: float = 25.0
     reward_too_close_weight: float = 0.30
@@ -123,7 +123,39 @@ class DogfightEnvConfig:
     max_horizontal_range_ft: float = 400.0
     boundary_soft_margin_ft: float = 120.0
     boundary_soft_weight: float = 0.25
+    # YENI (KRITIK guvenlik freni): terminate_on_fault=False olsa BILE
+    # bu esikler HER ZAMAN sonlandirir - collision/HP/numeric_divergence
+    # ile ayni oncelikte. Amac 'hafif/orta dengesizligi cezalandirmadan
+    # izlemek' (mentor istegi) DEGIL, JSBSim'in fizik motorunun GERCEKTEN
+    # KIRILMADAN once bir emniyet freni koymak. crash_max_tilt_rad (80
+    # derece) gibi ESKI sert sinirlardan COK daha gevsek tutuldu - amac
+    # 'agresif ama fiziksel olarak anlamli' manevralari HALA
+    # yasaklamamak, sadece JSBSim'in aerodinamik tablolarinin hic
+    # tanimli olmadigi asiri bolgelere girmeden durdurmak.
+    extreme_tilt_rad: float = 2.5          # ~143 derece
+    extreme_altitude_min_ft: float = -100.0
+    extreme_altitude_max_ft: float = 2000.0
+    extreme_boundary_ft: float = 2000.0
+
     min_separation_ft: float = 8.0
+
+    # YENI (mentor istegi): rakip/kendi dengesizlik (asiri egim, irtifa
+    # tabani/tavani asma, sinir disi) artik EPISODE'U SONLANDIRMIYOR -
+    # SADECE cezalandiriliyor (bkz. _soft_safety_penalty, bu zaten HER
+    # ZAMAN calisiyordu, bagimsiz). False yapildiginda _hard_terminate()
+    # sonuclari sadece BILGI amacli raporlanir (info['self_fault']/
+    # info['opp_fault']), episode'u BITIRMEZ - boylece TRAINING/BEST
+    # dengesini kaybettiginde ani 'reset' olmadan davranisi uzun sureli
+    # izlemek mumkun olur.
+    # NOT: collision (carpisma) ve HP=0 (kazanma/kaybetme) BU ANAHTARDAN
+    # BAGIMSIZ, HER ZAMAN episode'u bitirir - bunlar instabilite degil,
+    # anlamli mucadele sonuclaridir. Ayrica JSBSim'in aerodinamik
+    # tablolari normal ucus zarfinin cok disinda (orn. uzun sureli asiri
+    # egim) tanimsiz olabileceginden, SAYISAL SAPMA (NaN/Inf) tespit
+    # edilirse bu anahtardan BAGIMSIZ olarak yine de sonlandirilir -
+    # bu bir 'instabilite cezasi' degil, simulasyon cokmesin diye
+    # gereken bir guvenlik agidir.
+    terminate_on_fault: bool = True
 
     # YENI: irtifa tabani/tavani icin de tilt/yawrate/boundary'deki gibi
     # KADEMELI ceza. Eskiden bu SADECE sert sinirdi (crash_min_alt_ft/
@@ -157,8 +189,15 @@ class DogfightEnvConfig:
     altitude_jitter_ft: float = 25.0
     spawn_range_min_ft: float = 80.0
     spawn_range_max_ft: float = 220.0
-    spawn_speed_max_fps: float = 18.0
-    spawn_attitude_jitter_rad: float = 0.12
+    # DUZELTME: eskiden 18.0/0.12 idi - Stage B'de taze/rastgele agirlikli
+    # bir TRAINING politikasi ile henuz mufredata karsi egitilmis (gercek
+    # rakiple hic karsilasmamis) bir BEST karsi karsiya gelince, agresif
+    # baslangic kosullari JSBSim'in aerodinamik modelinin hic test
+    # edilmemis bir bolgesine dusup GERCEK sayisal sapmaya (NaN) yol
+    # acabiliyordu (ozellikle episode'un DAHA ILK ADIMINDA). Daha
+    # yumusak baslangic, ilk adimdaki patlama riskini azaltir.
+    spawn_speed_max_fps: float = 10.0
+    spawn_attitude_jitter_rad: float = 0.05
 
     # ------------------------------------------------------------------
     # Self-play
@@ -250,7 +289,5 @@ def load_dogfight_config(path: Optional[str]) -> DogfightConfig:
         train=TrainConfig(**raw.get("train", {})),
         promotion=PromotionConfig(**raw.get("promotion", {})),
     )
-
-
 
 

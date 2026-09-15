@@ -1,4 +1,3 @@
-
 """Dogfight egitim betigi - v8.
 
 Degisiklikler:
@@ -56,6 +55,22 @@ def linear_schedule(initial: float, final_frac: float):
     return _f
 
 
+def _model_has_nan(model) -> bool:
+    """YENI: --resume ile yuklenen bir checkpoint'in agirliklarinda
+    NaN/Inf olup olmadigini kontrol eder. Bir NaN cokusu SONRASI
+    kaydedilmis (veya cokus TAM kaydetme anina denk gelmis) bir
+    live_snapshot, temiz gozlemlerle bile SESSIZCE bozuk kalmaya
+    devam eder - ag'in KENDISI zehirlenmis olur. Bu kontrol olmadan
+    --resume, corken checkpoint'i sessizce yukleyip AYNI hatayla
+    tekrar cokerdi (ilk cokus rollout toplarken, ikincisi egitim
+    adimi sirasinda - farkli yerlerde ama AYNI kok neden)."""
+    import torch
+    for p in model.policy.parameters():
+        if not torch.isfinite(p).all():
+            return True
+    return False
+
+
 class ProgressCallback(BaseCallback):
     """Shaped odul agirligi + rakip mufredati ilerlemesi.
 
@@ -104,6 +119,12 @@ class DiagnosticsCallback(BaseCallback):
         self.hp_self = []
         self.hp_opp = []
         self.reasons = {}
+        # YENI: terminate_on_fault=False iken bolum bitmiyor, bu yuzden
+        # 'reset_reason' istatistigi artik instabilite sikligini
+        # YAKALAYAMIYOR. Bu iki liste, HER ADIMDA (bolum bitse de
+        # bitmese de) dengesizlik olup olmadigini takip eder.
+        self.self_fault_flags = []
+        self.opp_fault_flags = []
 
     def _on_step(self) -> bool:
         infos = self.locals.get("infos", []) or []
@@ -117,6 +138,8 @@ class DiagnosticsCallback(BaseCallback):
             self.closing.append(info["closing_fps"])
             self.lock.append(1.0 if info["opp_in_my_cone"] else 0.0)
             self.exposed.append(1.0 if info["me_in_opp_cone"] else 0.0)
+            self.self_fault_flags.append(1.0 if info.get("self_fault") else 0.0)
+            self.opp_fault_flags.append(1.0 if info.get("opp_fault") else 0.0)
 
             # Episode bittiyse: bitis sebebi ve kalan HP'ler
             if dones is not None and i < len(dones) and dones[i]:
@@ -133,6 +156,9 @@ class DiagnosticsCallback(BaseCallback):
             self.logger.record("dogfight/closing_fps_mean", float(np.mean(self.closing)))
             self.logger.record("dogfight/lock_rate", float(np.mean(self.lock)))
             self.logger.record("dogfight/exposed_rate", float(np.mean(self.exposed)))
+        if self.self_fault_flags:
+            self.logger.record("dogfight/self_fault_rate", float(np.mean(self.self_fault_flags)))
+            self.logger.record("dogfight/opp_fault_rate", float(np.mean(self.opp_fault_flags)))
         if self.hp_self:
             self.logger.record("dogfight/hp_self_end", float(np.mean(self.hp_self)))
             self.logger.record("dogfight/hp_opp_end", float(np.mean(self.hp_opp)))
@@ -398,6 +424,31 @@ def main():
         # (orn. _episode_won mantigi ya da odul fonksiyonu) agirliklari
         # SIFIRLAMADAN devreye girer.
         model = PPO.load(str(resume_model_path), env=venv, device="cpu")
+
+        # YENI: cokmus/zehirlenmis bir checkpoint'i SESSIZCE yukleyip
+        # AYNI hatayla tekrar cokmek yerine, burada erkenden ve ACIKCA
+        # durur.
+        if _model_has_nan(model):
+            raise RuntimeError(
+                f"\n[resume] KRITIK: '{resume_model_path}' agirliklarinda "
+                f"NaN/Inf tespit edildi - bu checkpoint bir NaN cokusu "
+                f"SIRASINDA ya da SONRASINDA kaydedilmis, artik KULLANILAMAZ "
+                f"(gozlemler temiz olsa bile ag kendi kendine NaN uretmeye "
+                f"devam eder).\n\n"
+                f"Secenekler:\n"
+                f"  1) '{out}/ckpt/' klasorunde daha ESKI bir 'ppo_*_steps.zip' "
+                f"var mi kontrol edin (varsa NaN icermeyen birini secip "
+                f"--resume YERINE bu betigi elle o dosyayi yukleyecek "
+                f"sekilde calistirmak gerekir).\n"
+                f"  2) Havuzdaki (CheckpointPool) en son PROMOTE EDILMIS "
+                f"versiyon KESINLIKLE NaN icermez (promosyon degerlendirmesi "
+                f"NaN aksiyonla asla basarili olamaz) - 'python main.py "
+                f"pool-info' ile kontrol edip o versiyonu yeni bir egitimin "
+                f"baslangici olarak kullanabilirsiniz.\n"
+                f"  3) --resume KULLANMADAN sifirdan baslatin - gozlem "
+                f"kirpma duzeltmesi sayesinde bu sorun BIR DAHA olusmayacak."
+            )
+
         already_done = int(model.num_timesteps)
         remaining = max(timesteps - already_done, 0)
         print(f"[resume] {resume_model_path} yuklendi.")
@@ -418,8 +469,15 @@ def main():
         already_done = 0
         remaining = timesteps
 
+    # DUZELTME: save_vecnormalize=True eklendi - eskiden ckpt/ klasoru
+    # SADECE model agirliklarini kaydediyordu, eslesen vecnormalize.pkl'i
+    # DEGIL. Bu yuzden bir NaN cokusu sonrasi geri donulebilecek, hem
+    # model hem normalizasyon istatistikleri birlikte SAGLAM bir ara
+    # nokta yoktu - sadece live_snapshot vardi, o da corken onunla
+    # birlikte bozuluyordu.
     ckpt_cb = CheckpointCallback(save_freq=max(20_000 // n_envs, 1),
-                                 save_path=str(out / "ckpt"), name_prefix="ppo")
+                                 save_path=str(out / "ckpt"), name_prefix="ppo",
+                                 save_vecnormalize=True)
     progress_cb = ProgressCallback(cfg.env)
     diag_cb = DiagnosticsCallback()
     snapshot_cb = PeriodicSnapshotCallback(out, save_freq=max(args.snapshot_freq // n_envs, 1))

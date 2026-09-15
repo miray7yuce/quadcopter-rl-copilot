@@ -85,6 +85,12 @@ FT_PER_DEG_LAT = 364567.2
 OBS_DIM = 30
 ACT_DIM = 4
 
+# YENI: sayisal sapma (NaN/Inf) TEK SEFERLIK teshis ciktisi icin
+# modul seviyesinde sayac. opponent_numeric_divergence her bolumde
+# tekrarlanan bir sorun oldugunda log'u SPAM'lememek icin sadece
+# ILK BIRKAC OLAYI detayli yazdirir, sonra sessizce durur.
+_DEBUG_DIVERGENCE_PRINTS_REMAINING = [5]
+
 
 # ======================================================================
 # Kucuk matematik yardimcilari
@@ -454,6 +460,7 @@ class DogfightEnv(gym.Env):
 
         self._arena_center_n = 0.0
         self._arena_center_e = 0.0
+        self._spawn_debug = {}
 
     # ------------------------------------------------------------------
     @property
@@ -467,6 +474,33 @@ class DogfightEnv(gym.Env):
 
     def set_curriculum_progress(self, p: float):
         self.curriculum_progress = float(np.clip(p, 0.0, 1.0))
+
+    def set_terminate_on_fault(self, enabled: bool):
+        """YENI: EGITIM config'ine (yaml) HIC DOKUNMADAN, sadece BU
+        ortam nesnesi icin dengesizlik/egim/irtifa/sinir ihlallerinin
+        bolumu sonlandirip sonlandirmayacagini calisma aninda degistirir.
+        Kullanim alani: offline kayit (ACMI/Tacview CSV) veya canli demo
+        - bunlar EGITIMDEN TAMAMEN AYRI, kendi ortam nesnelerini kurar,
+        bu yuzden burada False yapmak egitimi hicbir sekilde etkilemez.
+        Collision, HP=0, sayisal sapma ve 'felaket' esikleri (bkz.
+        _is_catastrophic) BU AYARDAN BAGIMSIZ, HER ZAMAN calismaya
+        devam eder - yani kayit sirasinda bile JSBSim'in GERCEKTEN
+        kirilmasina izin verilmez."""
+        self.cfg.terminate_on_fault = bool(enabled)
+
+    def set_max_episode_seconds(self, seconds: float):
+        """YENI: EGITIM config'ine (yaml) DOKUNMADAN, sadece BU ortam
+        nesnesi icin bolum (episode) suresini degistirir. Kullanim
+        alani: offline ACMI/Tacview kaydi - egitimdeki episode_seconds
+        (varsayilan 45s) bir kayit icin YETERSIZ kalirsa (orn. mentor
+        60s kesintisiz kayit istiyorsa), bolum suresi kayit hedefinden
+        UZUN yapilip TEK BIR bolumun TAMAMI kayit edilir - boylece
+        art arda birlestirilmis (reset'li/isinlanmali) bir kayit
+        DEGIL, gercekten TEK, kesintisiz bir ucus elde edilir.
+        NOT: bu metod ortamin ILK reset()/step() cagrisindan ONCE
+        cagrilmalidir - max_steps sadece burada yeniden hesaplanir."""
+        self.cfg.episode_seconds = float(seconds)
+        self.max_steps = int(seconds * self.control_hz)
 
     def set_opponent_controller(self, controller: BaseOpponentController):
         self.opponent_controller = controller
@@ -616,6 +650,20 @@ class DogfightEnv(gym.Env):
             hp_own / hp0, hp_other / hp0,                   # 24-25
             *prev_action_owner,                             # 26-29
         ], dtype=np.float32)
+
+        # YENI (KRITIK): savunma amacli kirpma/temizleme. terminate_on_fault
+        # =False oldugundan beri bir drone COK UZUN sure kontrolsuz
+        # kalabiliyor (artik aninda sonlandirilmiyor); bu sirada closing_fps,
+        # acisal hizlar (p/q/r), rakip hiz vektoru gibi bazi bilesenler HICBIR
+        # ZAMAN kirpilmiyordu (eskiden zaten hizla sonlandirildigi icin bu
+        # hic sorun olmamisti). Asiri buyuk (ama sonlu) degerler VecNormalize'in
+        # calisan varyans hesabini (Welford) TASIRIP NaN'a donusturuyor, bu da
+        # politika agina "bulasip" TUM aksiyon tahminlerini NaN yapiyor
+        # (egitimi tamamen coken bir ValueError ile durduruyor). _is_finite_state
+        # SADECE gercek NaN/Inf'i yakaliyordu, 'cok buyuk ama sonlu' degerleri
+        # DEGIL - bu ikinci, tamamlayici bir guvenlik katmani.
+        obs = np.nan_to_num(obs, nan=0.0, posinf=50.0, neginf=-50.0)
+        obs = np.clip(obs, -50.0, 50.0)
         return obs
 
     # ------------------------------------------------------------------
@@ -677,14 +725,27 @@ class DogfightEnv(gym.Env):
         self._arena_center_n = dn_target / 2.0
         self._arena_center_e = de_target / 2.0
 
+        speed_self = float(rng.uniform(0.0, spd))
+        speed_opp = float(rng.uniform(0.0, spd))
+        phi_self, theta_self = float(rng.uniform(-jit, jit)), float(rng.uniform(-jit, jit))
+        phi_opp, theta_opp = float(rng.uniform(-jit, jit)), float(rng.uniform(-jit, jit))
+        # YENI: teshis amacli - bir sayisal sapma olursa HANGI spawn
+        # kosullariyla basladigini gorebilmek icin saklaniyor.
+        self._spawn_debug = {
+            "alt_self": alt_self, "alt_opp": alt_opp,
+            "heading_self": heading_self, "heading_opp": heading_opp,
+            "speed_self": speed_self, "speed_opp": speed_opp,
+            "phi_self": phi_self, "theta_self": theta_self,
+            "phi_opp": phi_opp, "theta_opp": theta_opp,
+            "opponent_name": getattr(self.opponent_controller, "name", "?"),
+        }
+
         self._init_fdm(self.fdm_self, alt_self, heading_self,
                        north_ft=0.0, east_ft=0.0,
-                       speed_fps=rng.uniform(0.0, spd),
-                       phi=rng.uniform(-jit, jit), theta=rng.uniform(-jit, jit))
+                       speed_fps=speed_self, phi=phi_self, theta=theta_self)
         self._init_fdm(self.fdm_opp, alt_opp, heading_opp,
                        north_ft=dn_target, east_ft=de_target,
-                       speed_fps=rng.uniform(0.0, spd),
-                       phi=rng.uniform(-jit, jit), theta=rng.uniform(-jit, jit))
+                       speed_fps=speed_opp, phi=phi_opp, theta=theta_opp)
 
         self._surface_self[:] = 0.0
         self._surface_opp[:] = 0.0
@@ -728,7 +789,12 @@ class DogfightEnv(gym.Env):
         """DUZELTME (R4): egim ve donus hizi artik burada DEGIL, kademeli
         ceza olarak ele aliniyor. Eskiden 0.9 rad (51 derece) egim aninda
         -30 ceza + episode sonu demekti; bu, agresif manevrayi olumcul
-        kilip ajani 'duz uc, yaklasma' politikasina itiyordu."""
+        kilip ajani 'duz uc, yaklasma' politikasina itiyordu.
+
+        NOT: bu fonksiyonun DONDURDUGU deger artik cfg.terminate_on_fault
+        FALSE oldugunda step() icinde SONLANDIRMA icin KULLANILMIYOR -
+        sadece bilgi/teshis amacli (info['self_fault']/info['opp_fault'])
+        hesaplanmaya devam ediyor."""
         alt = fdm["position/h-agl-ft"]
         if alt < self.cfg.crash_min_alt_ft:
             return "ground"
@@ -740,6 +806,80 @@ class DogfightEnv(gym.Env):
         if self._boundary_dist(fdm) > self.cfg.max_horizontal_range_ft:
             return "boundary"
         return None
+
+    def _is_finite_state(self, fdm) -> bool:
+        """YENI: sayisal SAPMA (NaN/Inf) guvenlik agi. terminate_on_fault
+        FALSE oldugunda drone artik SERT sinirlarla korunmuyor - asiri
+        egimde COK uzun sure kalabilir. JSBSim'in aerodinamik tablolari
+        boyle bir ucus zarfinin disinda TANIMSIZ olabilir ve teorik
+        olarak NaN/Inf uretebilir. Bu durum instabilite CEZASI degil,
+        simulasyonun COKMESINI onleyen zorunlu bir kontrol - terminate_on_fault
+        ayarindan BAGIMSIZ olarak her zaman calisir."""
+        vals = (
+            fdm["position/h-agl-ft"],
+            fdm["position/lat-gc-deg"], fdm["position/long-gc-deg"],
+            fdm["attitude/phi-rad"], fdm["attitude/theta-rad"], fdm["attitude/psi-rad"],
+            fdm["velocities/u-fps"], fdm["velocities/v-fps"], fdm["velocities/w-fps"],
+        )
+        return all(math.isfinite(v) for v in vals)
+
+    def _debug_dump_divergence(self, which: str, fdm, action, prev_surface):
+        """YENI: bir sayisal sapma (NaN/Inf) OLDUGU ANDA, TEK SEFERLIK
+        (ilk birkac olay icin) TUM ilgili durumu yazdirir - HANGI
+        spawn kosullariyla basladigi, HANGI aksiyon uygulandigi, ve
+        TAM OLARAK hangi FDM ozelliginin NaN/Inf oldugu. Log'u
+        spam'lememek icin modul seviyesindeki sayac tukenince sessizce
+        durur."""
+        if _DEBUG_DIVERGENCE_PRINTS_REMAINING[0] <= 0:
+            return
+        _DEBUG_DIVERGENCE_PRINTS_REMAINING[0] -= 1
+
+        props = {
+            "h-agl-ft": fdm["position/h-agl-ft"],
+            "lat-gc-deg": fdm["position/lat-gc-deg"],
+            "long-gc-deg": fdm["position/long-gc-deg"],
+            "phi-rad": fdm["attitude/phi-rad"],
+            "theta-rad": fdm["attitude/theta-rad"],
+            "psi-rad": fdm["attitude/psi-rad"],
+            "u-fps": fdm["velocities/u-fps"],
+            "v-fps": fdm["velocities/v-fps"],
+            "w-fps": fdm["velocities/w-fps"],
+            "p-rad_sec": fdm["velocities/p-rad_sec"],
+            "q-rad_sec": fdm["velocities/q-rad_sec"],
+            "r-rad_sec": fdm["velocities/r-rad_sec"],
+            "h-dot-fps": fdm["velocities/h-dot-fps"],
+        }
+        bad = {k: v for k, v in props.items() if not math.isfinite(v)}
+
+        print(f"\n[DIVERGENCE DEBUG #{5 - _DEBUG_DIVERGENCE_PRINTS_REMAINING[0]}] "
+             f"taraf={which} step_count={self.step_count}")
+        print(f"  spawn kosullari : {self._spawn_debug}")
+        print(f"  uygulanan aksiyon (roll,pitch,yaw,throttle) = {list(np.asarray(action).tolist())}")
+        print(f"  yuzey durumu (aileron,elevator,rudder)      = {list(np.asarray(prev_surface).tolist())}")
+        print(f"  TUM fdm ozellikleri: {props}")
+        print(f"  NaN/Inf OLAN ozellikler: {bad if bad else '(hicbiri - tuhaf, tekrar kontrol edin)'}")
+        print("")
+
+    def _is_catastrophic(self, fdm) -> bool:
+        """YENI: terminate_on_fault=False olsa BILE HER ZAMAN sonlandiran
+        gevsek bir emniyet freni. _hard_terminate() ile KARISTIRMAYIN -
+        o eski, siki sinirlar (80 derece egim, 20-300ft irtifa) artik
+        SADECE terminate_on_fault=True iken sonlandiriyor. Bu fonksiyon
+        COK daha gevsek esikler kullanir (~143 derece egim, -100/+2000ft
+        irtifa, 2000ft sinir) - amac 'dengesizligi cezalandirmak' degil,
+        JSBSim'in fizik motoru GERCEKTEN sayisal olarak KIRILMADAN once
+        (NaN/Inf uretmeden once) bir sinir koymak. _is_finite_state zaten
+        NaN olustuktan SONRA yakaliyordu; bu fonksiyon bir onceki adimda,
+        NaN olusmadan ONCE devreye girmeyi hedefler."""
+        alt = fdm["position/h-agl-ft"]
+        if alt < self.cfg.extreme_altitude_min_ft or alt > self.cfg.extreme_altitude_max_ft:
+            return True
+        phi, theta, _ = self._attitude(fdm)
+        if abs(phi) > self.cfg.extreme_tilt_rad or abs(theta) > self.cfg.extreme_tilt_rad:
+            return True
+        if self._boundary_dist(fdm) > self.cfg.extreme_boundary_ft:
+            return True
+        return False
 
     def _soft_safety_penalty(self, fdm) -> float:
         cfg = self.cfg
@@ -859,8 +999,16 @@ class DogfightEnv(gym.Env):
         def _control_pen(fdm, act, prev_act):
             phi, theta, _ = self._attitude(fdm)
             tilt = abs(phi) + abs(theta)
-            spin = abs(fdm["velocities/p-rad_sec"]) + abs(fdm["velocities/q-rad_sec"])
-            yawr = abs(fdm["velocities/r-rad_sec"])
+            # YENI (KRITIK): spin/yawr eskiden HICBIR SEKILDE sinirli
+            # degildi - diger tum guvenlik terimleri min(...,1.0)**2
+            # ile sinirliyken bu ikisi degildi. terminate_on_fault=False
+            # sayesinde bir drone artik GERCEK bir kontrolsuz donuste
+            # (spin) 900 adim (45s) boyunca kalabiliyor; p/q/r JSBSim'in
+            # modellemedigi bolgede asiri buyuyebiliyor. Sinirlanmamis
+            # bu deger, VecNormalize'in ODUL tarafindaki calisan varyans
+            # hesabini (observation'daki gibi) tasirip NaN'a donusturuyordu.
+            spin = min(abs(fdm["velocities/p-rad_sec"]) + abs(fdm["velocities/q-rad_sec"]), 50.0)
+            yawr = min(abs(fdm["velocities/r-rad_sec"]), 50.0)
             jerk = float(np.sum(np.abs(act - prev_act)))
             return (cfg.reward_tilt_weight * tilt + cfg.reward_spin_weight * spin
                     + cfg.reward_yawrate_weight * yawr + cfg.reward_jerk_weight * jerk)
@@ -885,6 +1033,14 @@ class DogfightEnv(gym.Env):
         # --- Terminal olaylar (shaped_weight ile OLCEKLENMEZ) --------
         self_fault = self._hard_terminate(self.fdm_self)
         opp_fault = self._hard_terminate(self.fdm_opp)
+        # YENI: sayisal sapma kontrolu - terminate_on_fault ayarindan
+        # BAGIMSIZ, her zaman calisan zorunlu guvenlik agi.
+        self_numeric_ok = self._is_finite_state(self.fdm_self)
+        opp_numeric_ok = self._is_finite_state(self.fdm_opp)
+        if not self_numeric_ok:
+            self._debug_dump_divergence("self", self.fdm_self, action, self._surface_self)
+        if not opp_numeric_ok:
+            self._debug_dump_divergence("opponent", self.fdm_opp, opp_action, self._surface_opp)
         collided = rng_ft < cfg.min_separation_ft
 
         crashed = False
@@ -910,13 +1066,44 @@ class DogfightEnv(gym.Env):
             opp_reward += cfg.win_bonus
             terminated = True
             reset_reason = "self_down"
-        elif self_fault is not None:
+        elif not self_numeric_ok:
+            # YENI: guvenlik agi - terminate_on_fault=False olsa BILE
+            # sayisal sapma (NaN/Inf) durumunda sonlandirilir.
+            reward -= cfg.crash_penalty
+            opp_reward += cfg.opponent_fault_bonus
+            crashed = True
+            terminated = True
+            reset_reason = "self_numeric_divergence"
+        elif not opp_numeric_ok:
+            reward += cfg.opponent_fault_bonus
+            opp_reward -= cfg.crash_penalty
+            terminated = True
+            reset_reason = "opponent_numeric_divergence"
+        elif self._is_catastrophic(self.fdm_self):
+            # YENI: terminate_on_fault ayarindan BAGIMSIZ, gevsek
+            # ('felaket') emniyet freni - bkz. _is_catastrophic().
+            reward -= cfg.crash_penalty
+            opp_reward += cfg.opponent_fault_bonus
+            crashed = True
+            terminated = True
+            reset_reason = "self_catastrophic"
+        elif self._is_catastrophic(self.fdm_opp):
+            reward += cfg.opponent_fault_bonus
+            opp_reward -= cfg.crash_penalty
+            terminated = True
+            reset_reason = "opponent_catastrophic"
+        elif cfg.terminate_on_fault and self_fault is not None:
+            # DUZELTME (mentor istegi): bu dal artik SADECE
+            # cfg.terminate_on_fault=True iken calisir. False oldugunda
+            # egim/irtifa/sinir ihlalleri episode'u BITIRMEZ - sadece
+            # _soft_safety_penalty uzerinden (asagida zaten hesaplandi,
+            # BAGIMSIZ olarak) cezalandirilmaya devam eder.
             reward -= cfg.crash_penalty
             opp_reward += cfg.opponent_fault_bonus
             crashed = True
             terminated = True
             reset_reason = f"self_{self_fault}"
-        elif opp_fault is not None:
+        elif cfg.terminate_on_fault and opp_fault is not None:
             reward += cfg.opponent_fault_bonus
             opp_reward -= cfg.crash_penalty
             terminated = True
@@ -931,6 +1118,16 @@ class DogfightEnv(gym.Env):
             hp_edge = (self.hp_self - self.hp_opp) / max(cfg.hp_initial, 1e-6)
             reward += cfg.timeout_hp_bonus * hp_edge
             opp_reward -= cfg.timeout_hp_bonus * hp_edge
+
+        # YENI (KRITIK, obs'daki gibi): kaynagi ne olursa olsun (bilinen
+        # ya da HENUZ ONGORULEMEYEN bir terim) odulun kendisi de artik
+        # savunma amacli sinirlaniyor. Boylece VecNormalize'in odul
+        # normalizasyon istatistikleri (calisan varyans) hicbir zaman
+        # tasip NaN'a donusemiyor - terminate_on_fault=False'un actigi
+        # 'uzun sureli kontrolsuz ucus' senaryosunda HANGI terimin
+        # buyudugunu tek tek avlamak yerine, ceviri son bir garanti.
+        reward = float(np.clip(np.nan_to_num(reward, nan=0.0, posinf=100.0, neginf=-100.0), -100.0, 100.0))
+        opp_reward = float(np.clip(np.nan_to_num(opp_reward, nan=0.0, posinf=100.0, neginf=-100.0), -100.0, 100.0))
 
         obs = self._get_obs_for(self.fdm_self, self.fdm_opp, self.prev_action_self)
 
@@ -962,6 +1159,10 @@ class DogfightEnv(gym.Env):
             "hp_initial": float(cfg.hp_initial),
             "crashed": crashed,
             "reset_reason": reset_reason,
+            # YENI: episode bitmese bile (terminate_on_fault=False)
+            # dengesizlik bilgisini KAYBETMEMEK icin ham fault etiketi.
+            "self_fault": self_fault,
+            "opp_fault": opp_fault,
             "shaped_weight": float(self.shaped_weight),
             "curriculum_progress": float(self.curriculum_progress),
             "opponent_name": getattr(self.opponent_controller, "name", "?"),
@@ -994,5 +1195,6 @@ class DogfightEnv(gym.Env):
         }
 
         return obs, float(reward), terminated, truncated, info
+
 
 
